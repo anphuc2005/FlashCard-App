@@ -2,4 +2,49 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Background -->
+    <color name="md_theme_light_background1">#F8FAFC</color>
+    <color name="md_theme_light_background2">#2563EB</color>
+
+    <color name="md_theme_dard_background1">#3B82F633</color>
+    <color name="md_theme_dark_background2">#0F172A</color>
+
+    <!-- Loading Background -->
+    <color name="md_theme_light_loading_background1">#2563EB</color>
+    <color name="md_theme_light_loading_background2">#22D3EE</color>
+
+    <!-- Button -->
+    <color name="md_button">#2563EB</color>
+
+    <!-- Button Bottom Nav -->
+    <color name="md_button_bottom_nav_active">#2563EB"</color>
+    <color name="md_button_bottom_nav_inactive">#64748B"</color>
+    
+    <!-- Main Background -->
+    <color name="md_theme_light_main_background">#F8FAFC</color>
+    <color name="md_theme_dark_main_background">#0F172A</color>
+
+    <!-- Component Background -->
+    <color name="md_theme_light_component_background">#FFFFFF</color>
+    <color name="md_theme_dark_component_background">#1E293B</color>
+
+
+    <!-- Sub title -->
+    <color name="md_sub_title">#64748B</color>
+
+    <!-- Text -->
+    <color name="md_theme_light_text">#000000</color>
+    <color name="md_theme_dark_text">#FFFFFF</color>
+
+    <!-- Color icon -->
+    <color name="md_icon_blue">#247BDF</color>
+    <color name="md_icon_red">#F43F5E</color>
+    <color name="md_icon_green">#10B981</color>
+    <color name="md_icon_yellow">#F59E0B</color>
+    <color name="md_icon_purple">#6366F1</color>
+    <color name="md_icon_gray">#64748B</color>
+
+    <!-- Nav_bar active -->
+    <color name="md_navbar_active">#247BDF</color>
 </resources>
