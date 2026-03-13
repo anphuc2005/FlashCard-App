@@ -5,7 +5,7 @@
         android:icon="@drawable/ic_home"
         android:title="Trang chủ" />
     <item
-        android:id="@+id/decksFragment"
+        android:id="@+id/deckListFragment"
         android:icon="@drawable/ic_deck"
         android:title="Bộ thẻ" />
     <item

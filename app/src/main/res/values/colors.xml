@@ -18,8 +18,8 @@
     <color name="md_button">#2563EB</color>
 
     <!-- Button Bottom Nav -->
-    <color name="md_button_bottom_nav_active">#2563EB"</color>
-    <color name="md_button_bottom_nav_inactive">#64748B"</color>
+    <color name="md_button_bottom_nav_active">#2563EB</color>
+    <color name="md_button_bottom_nav_inactive">#64748B</color>
     
     <!-- Main Background -->
     <color name="md_theme_light_main_background">#F8FAFC</color>

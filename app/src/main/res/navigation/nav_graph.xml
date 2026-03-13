@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/onboardingFragment">
+
+    <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="com.example.flashcardapp.ui.feature.onboarding.OnboardingFragment"
+        android:label="OnboardingFragment">
+
+        <!-- Dieu huong: Man Hinh Gioi Thieu -> Man Hinh Dang Nhap -->
+        <action
+            android:id="@+id/action_onboardingFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.LoginFragment"
+        android:label="LoginFragment">
+
+        <!-- Dieu huong: Man Hinh Dang Nhap -> Man Hinh Dang Ky -->
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+
+        <!-- Dieu huong: Man Hinh Dang Nhap -> Man Hinh Quen Mat Khau -->
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+
+        <!-- Dieu huong: Man Hinh Dang Nhap -> Man Hinh Trang Chu -->
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.RegisterFragment"
+        android:label="RegisterFragment">
+
+        <!-- Dieu huong: Man Hinh Dang Ky -> Man Hinh Xac Thuc OTP -->
+        <action
+            android:id="@+id/action_registerFragment_to_otpVerificationFragment"
+            app:destination="@id/otpVerificationFragment" />
+
+        <!-- Dieu huong: Man Hinh Dang Ky -> Man Hinh Dang Nhap -->
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.ForgotPasswordFragment"
+        android:label="ForgotPasswordFragment">
+
+        <!-- Dieu huong: Man Hinh Quen Mat Khau -> Man Hinh Xac Thuc OTP -->
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_otpVerificationFragment"
+            app:destination="@id/otpVerificationFragment" />
+
+        <!-- Dieu huong: Man Hinh Quen Mat Khau -> Man Hinh Dang Nhap -->
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/otpVerificationFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.OtpVerificationFragment"
+        android:label="OtpVerificationFragment">
+
+        <!-- Dieu huong: Man Hinh Xac Thuc OTP -> Man Hinh Trang Chu -->
+        <action
+            android:id="@+id/action_otpVerificationFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+
+        <!-- Dieu huong: Man Hinh Xac Thuc OTP -> Man Hinh Dang Nhap -->
+        <action
+            android:id="@+id/action_otpVerificationFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.flashcardapp.ui.feature.home.HomeFragment"
+        android:label="HomeFragment">
+
+        <!-- Dieu huong: Man Hinh Trang Chu -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_homeFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+
+        <!-- Dieu huong: Man Hinh Trang Chu -> Man Hinh Kham Pha -->
+        <action
+            android:id="@+id/action_homeFragment_to_exploreFragment"
+            app:destination="@id/exploreFragment" />
+
+        <!-- Dieu huong: Man Hinh Trang Chu -> Man Hinh Thong Ke -->
+        <action
+            android:id="@+id/action_homeFragment_to_statsFragment"
+            app:destination="@id/statsFragment" />
+
+        <!-- Dieu huong: Man Hinh Trang Chu -> Man Hinh Ca Nhan -->
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/deckListFragment"
+        android:name="com.example.flashcardapp.ui.feature.deck.DeckListFragment"
+        android:label="DeckListFragment">
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Chi Tiet Bo The -->
+        <action
+            android:id="@+id/action_deckListFragment_to_deckDetailFragment"
+            app:destination="@id/deckDetailFragment" />
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Tao Sua Bo The -->
+        <action
+            android:id="@+id/action_deckListFragment_to_createEditDeckFragment"
+            app:destination="@id/createEditDeckFragment" />
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Bo The Rong -->
+        <action
+            android:id="@+id/action_deckListFragment_to_emptyDeckFragment"
+            app:destination="@id/emptyDeckFragment" />
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Trang Chu -->
+        <action
+            android:id="@+id/action_deckListFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Kham Pha -->
+        <action
+            android:id="@+id/action_deckListFragment_to_exploreFragment"
+            app:destination="@id/exploreFragment" />
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Thong Ke -->
+        <action
+            android:id="@+id/action_deckListFragment_to_statsFragment"
+            app:destination="@id/statsFragment" />
+
+        <!-- Dieu huong: Man Hinh Danh Sach Bo The -> Man Hinh Ca Nhan -->
+        <action
+            android:id="@+id/action_deckListFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/deckDetailFragment"
+        android:name="com.example.flashcardapp.ui.feature.deck.DeckDetailFragment"
+        android:label="DeckDetailFragment">
+
+        <!-- Dieu huong: Man Hinh Chi Tiet Bo The -> Man Hinh Tao Sua Bo The -->
+        <action
+            android:id="@+id/action_deckDetailFragment_to_createEditDeckFragment"
+            app:destination="@id/createEditDeckFragment" />
+
+        <!-- Dieu huong: Man Hinh Chi Tiet Bo The -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_deckDetailFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createEditDeckFragment"
+        android:name="com.example.flashcardapp.ui.feature.deck.CreateEditDeckFragment"
+        android:label="CreateEditDeckFragment">
+
+        <!-- Dieu huong: Man Hinh Tao Sua Bo The -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_createEditDeckFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+
+        <!-- Dieu huong: Man Hinh Tao Sua Bo The -> Man Hinh Chi Tiet Bo The -->
+        <action
+            android:id="@+id/action_createEditDeckFragment_to_deckDetailFragment"
+            app:destination="@id/deckDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/emptyDeckFragment"
+        android:name="com.example.flashcardapp.ui.feature.deck.EmptyDeckFragment"
+        android:label="EmptyDeckFragment">
+
+        <!-- Dieu huong: Man Hinh Bo The Rong -> Man Hinh Tao Sua Bo The -->
+        <action
+            android:id="@+id/action_emptyDeckFragment_to_createEditDeckFragment"
+            app:destination="@id/createEditDeckFragment" />
+
+        <!-- Dieu huong: Man Hinh Bo The Rong -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_emptyDeckFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.example.flashcardapp.ui.feature.explore.ExploreFragment"
+        android:label="ExploreFragment">
+
+        <!-- Dieu huong: Man Hinh Kham Pha -> Man Hinh Trang Chu -->
+        <action
+            android:id="@+id/action_exploreFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+
+        <!-- Dieu huong: Man Hinh Kham Pha -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_exploreFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+
+        <!-- Dieu huong: Man Hinh Kham Pha -> Man Hinh Thong Ke -->
+        <action
+            android:id="@+id/action_exploreFragment_to_statsFragment"
+            app:destination="@id/statsFragment" />
+
+        <!-- Dieu huong: Man Hinh Kham Pha -> Man Hinh Ca Nhan -->
+        <action
+            android:id="@+id/action_exploreFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.example.flashcardapp.ui.feature.stats.StatsFragment"
+        android:label="StatsFragment">
+
+        <!-- Dieu huong: Man Hinh Thong Ke -> Man Hinh Trang Chu -->
+        <action
+            android:id="@+id/action_statsFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+
+        <!-- Dieu huong: Man Hinh Thong Ke -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_statsFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+
+        <!-- Dieu huong: Man Hinh Thong Ke -> Man Hinh Kham Pha -->
+        <action
+            android:id="@+id/action_statsFragment_to_exploreFragment"
+            app:destination="@id/exploreFragment" />
+
+        <!-- Dieu huong: Man Hinh Thong Ke -> Man Hinh Ca Nhan -->
+        <action
+            android:id="@+id/action_statsFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.flashcardapp.ui.feature.profile.ProfileFragment"
+        android:label="ProfileFragment">
+
+        <!-- Dieu huong: Man Hinh Ca Nhan -> Man Hinh Trang Chu -->
+        <action
+            android:id="@+id/action_profileFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+
+        <!-- Dieu huong: Man Hinh Ca Nhan -> Man Hinh Danh Sach Bo The -->
+        <action
+            android:id="@+id/action_profileFragment_to_deckListFragment"
+            app:destination="@id/deckListFragment" />
+
+        <!-- Dieu huong: Man Hinh Ca Nhan -> Man Hinh Kham Pha -->
+        <action
+            android:id="@+id/action_profileFragment_to_exploreFragment"
+            app:destination="@id/exploreFragment" />
+
+        <!-- Dieu huong: Man Hinh Ca Nhan -> Man Hinh Thong Ke -->
+        <action
+            android:id="@+id/action_profileFragment_to_statsFragment"
+            app:destination="@id/statsFragment" />
+    </fragment>
+
+</navigation>
