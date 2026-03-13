@@ -11,11 +11,11 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.testapi"
+    namespace = "com.example.flashcardapp"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.testapi"
+        applicationId = "com.example.flashcardapp"
         minSdk = 33
         targetSdk = 36
         versionCode = 1
