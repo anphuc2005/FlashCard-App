@@ -1,4 +1,4 @@
-package com.example.flashcarapp
+package com.example.flashcardapp
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
