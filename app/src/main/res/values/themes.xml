@@ -39,6 +39,13 @@
         <item name="iconPurple">@color/md_icon_purple</item>
         <item name="iconGray">@color/md_icon_gray</item>
 
+        <item name="iconBlueBackground">@color/md_icon_blue_background</item>
+        <item name="iconRedBackground">@color/md_icon_red_background</item>
+        <item name="iconGreenBackground">@color/md_icon_green_background</item>
+        <item name="iconYellowBackground">@color/md_icon_yellow_background</item>
+        <item name="iconPurpleBackground">@color/md_icon_purple_background</item>
+
+
         <!-- Nav bar active color -->
         <item name="navBarActive">@color/md_navbar_active</item>
     </style>

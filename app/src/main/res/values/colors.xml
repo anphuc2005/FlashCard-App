@@ -18,9 +18,9 @@
     <color name="md_button">#2563EB</color>
 
     <!-- Button Bottom Nav -->
-    <color name="md_button_bottom_nav_active">#2563EB"</color>
-    <color name="md_button_bottom_nav_inactive">#64748B"</color>
-    
+    <color name="md_button_bottom_nav_active">#2563EB</color>
+    <color name="md_button_bottom_nav_inactive">#64748B</color>
+
     <!-- Main Background -->
     <color name="md_theme_light_main_background">#F8FAFC</color>
     <color name="md_theme_dark_main_background">#0F172A</color>
@@ -44,6 +44,13 @@
     <color name="md_icon_yellow">#F59E0B</color>
     <color name="md_icon_purple">#6366F1</color>
     <color name="md_icon_gray">#64748B</color>
+
+    <color name="md_icon_blue_background">#19247BDF</color>
+    <color name="md_icon_red_background">#19F43F5E</color>
+    <color name="md_icon_green_background">#1910B981</color>
+    <color name="md_icon_yellow_background">#19F59E0B</color>
+    <color name="md_icon_purple_background">#196366F1</color>
+    <color name="md_icon_gray_background">#1964748B</color>
 
     <!-- Nav_bar active -->
     <color name="md_navbar_active">#247BDF</color>

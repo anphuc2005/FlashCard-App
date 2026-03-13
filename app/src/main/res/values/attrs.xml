@@ -36,6 +36,14 @@
     <attr name="iconPurple" format="color" />
     <attr name="iconGray" format="color" />
 
+    <attr name="iconBlueBackground" format="color" />
+    <attr name="iconRedBackground" format="color" />
+    <attr name="iconGreenBackground" format="color" />
+    <attr name="iconYellowBackground" format="color" />
+    <attr name="iconPurpleBackground" format="color" />
+    <attr name="iconGrayBackground" format="color" />
+
+
     <!-- Nav bar -->
     <attr name="navBarActive" format="color" />
 </resources>
