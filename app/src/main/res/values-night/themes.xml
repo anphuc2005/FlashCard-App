@@ -12,6 +12,9 @@
         <!-- Component background -->
         <item name="componentBackground">@color/md_theme_dark_component_background</item>
 
+        <!-- Card background -->
+        <item name="cardBackgroundColor">@color/md_theme_dark_main_background</item>
+
         <!-- Text color -->
         <item name="android:textColor">@color/md_theme_dark_text</item>
         <item name="textColor">@color/md_theme_dark_text</item>
@@ -26,8 +29,6 @@
         <!-- Button Bottom Nav -->
         <item name="buttonBottomNavActive">@color/md_button_bottom_nav_active</item>
         <item name="buttonBottomNavInactive">@color/md_button_bottom_nav_inactive</item>
-
-
 
         <!-- Sub title -->
         <item name="subTitleColor">@color/md_sub_title</item>
@@ -45,7 +46,7 @@
         <item name="iconGreenBackground">@color/md_icon_green_background</item>
         <item name="iconYellowBackground">@color/md_icon_yellow_background</item>
         <item name="iconPurpleBackground">@color/md_icon_purple_background</item>
-        <item name="iconGrayBackground">@color/md_icon_gray_background</item>"
+        <item name="iconGrayBackground">@color/md_icon_gray_background</item>
 
         <!-- Nav bar active color -->
         <item name="navBarActive">@color/md_navbar_active</item>
