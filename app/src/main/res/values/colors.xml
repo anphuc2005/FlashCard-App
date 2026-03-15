@@ -54,4 +54,9 @@
 
     <!-- Nav_bar active -->
     <color name="md_navbar_active">#247BDF</color>
+
+    <!-- Bar chart -->
+    <color name="blue_primary">#2E6BFF</color>
+    <color name="bar_track">#E5ECF6</color>
+    <color name="gray_600">#9AA6B6</color>
 </resources>
