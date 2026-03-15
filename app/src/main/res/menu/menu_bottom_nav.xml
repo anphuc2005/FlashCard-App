@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="Trang chủ" />
+    <item
+        android:id="@+id/deckFragment"
+        android:icon="@drawable/ic_deck"
+        android:title="Bộ thẻ" />
+    <item
+        android:id="@+id/discoverFragment"
+        android:icon="@drawable/ic_discover"
+        android:title="Khám phá" />
+    <item
+        android:id="@+id/statisticFragment"
+        android:icon="@drawable/ic_statistics"
+        android:title="Thống kê" />
+    <item
+        android:id="@+id/accountFragment"
+        android:icon="@drawable/ic_account"
+        android:title="Cá nhân" />
+</menu>
