@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.flashcardapp.model.Deck
 import com.example.flashcardapp.model.Shortcut
+import com.example.flashcardapp.utils.MockDeckData
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -27,8 +28,22 @@ class HomeViewModel : ViewModel() {
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        loadHomeData()
+        loadMockData()
+        //loadHomeData()
         initializeShortcuts()
+    }
+
+    //Mock data
+    private fun loadMockData() {
+        val mockDatas = MockDeckData.getMockDecks()
+
+        _uiState.value = HomeUiState(
+            isLoading = false,
+            recentDecks = mockDatas,
+            activeDeck = mockDatas.first(),
+            userProgress = 65,
+            userStreak = 12
+        )
     }
 
     private fun loadHomeData() {

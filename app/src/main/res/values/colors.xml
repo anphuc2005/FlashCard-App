@@ -61,4 +61,17 @@
     <color name="blue_primary">#2E6BFF</color>
     <color name="bar_track">#E5ECF6</color>
     <color name="gray_600">#9AA6B6</color>
+
+    <!-- Deck Colors -->
+    <color name="color_red">#FF6B6B</color>
+    <color name="color_blue">#4ECDC4</color>
+    <color name="color_yellow">#FFE66D</color>
+    <color name="color_green">#95E1D3</color>
+    <color name="color_purple">#C7A2FF</color>
+    <color name="color_orange">#FFA500</color>
+
+    <!-- Chip Color -->
+    <color name="chip_selector">#EAF2FF</color>
+    <color name="switch_thumb">#2E6BFF</color>
+    <color name="switch_track">#99C2FF</color>
 </resources>

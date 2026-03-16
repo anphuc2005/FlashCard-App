@@ -19,7 +19,11 @@
         android:id="@id/deckFragment"
         android:name="com.example.flashcardapp.ui.fragment.DeckFragment"
         android:label="fragment_deck"
-        tools:layout="@layout/fragment_deck" />
+        tools:layout="@layout/fragment_deck" >
+        <action
+            android:id="@+id/action_deckFragment_to_addDeskFragment"
+            app:destination="@id/addDeskFragment" />
+    </fragment>
     <fragment
         android:id="@id/discoverFragment"
         android:name="com.example.flashcardapp.ui.fragment.DiscoverFragment"
@@ -30,4 +34,9 @@
         android:name="com.example.flashcardapp.ui.fragment.StatisticFragment"
         android:label="fragment_statistic"
         tools:layout="@layout/fragment_statistic" />
+    <fragment
+        android:id="@+id/addDeskFragment"
+        android:name="com.example.flashcardapp.ui.module_add_fragment.AddDeskFragment"
+        android:label="fragment_add_desk"
+        tools:layout="@layout/fragment_add_desk" />
 </navigation>

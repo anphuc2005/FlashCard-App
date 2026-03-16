@@ -2,6 +2,7 @@ package com.example.flashcardapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -31,8 +32,20 @@ class RecentDeckAdapter(
                 tvTitle.text = item.name
                 tvSubtitle.text = tvSubtitle.context.getString(
                     com.example.flashcardapp.R.string.item_deck_card_count,
-                    item.cards.size
+                    item.cardCount
                 )
+
+                if(item.iconResId != null) {
+                    imgIcon.setImageResource(item.iconResId)
+                }
+
+                if (item.backgroundResId != null) {
+                    val colorValue = ContextCompat.getColor(
+                        binding.root.context,
+                        item.backgroundResId
+                    )
+                    cardIcon.setCardBackgroundColor(colorValue)
+                }
 
                 cardRoot.setOnClickListener {
                     onItemClick(item)
