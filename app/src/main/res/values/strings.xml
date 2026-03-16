@@ -45,6 +45,9 @@
     <string name="app_home_progress">Tiến độ</string>
     <string name="app_home_study_now">Học ngay</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="item_deck_card_count">%d thẻ</string>
+    <string name="home_progress_format">%d%%</string>
+    <string name="home_no_active_deck">Không có bộ thẻ nào</string>
 
     <string name="app_deck">Bộ thẻ của tôi</string>
 

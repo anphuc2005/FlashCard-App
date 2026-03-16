@@ -44,6 +44,7 @@
     <color name="md_icon_yellow">#F59E0B</color>
     <color name="md_icon_purple">#6366F1</color>
     <color name="md_icon_gray">#64748B</color>
+    <color name="md_icon_orange">#F97316</color>
 
     <color name="md_icon_blue_background">#19247BDF</color>
     <color name="md_icon_red_background">#19F43F5E</color>
@@ -51,6 +52,7 @@
     <color name="md_icon_yellow_background">#19F59E0B</color>
     <color name="md_icon_purple_background">#196366F1</color>
     <color name="md_icon_gray_background">#1964748B</color>
+    <color name="md_icon_orange_background">#19F97316</color>
 
     <!-- Nav_bar active -->
     <color name="md_navbar_active">#247BDF</color>
