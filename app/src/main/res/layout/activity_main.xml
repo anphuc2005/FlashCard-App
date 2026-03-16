@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
+        app:itemActiveIndicatorStyle="@null"
         app:itemBackground="@android:color/transparent"
         app:itemIconTint="@drawable/bottom_nav_selector"
         app:itemRippleColor="@android:color/transparent"

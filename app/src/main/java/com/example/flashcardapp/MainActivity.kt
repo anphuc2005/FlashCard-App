@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.flashcardapp.databinding.ActivityMainBinding
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         val bottomNav: BottomNavigationView = binding.bottomNav
 
         bottomNav.setupWithNavController(navController)
+        redirectIfOnboardingAlreadyCompleted(navController)
 
         // Chỉ hiện Bottom Nav ở các màn chính
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -51,5 +53,18 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    private fun redirectIfOnboardingAlreadyCompleted(navController: NavController) {
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val onboardingCompleted = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+        if (onboardingCompleted && navController.currentDestination?.id == R.id.onboardingFragment) {
+            navController.navigate(R.id.action_onboardingFragment_to_loginFragment)
+        }
+    }
+
+    private companion object {
+        const val PREFS_NAME = "flashcard_prefs"
+        const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
     }
 }
