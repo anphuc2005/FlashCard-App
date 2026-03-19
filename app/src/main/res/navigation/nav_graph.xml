@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.LoginFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.LoginFragment"
         android:label="LoginFragment">
 
         <!-- Dieu huong: Man Hinh Dang Nhap -> Man Hinh Dang Ky -->
@@ -38,7 +38,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.RegisterFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.RegisterFragment"
         android:label="RegisterFragment">
 
         <!-- Dieu huong: Man Hinh Dang Ky -> Man Hinh Xac Thuc OTP -->
@@ -54,7 +54,7 @@
 
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.ForgotPasswordFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.ForgotPasswordFragment"
         android:label="ForgotPasswordFragment">
 
         <!-- Dieu huong: Man Hinh Quen Mat Khau -> Man Hinh Xac Thuc OTP -->
@@ -70,7 +70,7 @@
 
     <fragment
         android:id="@+id/otpVerificationFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.OtpVerificationFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.OtpVerificationFragment"
         android:label="OtpVerificationFragment">
 
         <!-- Dieu huong: Man Hinh Xac Thuc OTP -> Man Hinh Trang Chu -->

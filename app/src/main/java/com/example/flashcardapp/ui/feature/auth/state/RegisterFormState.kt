@@ -1,4 +1,4 @@
-package com.example.flashcardapp.ui.feature.auth.logic.state
+package com.example.flashcardapp.ui.feature.auth.state
 
 data class RegisterFormState(
     val fullName: String = "",
@@ -10,4 +10,3 @@ data class RegisterFormState(
     val passwordError: String? = null,
     val confirmPasswordError: String? = null
 )
-

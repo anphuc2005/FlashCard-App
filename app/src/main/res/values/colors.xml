@@ -7,7 +7,7 @@
     <color name="md_theme_light_background1">#F8FAFC</color>
     <color name="md_theme_light_background2">#2563EB</color>
 
-    <color name="md_theme_dard_background1">#3B82F633</color>
+    <color name="md_theme_dark_background1">#3B82F633</color>
     <color name="md_theme_dark_background2">#0F172A</color>
 
     <!-- Loading Background -->
@@ -16,10 +16,14 @@
 
     <!-- Button -->
     <color name="md_button">#2563EB</color>
+    <color name="md_button_ripple">#332563EB</color>
 
     <!-- Button Bottom Nav -->
     <color name="md_button_bottom_nav_active">#2563EB</color>
     <color name="md_button_bottom_nav_inactive">#64748B</color>
+
+    <!-- Auth -->
+    <color name="auth_input_stroke">#D6DEE8</color>
     
     <!-- Main Background -->
     <color name="md_theme_light_main_background">#F8FAFC</color>
@@ -47,4 +51,9 @@
 
     <!-- Nav_bar active -->
     <color name="md_navbar_active">#247BDF</color>
+
+    <!-- Onboarding -->
+    <color name="md_onboarding_card_background">#F8FBFF</color>
+    <color name="md_onboarding_card_glow">#142563EB</color>
+    <color name="md_onboarding_indicator_inactive">#D7E4F8</color>
 </resources>

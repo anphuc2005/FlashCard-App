@@ -1,11 +1,11 @@
-package com.example.flashcardapp.ui.feature.auth.logic.presentation
+package com.example.flashcardapp.ui.feature.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.flashcardapp.ui.feature.auth.logic.data.AuthRepository
-import com.example.flashcardapp.ui.feature.auth.logic.domain.ForgotPasswordUseCase
-import com.example.flashcardapp.ui.feature.auth.logic.domain.LoginUseCase
-import com.example.flashcardapp.ui.feature.auth.logic.domain.RegisterUseCase
+import com.example.flashcardapp.ui.feature.auth.data.AuthRepository
+import com.example.flashcardapp.ui.feature.auth.domain.ForgotPasswordUseCase
+import com.example.flashcardapp.ui.feature.auth.domain.LoginUseCase
+import com.example.flashcardapp.ui.feature.auth.domain.RegisterUseCase
 
 class AuthViewModelFactory(
     private val authRepository: AuthRepository
@@ -30,4 +30,3 @@ class AuthViewModelFactory(
         }
     }
 }
-

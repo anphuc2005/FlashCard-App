@@ -1,4 +1,4 @@
-package com.example.flashcardapp.ui.feature.auth.logic.state
+package com.example.flashcardapp.ui.feature.auth.state
 
 sealed interface AuthOperationState<out T> {
     data object Idle : AuthOperationState<Nothing>
@@ -6,4 +6,3 @@ sealed interface AuthOperationState<out T> {
     data class Success<T>(val data: T) : AuthOperationState<T>
     data class Error(val message: String) : AuthOperationState<Nothing>
 }
-

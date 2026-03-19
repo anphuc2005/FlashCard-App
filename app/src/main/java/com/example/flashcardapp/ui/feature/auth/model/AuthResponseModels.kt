@@ -1,4 +1,4 @@
-package com.example.flashcardapp.ui.feature.auth.logic.model
+package com.example.flashcardapp.ui.feature.auth.model
 
 data class LoginResponse(
     val userId: String,
@@ -16,4 +16,3 @@ data class ForgotPasswordResponse(
     val requestId: String,
     val message: String
 )
-

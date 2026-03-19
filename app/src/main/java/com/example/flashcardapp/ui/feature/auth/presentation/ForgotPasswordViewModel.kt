@@ -1,13 +1,13 @@
-package com.example.flashcardapp.ui.feature.auth.logic.presentation
+package com.example.flashcardapp.ui.feature.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.ui.feature.auth.logic.domain.ForgotPasswordUseCase
-import com.example.flashcardapp.ui.feature.auth.logic.model.ForgotPasswordRequest
-import com.example.flashcardapp.ui.feature.auth.logic.model.ForgotPasswordResponse
-import com.example.flashcardapp.ui.feature.auth.logic.state.AuthOperationState
-import com.example.flashcardapp.ui.feature.auth.logic.state.ForgotPasswordFormState
-import com.example.flashcardapp.ui.feature.auth.logic.validation.AuthValidator
+import com.example.flashcardapp.ui.feature.auth.domain.ForgotPasswordUseCase
+import com.example.flashcardapp.ui.feature.auth.model.ForgotPasswordRequest
+import com.example.flashcardapp.ui.feature.auth.model.ForgotPasswordResponse
+import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
+import com.example.flashcardapp.ui.feature.auth.state.ForgotPasswordFormState
+import com.example.flashcardapp.ui.feature.auth.validation.AuthValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,4 +52,3 @@ class ForgotPasswordViewModel(
         _uiState.value = AuthOperationState.Idle
     }
 }
-

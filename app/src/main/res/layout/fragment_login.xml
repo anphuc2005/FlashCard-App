@@ -152,7 +152,7 @@
                 android:insetBottom="0dp"
                 android:text="Đăng nhập"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:textSize="15sp"
                 app:cornerRadius="12dp" />
 

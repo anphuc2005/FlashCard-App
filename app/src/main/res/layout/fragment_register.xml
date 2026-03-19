@@ -30,7 +30,8 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@null"
                 android:padding="4dp"
-                android:src="@drawable/ic_onboarding_back" />
+                android:src="@drawable/ic_onboarding_back"
+                app:tint="?attr/textColor" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -218,7 +219,7 @@
                 android:insetBottom="0dp"
                 android:text="Đăng ký"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:textSize="15sp"
                 app:cornerRadius="12dp" />
 

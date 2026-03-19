@@ -1,4 +1,4 @@
-package com.example.flashcardapp.ui.feature.auth.logic.model
+package com.example.flashcardapp.ui.feature.auth.model
 
 data class LoginRequest(
     val email: String,
@@ -15,4 +15,3 @@ data class RegisterRequest(
 data class ForgotPasswordRequest(
     val email: String
 )
-

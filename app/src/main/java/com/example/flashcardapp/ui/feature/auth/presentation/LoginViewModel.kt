@@ -1,13 +1,13 @@
-package com.example.flashcardapp.ui.feature.auth.logic.presentation
+package com.example.flashcardapp.ui.feature.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.ui.feature.auth.logic.domain.LoginUseCase
-import com.example.flashcardapp.ui.feature.auth.logic.model.LoginRequest
-import com.example.flashcardapp.ui.feature.auth.logic.model.LoginResponse
-import com.example.flashcardapp.ui.feature.auth.logic.state.AuthOperationState
-import com.example.flashcardapp.ui.feature.auth.logic.state.LoginFormState
-import com.example.flashcardapp.ui.feature.auth.logic.validation.AuthValidator
+import com.example.flashcardapp.ui.feature.auth.domain.LoginUseCase
+import com.example.flashcardapp.ui.feature.auth.model.LoginRequest
+import com.example.flashcardapp.ui.feature.auth.model.LoginResponse
+import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
+import com.example.flashcardapp.ui.feature.auth.state.LoginFormState
+import com.example.flashcardapp.ui.feature.auth.validation.AuthValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,4 +68,3 @@ class LoginViewModel(
         _uiState.value = AuthOperationState.Idle
     }
 }
-

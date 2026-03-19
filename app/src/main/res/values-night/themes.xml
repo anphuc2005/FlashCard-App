@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.FlashCardApp" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorOnBackground">@color/md_theme_dark_main_background</item>
-        <item name="gradientBackground1">@color/md_theme_dard_background1</item>
+        <item name="gradientBackground1">@color/md_theme_dark_background1</item>
         <item name="gradientBackground2">@color/md_theme_dark_background2</item>
         <item name="mainBackground">@color/md_theme_dark_main_background</item>
         <item name="componentBackground">@color/md_theme_dark_component_background</item>

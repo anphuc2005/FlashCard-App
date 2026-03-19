@@ -1,4 +1,4 @@
-package com.example.flashcardapp.ui.feature.auth.logic.validation
+package com.example.flashcardapp.ui.feature.auth.validation
 
 import android.util.Patterns
 
@@ -43,4 +43,3 @@ object AuthValidator {
         }
     }
 }
-

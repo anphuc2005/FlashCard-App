@@ -1,4 +1,4 @@
-package com.example.flashcardapp.ui.feature.auth.logic.state
+package com.example.flashcardapp.ui.feature.auth.state
 
 data class LoginFormState(
     val email: String = "",
@@ -6,4 +6,3 @@ data class LoginFormState(
     val emailError: String? = null,
     val passwordError: String? = null
 )
-
