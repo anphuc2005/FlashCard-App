@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FlashCardApp">
         <activity
+            android:name=".ui.activity.LearningActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.FlashCardApp.Splash"
             android:exported="true">
@@ -21,6 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.activity.AddDeckContainerActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

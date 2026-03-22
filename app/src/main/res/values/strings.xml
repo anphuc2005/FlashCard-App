@@ -4,7 +4,7 @@
 
     <string name="app_splash_1">Học nhanh, nhớ lâu</string>
     <string name="app_splash_sub_1">Ghi nhớ kiến thức hiệu quả với phương pháp lặp lại ngắt quãng</string>
-    <string name ="app_splash_2">Duy trì thói quen</string>
+    <string name="app_splash_2">Duy trì thói quen</string>
     <string name="app_splash_sub_2">Hệ thống nhắc nhở thông minh giúp bạn không bỏ lỡ ngày học nào</string>
 
     <string name="app_login">Chào mừng trở lại</string>
@@ -16,7 +16,7 @@
     <string name="app_login_method">Hoặc đăng nhập bằng</string>
     <string name="app_login_not_account">Chưa có tài khoản?</string>
 
-    <string name ="app_login_register">Đăng ký</string>
+    <string name="app_login_register">Đăng ký</string>
     <string name="app_login_login">Đăng nhập</string>
 
     <string name="app_register">Tạo tài khoản mới</string>
@@ -28,10 +28,10 @@
 
     <string name="app_forgot_pass">Quên mật khẩu</string>
     <string name="app_forgot_pass_subtitle">Nhập email của bạn để lấy lại mật khẩu</string>
-    <string name ="app_forgot_pass_hint">Email của bạn</string>
-    <string name ="app_forgot_button">Gửi mã xác nhận</string>
+    <string name="app_forgot_pass_hint">Email của bạn</string>
+    <string name="app_forgot_button">Gửi mã xác nhận</string>
 
-    <string name ="app_otp">Xác nhận mã OTP</string>
+    <string name="app_otp">Xác nhận mã OTP</string>
     <string name="app_otp_sub">Mã đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến / thư rác</string>
     <string name="app_otp_no_receive">Bạn chưa nhận được mã</string>
     <string name="app_otp_resend">Gửi lại</string>
@@ -40,6 +40,16 @@
     <string name="app_home_shortcut">Lối tắt</string>
     <string name="app_home_deck_recent">Bộ thẻ gần đây</string>
     <string name="app_home_deck_all">Xem tất cả</string>
+    <string name="app_home_ready_to_learn">Sẵn sàng học chưa?</string>
+    <string name="app_home_learing">Đang học</string>
+    <string name="app_home_progress">Tiến độ</string>
+    <string name="app_home_study_now">Học ngay</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="item_deck_card_count">%d thẻ</string>
+    <string name="home_progress_format">%d%%</string>
+    <string name="home_no_active_deck">Không có bộ thẻ nào</string>
+
+    <string name="app_deck">Bộ thẻ của tôi</string>
 
 
 </resources>

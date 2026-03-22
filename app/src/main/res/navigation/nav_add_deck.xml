@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_add_deck"
+    app:startDestination="@id/addDeckFragment">
+
+    <fragment
+        android:id="@+id/addDeckFragment"
+        android:name="com.example.flashcardapp.ui.module_add_fragment.AddDeckFragment"
+        android:label="Tạo Bộ Thẻ Mới"
+        tools:layout="@layout/fragment_add_desk">
+        <action
+            android:id="@+id/action_addDeckFragment_to_addCardFragment"
+            app:destination="@id/addCardFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addCardFragment"
+        android:name="com.example.flashcardapp.ui.module_add_fragment.AddCardFragment"
+        android:label="Thêm Thẻ"
+        tools:layout="@layout/fragment_add_card" />
+
+</navigation>
+

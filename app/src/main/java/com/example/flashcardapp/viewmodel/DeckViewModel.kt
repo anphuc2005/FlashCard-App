@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.flashcardapp.R
+import com.example.flashcardapp.utils.MockDeckData
 
 sealed class DeckUiState {
     object Loading : DeckUiState()
@@ -16,18 +18,36 @@ sealed class DeckUiState {
     object Empty : DeckUiState()
 }
 
-class DeckViewModel(private val deckRepository: DeckRepository) : ViewModel() {
+class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
 
     private val _deckUiState = MutableStateFlow<DeckUiState>(DeckUiState.Loading)
     val deckUiState: StateFlow<DeckUiState> = _deckUiState.asStateFlow()
 
     init {
-        getAllDecks()
+        // If repository is null, use mock data for testing
+        if (deckRepository == null) {
+            loadMockData()
+        } else {
+            getAllDecks()
+        }
+    }
+
+    /**
+     * Load mock data for UI testing - temporary
+     */
+    private fun loadMockData() {
+        val mockDecks = MockDeckData.getMockDecks()
+
+        _deckUiState.value = DeckUiState.Success(mockDecks)
     }
 
     fun getAllDecks() {
         viewModelScope.launch {
             _deckUiState.value = DeckUiState.Loading
+            if (deckRepository == null) {
+                loadMockData()
+                return@launch
+            }
             try {
                 val result = deckRepository.getAllDecksFromApi()
                 result.onSuccess { decks ->
@@ -49,6 +69,10 @@ class DeckViewModel(private val deckRepository: DeckRepository) : ViewModel() {
     fun getDeckById(id: String) {
         viewModelScope.launch {
             _deckUiState.value = DeckUiState.Loading
+            if (deckRepository == null) {
+                _deckUiState.value = DeckUiState.Error("Repository not available")
+                return@launch
+            }
             try {
                 val result = deckRepository.getDeckByIdFromApi(id)
                 result.onSuccess { deck ->
@@ -65,6 +89,10 @@ class DeckViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
     fun createDeck(deck: Deck) {
         viewModelScope.launch {
+            if (deckRepository == null) {
+                _deckUiState.value = DeckUiState.Error("Repository not available")
+                return@launch
+            }
             try {
                 deckRepository.createDeck(deck)
                 getAllDecks()
@@ -76,6 +104,10 @@ class DeckViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
     fun updateDeck(id: String, deck: Deck) {
         viewModelScope.launch {
+            if (deckRepository == null) {
+                _deckUiState.value = DeckUiState.Error("Repository not available")
+                return@launch
+            }
             try {
                 deckRepository.updateDeck(id, deck)
                 getAllDecks()
@@ -87,6 +119,10 @@ class DeckViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
     fun deleteDeck(id: String) {
         viewModelScope.launch {
+            if (deckRepository == null) {
+                _deckUiState.value = DeckUiState.Error("Repository not available")
+                return@launch
+            }
             try {
                 deckRepository.deleteDeck(id)
                 getAllDecks()

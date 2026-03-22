@@ -7,7 +7,7 @@
     <color name="md_theme_light_background1">#F8FAFC</color>
     <color name="md_theme_light_background2">#2563EB</color>
 
-    <color name="md_theme_dark_background1">#3B82F633</color>
+    <color name="md_theme_dard_background1">#3B82F633</color>
     <color name="md_theme_dark_background2">#0F172A</color>
 
     <!-- Loading Background -->
@@ -16,15 +16,11 @@
 
     <!-- Button -->
     <color name="md_button">#2563EB</color>
-    <color name="md_button_ripple">#332563EB</color>
 
     <!-- Button Bottom Nav -->
     <color name="md_button_bottom_nav_active">#2563EB</color>
     <color name="md_button_bottom_nav_inactive">#64748B</color>
 
-    <!-- Auth -->
-    <color name="auth_input_stroke">#D6DEE8</color>
-    
     <!-- Main Background -->
     <color name="md_theme_light_main_background">#F8FAFC</color>
     <color name="md_theme_dark_main_background">#0F172A</color>
@@ -48,12 +44,34 @@
     <color name="md_icon_yellow">#F59E0B</color>
     <color name="md_icon_purple">#6366F1</color>
     <color name="md_icon_gray">#64748B</color>
+    <color name="md_icon_orange">#F97316</color>
+
+    <color name="md_icon_blue_background">#19247BDF</color>
+    <color name="md_icon_red_background">#19F43F5E</color>
+    <color name="md_icon_green_background">#1910B981</color>
+    <color name="md_icon_yellow_background">#19F59E0B</color>
+    <color name="md_icon_purple_background">#196366F1</color>
+    <color name="md_icon_gray_background">#1964748B</color>
+    <color name="md_icon_orange_background">#19F97316</color>
 
     <!-- Nav_bar active -->
     <color name="md_navbar_active">#247BDF</color>
 
-    <!-- Onboarding -->
-    <color name="md_onboarding_card_background">#F8FBFF</color>
-    <color name="md_onboarding_card_glow">#142563EB</color>
-    <color name="md_onboarding_indicator_inactive">#D7E4F8</color>
+    <!-- Bar chart -->
+    <color name="blue_primary">#2E6BFF</color>
+    <color name="bar_track">#E5ECF6</color>
+    <color name="gray_600">#9AA6B6</color>
+
+    <!-- Deck Colors -->
+    <color name="color_red">#FF6B6B</color>
+    <color name="color_blue">#4ECDC4</color>
+    <color name="color_yellow">#FFE66D</color>
+    <color name="color_green">#95E1D3</color>
+    <color name="color_purple">#C7A2FF</color>
+    <color name="color_orange">#FFA500</color>
+
+    <!-- Chip Color -->
+    <color name="chip_selector">#EAF2FF</color>
+    <color name="switch_thumb">#2E6BFF</color>
+    <color name="switch_track">#99C2FF</color>
 </resources>

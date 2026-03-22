@@ -5,19 +5,19 @@
         android:icon="@drawable/ic_home"
         android:title="Trang chủ" />
     <item
-        android:id="@+id/deckListFragment"
+        android:id="@+id/deckFragment"
         android:icon="@drawable/ic_deck"
         android:title="Bộ thẻ" />
     <item
-        android:id="@+id/exploreFragment"
+        android:id="@+id/discoverFragment"
         android:icon="@drawable/ic_discover"
         android:title="Khám phá" />
     <item
-        android:id="@+id/statsFragment"
+        android:id="@+id/statisticFragment"
         android:icon="@drawable/ic_statistics"
         android:title="Thống kê" />
     <item
-        android:id="@+id/profileFragment"
+        android:id="@+id/accountFragment"
         android:icon="@drawable/ic_account"
         android:title="Cá nhân" />
 </menu>
