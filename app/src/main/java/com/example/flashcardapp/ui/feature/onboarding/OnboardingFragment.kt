@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import com.example.flashcardapp.AppNavigator
 import androidx.viewpager2.widget.ViewPager2
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentOnboardingBinding
@@ -56,19 +56,7 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
     }
 
     private fun navigateToLogin() {
-        saveOnboardingCompleted()
-        val navController = findNavController()
-        if (navController.currentDestination?.id == R.id.onboardingFragment) {
-            navController.navigate(R.id.action_onboardingFragment_to_loginFragment)
-        }
-    }
-
-    private fun saveOnboardingCompleted() {
-        requireContext()
-            .getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_ONBOARDING_COMPLETED, true)
-            .apply()
+        (activity as? AppNavigator)?.completeOnboarding()
     }
 
     private fun setupIndicators() {
@@ -130,7 +118,5 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
     private companion object {
         const val PAGE_COUNT = 3
         const val LAST_PAGE_INDEX = 2
-        const val PREFS_NAME = "flashcard_prefs"
-        const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
     }
 }

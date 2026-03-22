@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
+import com.example.flashcardapp.AppNavigator
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
@@ -40,7 +40,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
     private fun setupListeners() {
         binding.buttonBack.setOnClickListener {
-            findNavController().popBackStack()
+            (activity as? AppNavigator)?.navigateBack()
         }
         binding.buttonSendVerificationCode.setOnClickListener {
             viewModel.submit()
@@ -67,7 +67,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                findNavController().navigate(R.id.action_forgotPasswordFragment_to_otpVerificationFragment)
+                                (activity as? AppNavigator)?.openOtpVerification()
                             }
 
                             is AuthOperationState.Error -> {

@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
+import com.example.flashcardapp.AppNavigator
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentRegisterBinding
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
@@ -39,9 +39,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     }
 
     private fun setupListeners() {
-        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
+        binding.buttonBack.setOnClickListener { (activity as? AppNavigator)?.navigateBack() }
         binding.textLoginNow.setOnClickListener {
-            findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+            (activity as? AppNavigator)?.navigateBack()
         }
         binding.buttonRegister.setOnClickListener { viewModel.submit() }
 
@@ -79,7 +79,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                findNavController().navigate(R.id.action_registerFragment_to_otpVerificationFragment)
+                                (activity as? AppNavigator)?.openOtpVerification()
                             }
 
                             is AuthOperationState.Error -> {

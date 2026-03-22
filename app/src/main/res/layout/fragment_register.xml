@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/componentBackground">
+    android:background="?attr/colorOnBackground">
 
     <ScrollView
         android:layout_width="0dp"
@@ -71,7 +71,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/auth_input_stroke"
+                app:boxStrokeColor="?attr/buttonBottomNavInactive"
                 app:boxStrokeWidth="1dp"
                 app:boxStrokeWidthFocused="1dp">
 
@@ -108,7 +108,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/auth_input_stroke"
+                app:boxStrokeColor="?attr/buttonBottomNavInactive"
                 app:boxStrokeWidth="1dp"
                 app:boxStrokeWidthFocused="1dp">
 
@@ -145,7 +145,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/auth_input_stroke"
+                app:boxStrokeColor="?attr/buttonBottomNavInactive"
                 app:boxStrokeWidth="1dp"
                 app:boxStrokeWidthFocused="1dp"
                 app:endIconMode="none">
@@ -183,7 +183,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/auth_input_stroke"
+                app:boxStrokeColor="?attr/buttonBottomNavInactive"
                 app:boxStrokeWidth="1dp"
                 app:boxStrokeWidthFocused="1dp"
                 app:endIconMode="none">

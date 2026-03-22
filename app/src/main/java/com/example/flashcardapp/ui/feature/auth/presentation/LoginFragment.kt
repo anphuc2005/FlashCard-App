@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
+import com.example.flashcardapp.AppNavigator
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
@@ -40,10 +40,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private fun setupListeners() {
         binding.textRegisterNow.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+            (activity as? AppNavigator)?.openRegister()
         }
         binding.textForgotPassword.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
+            (activity as? AppNavigator)?.openForgotPassword()
         }
         binding.buttonLogin.setOnClickListener { viewModel.submit() }
 
@@ -73,7 +73,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                                (activity as? AppNavigator)?.completeLogin(state.data.accessToken)
                             }
 
                             is AuthOperationState.Error -> {

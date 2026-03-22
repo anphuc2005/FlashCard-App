@@ -16,6 +16,15 @@
 
     <!-- Button -->
     <color name="md_button">#2563EB</color>
+    <color name="md_button_ripple">#332563EB</color>
+
+    <!-- Auth -->
+    <color name="auth_input_stroke">#64748B</color>
+
+    <!-- Onboarding -->
+    <color name="md_onboarding_card_background">#FFFFFFFF</color>
+    <color name="md_onboarding_card_glow">#1A2563EB</color>
+    <color name="md_onboarding_indicator_inactive">#CBD5E1</color>
 
     <!-- Button Bottom Nav -->
     <color name="md_button_bottom_nav_active">#2563EB</color>
