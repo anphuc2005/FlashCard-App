@@ -51,5 +51,22 @@
 
     <string name="app_deck">Bộ thẻ của tôi</string>
 
+    <string name="app_session_setting_deck_count">Số lượng thẻ</string>
+    <string name="app_session_setting_deck_limit">Chọn giới hạn thẻ</string>
+
+    <string name="app_deck_detail">Mô tả bộ thẻ</string>
+    <string name="app_deck_detail_all_card">Tất cả</string>
+    <string name="app_deck_detail_marked">Đánh dấu</string>
+    <string name="app_deck_detail_mastery">Thuần thục</string>
+
+    <string name="app_front_card_learnProgress">Tiến độ học tập</string>
+    <string name="app_front_card_flipCard">Chạm để lật</string>
+
+    <string name="app_back_card_learnLesson">Bài học hôm nay</string>
+
+    <string name="app_study_result">Kết quả học tập</string>
+    <string name="app_study_result_congratulation">Tuyệt vời</string>
+    <string name="app_study_result_congratulation_subTitle">Bạn đã hoàn thành xuất sắc phiên học này.\nHãy tiếp tục duy trì phong độ nhé!</string>
+
 
 </resources>

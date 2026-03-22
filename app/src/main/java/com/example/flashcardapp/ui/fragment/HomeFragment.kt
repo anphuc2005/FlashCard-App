@@ -1,5 +1,6 @@
 package com.example.flashcardapp.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.databinding.FragmentHomeBinding
+import com.example.flashcardapp.ui.activity.LearningActivity
 import com.example.flashcardapp.ui.adapter.RecentDeckAdapter
 import com.example.flashcardapp.ui.adapter.ShortcutAdapter
 import com.example.flashcardapp.viewmodel.HomeViewModel
@@ -139,8 +141,11 @@ class HomeFragment : Fragment() {
         viewModel.clearError()
     }
 
-    private fun navigateToDeckDetail(@Suppress("UNUSED_PARAMETER") deckId: String) {
-        // TODO: Navigate to deck detail screen
+    private fun navigateToDeckDetail(deckId: String) {
+        val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
+            putExtra("DECK_ID", deckId)
+        }
+        requireActivity().startActivity(intent)
     }
 
     private fun navigateToAllDecks() {
