@@ -2,13 +2,13 @@ package com.example.flashcardapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flashcardapp.model.Deck
+import com.example.flashcardapp.model.Shortcut
+import com.example.flashcardapp.utils.MockDeckData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.flashcardapp.model.Deck
-import com.example.flashcardapp.model.Shortcut
-import com.example.flashcardapp.utils.MockDeckData
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -17,23 +17,21 @@ data class HomeUiState(
     val shortcuts: List<Shortcut> = emptyList(),
     val error: String? = null,
     val userStreak: Int = 0,
-    val userGreeting: String = "Chào Phúc!",
+    val userGreeting: String = "",
     val userAvatarUrl: String? = null,
     val userProgress: Int = 0
 )
 
 class HomeViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState())
+    private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
         loadMockData()
-        //loadHomeData()
         initializeShortcuts()
     }
 
-    //Mock data
     private fun loadMockData() {
         val mockDatas = MockDeckData.getMockDecks()
 
@@ -51,17 +49,12 @@ class HomeViewModel : ViewModel() {
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true)
 
-                // TODO: Call API to get active deck and recent decks
-                // val activeDeck = repository.getActiveDeck()
-                // val recentDecks = repository.getRecentDecks()
-                // val userStreak = repository.getUserStreak()
-
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    activeDeck = null, // Replace with actual data
-                    recentDecks = emptyList(), // Replace with actual data
-                    userStreak = 12, // Replace with actual data
-                    userProgress = 85 // Replace with actual data
+                    activeDeck = null,
+                    recentDecks = emptyList(),
+                    userStreak = 12,
+                    userProgress = 85
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -122,7 +115,7 @@ class HomeViewModel : ViewModel() {
                 iconResId = com.example.flashcardapp.R.drawable.ic_account_shortcut,
                 backgroundResId = com.example.flashcardapp.R.color.md_icon_blue_background,
                 action = "SETTINGS"
-                )
+            )
         )
 
         _uiState.value = _uiState.value.copy(shortcuts = shortcuts)
@@ -136,4 +129,3 @@ class HomeViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(error = null)
     }
 }
-

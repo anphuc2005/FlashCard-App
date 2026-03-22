@@ -38,6 +38,8 @@ class LoginViewModel(
     }
 
     fun submit() {
+        if (_uiState.value is AuthOperationState.Loading) return
+
         val current = _formState.value
         val emailResult = AuthValidator.validateEmail(current.email.trim())
         val passwordResult = AuthValidator.validatePassword(current.password)
@@ -59,7 +61,7 @@ class LoginViewModel(
             val result = loginUseCase(request)
             _uiState.value = result.fold(
                 onSuccess = { AuthOperationState.Success(it) },
-                onFailure = { AuthOperationState.Error(it.message ?: "Login failed") }
+                onFailure = { AuthOperationState.Error(it.message ?: "Đăng nhập thất bại") }
             )
         }
     }

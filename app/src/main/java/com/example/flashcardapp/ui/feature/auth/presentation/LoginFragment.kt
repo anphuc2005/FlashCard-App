@@ -9,11 +9,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.flashcardapp.AppNavigator
+import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
 import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
@@ -22,15 +24,21 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private val binding get() = _binding!!
 
     private val viewModel: LoginViewModel by viewModels {
-        AuthDependencyProvider.provideViewModelFactory()
+        AuthDependencyProvider.provideViewModelFactory(requireContext())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentLoginBinding.bind(view)
 
+        setupPasswordToggle(binding.layoutPassword, binding.inputPassword)
         setupListeners()
         observeViewModel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideMainChrome()
     }
 
     override fun onDestroyView() {
@@ -40,10 +48,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private fun setupListeners() {
         binding.textRegisterNow.setOnClickListener {
-            (activity as? AppNavigator)?.openRegister()
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
         binding.textForgotPassword.setOnClickListener {
-            (activity as? AppNavigator)?.openForgotPassword()
+            findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
         }
         binding.buttonLogin.setOnClickListener { viewModel.submit() }
 
@@ -73,7 +81,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                (activity as? AppNavigator)?.completeLogin(state.data.accessToken)
+                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                             }
 
                             is AuthOperationState.Error -> {
@@ -91,5 +99,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private fun renderLoading(isLoading: Boolean) {
         binding.buttonLogin.isEnabled = !isLoading
         binding.buttonLogin.alpha = if (isLoading) 0.7f else 1f
+    }
+
+    private fun hideMainChrome() {
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
+        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 }

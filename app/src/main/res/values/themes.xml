@@ -51,6 +51,6 @@
     <style name="Theme.FlashCardApp" parent="Base.Theme.FlashCardApp" />
 
     <style name="Theme.FlashCardApp.Splash" parent="Theme.FlashCardApp">
-        <item name="android:windowBackground">?attr/mainBackground</item>
+        <item name="android:windowBackground">@drawable/bg_splash_screen</item>
     </style>
 </resources>

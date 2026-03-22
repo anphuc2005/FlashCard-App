@@ -31,6 +31,8 @@ class ForgotPasswordViewModel(
     }
 
     fun submit() {
+        if (_uiState.value is AuthOperationState.Loading) return
+
         val current = _formState.value
         val emailResult = AuthValidator.validateEmail(current.email.trim())
         _formState.value = current.copy(emailError = emailResult.errorMessage)
@@ -43,7 +45,7 @@ class ForgotPasswordViewModel(
             val result = forgotPasswordUseCase(request)
             _uiState.value = result.fold(
                 onSuccess = { AuthOperationState.Success(it) },
-                onFailure = { AuthOperationState.Error(it.message ?: "Forgot password failed") }
+                onFailure = { AuthOperationState.Error(it.message ?: "Gửi yêu cầu quên mật khẩu thất bại") }
             )
         }
     }

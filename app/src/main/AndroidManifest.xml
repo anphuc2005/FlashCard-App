@@ -15,7 +15,10 @@
             android:name=".ui.activity.LearningActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.DocumentViewerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
             android:theme="@style/Theme.FlashCardApp.Splash"
             android:exported="true">
             <intent-filter>
@@ -24,6 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.activity.AddDeckContainerActivity"
             android:exported="false" />

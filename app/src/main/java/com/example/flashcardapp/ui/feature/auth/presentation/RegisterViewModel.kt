@@ -52,9 +52,11 @@ class RegisterViewModel(
     }
 
     fun submit() {
+        if (_uiState.value is AuthOperationState.Loading) return
+
         val current = _formState.value
 
-        val fullNameResult = AuthValidator.validateRequired(current.fullName.trim(), "Full name")
+        val fullNameResult = AuthValidator.validateRequired(current.fullName.trim(), "Họ và tên")
         val emailResult = AuthValidator.validateEmail(current.email.trim())
         val passwordResult = AuthValidator.validatePassword(current.password)
         val confirmPasswordResult = AuthValidator.validateConfirmPassword(
@@ -87,7 +89,7 @@ class RegisterViewModel(
             val result = registerUseCase(request)
             _uiState.value = result.fold(
                 onSuccess = { AuthOperationState.Success(it) },
-                onFailure = { AuthOperationState.Error(it.message ?: "Register failed") }
+                onFailure = { AuthOperationState.Error(it.message ?: "Đăng ký thất bại") }
             )
         }
     }

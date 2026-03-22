@@ -11,4 +11,6 @@ interface AuthRepository {
     suspend fun login(request: LoginRequest): Result<LoginResponse>
     suspend fun register(request: RegisterRequest): Result<RegisterResponse>
     suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse>
+    fun saveLoginSession(accessToken: String?)
+    fun clearLoginSession()
 }

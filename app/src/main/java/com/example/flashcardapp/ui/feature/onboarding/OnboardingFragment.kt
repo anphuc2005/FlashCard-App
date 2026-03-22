@@ -5,10 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.example.flashcardapp.AppNavigator
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.example.flashcardapp.AppSessionManager
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentOnboardingBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
 
@@ -48,6 +51,11 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
         updateBottomUi(binding.viewPagerOnboarding.currentItem)
     }
 
+    override fun onResume() {
+        super.onResume()
+        hideMainChrome()
+    }
+
     override fun onDestroyView() {
         binding.viewPagerOnboarding.unregisterOnPageChangeCallback(pageChangeCallback)
         binding.viewPagerOnboarding.adapter = null
@@ -56,7 +64,13 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
     }
 
     private fun navigateToLogin() {
-        (activity as? AppNavigator)?.completeOnboarding()
+        AppSessionManager(requireContext()).markOnboardingCompleted()
+        findNavController().navigate(R.id.action_onboardingFragment_to_loginFragment)
+    }
+
+    private fun hideMainChrome() {
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
+        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 
     private fun setupIndicators() {
@@ -67,8 +81,11 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
     }
 
     private fun updateBottomUi(position: Int) {
-        binding.buttonPrimary.text =
-            if (position == LAST_PAGE_INDEX) "Bắt đầu ngay" else "Tiếp tục"
+        binding.buttonPrimary.text = if (position == LAST_PAGE_INDEX) {
+            getString(R.string.onboarding_start_now)
+        } else {
+            getString(R.string.onboarding_continue)
+        }
 
         for (index in 0 until binding.indicatorContainer.childCount) {
             val dot = binding.indicatorContainer.getChildAt(index)

@@ -9,11 +9,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.flashcardapp.AppNavigator
+import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
 import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
 class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
@@ -22,7 +24,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     private val binding get() = _binding!!
 
     private val viewModel: ForgotPasswordViewModel by viewModels {
-        AuthDependencyProvider.provideViewModelFactory()
+        AuthDependencyProvider.provideViewModelFactory(requireContext())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,6 +35,11 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
         observeViewModel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        hideMainChrome()
+    }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
@@ -40,7 +47,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
     private fun setupListeners() {
         binding.buttonBack.setOnClickListener {
-            (activity as? AppNavigator)?.navigateBack()
+            findNavController().popBackStack()
         }
         binding.buttonSendVerificationCode.setOnClickListener {
             viewModel.submit()
@@ -67,7 +74,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                (activity as? AppNavigator)?.openOtpVerification()
+                                findNavController().navigate(R.id.action_forgotPasswordFragment_to_otpVerificationFragment)
                             }
 
                             is AuthOperationState.Error -> {
@@ -85,5 +92,10 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     private fun renderLoading(isLoading: Boolean) {
         binding.buttonSendVerificationCode.isEnabled = !isLoading
         binding.buttonSendVerificationCode.alpha = if (isLoading) 0.7f else 1f
+    }
+
+    private fun hideMainChrome() {
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
+        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 }

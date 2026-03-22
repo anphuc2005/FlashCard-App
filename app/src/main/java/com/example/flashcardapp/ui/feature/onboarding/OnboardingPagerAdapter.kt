@@ -15,18 +15,18 @@ class OnboardingPagerAdapter(
     private val pages = listOf(
         OnboardingPagerItem(
             iconResId = R.drawable.ic_onboard1,
-            title = "Học nhanh, nhớ lâu",
-            description = "Ghi nhớ kiến thức hiệu quả hơn với phương pháp lặp lại ngắt quãng."
+            titleResId = R.string.onboarding_title_1,
+            descriptionResId = R.string.onboarding_description_1
         ),
         OnboardingPagerItem(
             iconResId = R.drawable.ic_onboard2,
-            title = "Duy trì thói quen",
-            description = "Hệ thống nhắc nhở thông minh giúp bạn không bỏ lỡ ngày học nào."
+            titleResId = R.string.onboarding_title_2,
+            descriptionResId = R.string.onboarding_description_2
         ),
         OnboardingPagerItem(
             iconResId = R.drawable.ic_onboard3,
-            title = "Sáng tạo bộ thẻ",
-            description = "Dễ dàng tạo bộ thẻ riêng hoặc khám phá thêm nhiều nội dung từ cộng đồng."
+            titleResId = R.string.onboarding_title_3,
+            descriptionResId = R.string.onboarding_description_3
         )
     )
 
@@ -61,8 +61,8 @@ class OnboardingPagerAdapter(
             onSkipClick: () -> Unit
         ) {
             binding.imageOnboarding.setImageResource(item.iconResId)
-            binding.textTitle.text = item.title
-            binding.textDescription.text = item.description
+            binding.textTitle.setText(item.titleResId)
+            binding.textDescription.setText(item.descriptionResId)
 
             binding.buttonBack.visibility = if (position == 0) View.INVISIBLE else View.VISIBLE
             binding.buttonBack.setOnClickListener { onBackClick(position) }
@@ -73,6 +73,6 @@ class OnboardingPagerAdapter(
 
 data class OnboardingPagerItem(
     val iconResId: Int,
-    val title: String,
-    val description: String
+    val titleResId: Int,
+    val descriptionResId: Int
 )

@@ -20,4 +20,8 @@ class AuthRepositoryPlaceholder : AuthRepository {
     override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse> {
         return Result.failure(NotImplementedError("Forgot password API/Firebase not implemented yet"))
     }
+
+    override fun saveLoginSession(accessToken: String?) = Unit
+
+    override fun clearLoginSession() = Unit
 }
