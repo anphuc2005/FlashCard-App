@@ -1,100 +1,101 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorOnBackground"
-    tools:context=".ui.fragment.HomeFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.fragment.HomeFragment"
+    android:background="?attr/colorOnBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="@dimen/home_content_padding_horizontal"
-        android:paddingTop="@dimen/home_top_banner_margin_top"
-        android:paddingEnd="@dimen/home_content_padding_horizontal"
-        android:paddingBottom="@dimen/home_content_padding_bottom">
+        android:orientation="vertical">
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/home_top_banner_height"
-            android:backgroundTint="?attr/componentBackground"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="0dp"
-            app:strokeColor="?attr/buttonColor"
-            app:strokeWidth="@dimen/home_top_banner_stroke" />
-
-        <TextView
-            android:id="@+id/tv_Hello"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_header_margin_top"
-            android:text="@string/home_welcome_back"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/home_title_text_size"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_subHello"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_subtitle_margin_top"
-            android:text="@string/home_welcome_subtitle"
-            android:textColor="?attr/subTitleColor"
-            android:textSize="@dimen/home_subtitle_text_size" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_streak_margin_top"
-            android:backgroundTint="?attr/componentBackground"
-            app:cardCornerRadius="@dimen/home_streak_chip_radius"
-            app:cardElevation="0dp"
-            app:strokeColor="?attr/componentBackground">
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:scaleType="centerCrop"/>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="@dimen/home_streak_padding_horizontal"
-                android:paddingVertical="@dimen/home_streak_padding_vertical">
-
-                <ImageView
-                    android:id="@+id/imgAvatar"
-                    android:layout_width="@dimen/home_streak_icon_size"
-                    android:layout_height="@dimen/home_streak_icon_size"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_fire"
-                    app:tint="?attr/iconGreen" />
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_Streak"
+                    android:id="@+id/tv_Hello"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/home_streak_spacing"
-                    android:text="12"
-                    android:textColor="?attr/iconGreen"
-                    android:textSize="@dimen/home_streak_text_size"
-                    android:textStyle="bold" />
+                    android:text="Chào Phúc!"
+                    android:textColor="?attr/textColor"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tv_subHello"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_home_ready_to_learn"
+                    android:textColor="?attr/subTitleColor"/>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                android:backgroundTint="?attr/componentBackground"
+                app:strokeColor="?attr/componentBackground">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_fire"
+                        app:tint="?attr/iconGreen"/>
+
+                    <TextView
+                        android:id="@+id/tv_Streak"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="12"
+                        android:textColor="?attr/iconGreen"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_feature_card_margin_top"
-            android:backgroundTint="?attr/componentBackground"
-            app:cardCornerRadius="@dimen/home_card_corner_radius"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
-            app:strokeWidth="0dp">
+            app:strokeWidth="0dp"
+            android:backgroundTint="?attr/componentBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/home_card_padding">
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -105,58 +106,58 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="?attr/iconBlueBackground"
-                        app:cardCornerRadius="@dimen/home_tag_corner_radius"
+                        app:cardCornerRadius="10dp"
                         app:cardElevation="0dp"
-                        app:strokeWidth="0dp">
-
+                        app:strokeWidth="0dp"
+                        android:backgroundTint="?attr/iconBlueBackground">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingHorizontal="@dimen/home_tag_padding_horizontal"
-                            android:paddingVertical="@dimen/home_tag_padding_vertical"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="6dp"
                             android:text="@string/app_home_learing"
-                            android:textAllCaps="true"
                             android:textColor="?attr/iconBlue"
-                            android:textSize="@dimen/home_tag_text_size"
-                            android:textStyle="bold" />
-                    </com.google.android.material.card.MaterialCardView>
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true"/>
 
+                    </com.google.android.material.card.MaterialCardView>
                     <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"/>
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="?attr/colorOnBackground"
-                        app:cardCornerRadius="@dimen/home_tag_corner_radius"
+                        app:cardCornerRadius="10dp"
                         app:cardElevation="0dp"
-                        app:strokeWidth="0dp">
+                        app:strokeWidth="0dp"
+                        android:backgroundTint="?attr/colorOnBackground">
 
                         <ImageView
-                            android:layout_width="@dimen/home_book_icon_size"
-                            android:layout_height="@dimen/home_book_icon_size"
-                            android:layout_margin="@dimen/home_book_icon_margin"
-                            android:src="@drawable/ic_book" />
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_margin="10dp"
+                            android:src="@drawable/ic_book"/>
                     </com.google.android.material.card.MaterialCardView>
+
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tv_Course_Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_course_title_margin_top"
+                    android:layout_marginTop="10dp"
                     android:text="Mastering Japanese N2"
                     android:textColor="?attr/textColor"
-                    android:textSize="@dimen/home_course_title_text_size"
-                    android:textStyle="bold" />
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_progress_margin_top"
+                    android:layout_marginTop="10dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -165,104 +166,108 @@
                         android:layout_height="wrap_content"
                         android:text="@string/app_home_progress"
                         android:textColor="?attr/subTitleColor"
-                        android:textSize="@dimen/home_progress_text_size" />
+                        android:textSize="13sp"/>
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_weight="1" />
-
+                        android:layout_weight="1"/>
                     <TextView
                         android:id="@+id/tv_Progress_Percent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="85%"
                         android:textColor="?attr/subTitleColor"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"/>
                 </LinearLayout>
 
                 <com.example.flashcardapp.utils.chart.ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/home_progress_bar_height"
-                    android:layout_marginTop="@dimen/home_progress_bar_margin_vertical"
-                    android:layout_marginBottom="@dimen/home_progress_bar_margin_vertical" />
+                    android:layout_height="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_Start"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/home_start_button_height"
-                    android:layout_marginTop="@dimen/home_start_button_margin_top"
-                    android:backgroundTint="?attr/buttonColor"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="14dp"
                     android:text="@string/app_home_study_now"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/home_start_button_text_size"
                     android:textStyle="bold"
-                    app:cornerRadius="@dimen/home_start_button_radius"
+                    android:textColor="@color/white"
+                    android:textSize="16dp"
+                    app:cornerRadius="14dp"
+                    android:backgroundTint="?attr/buttonColor"
                     app:icon="@drawable/ic_play"
                     app:iconGravity="textEnd"
-                    app:iconPadding="@dimen/home_start_button_icon_padding" />
+                    app:iconPadding="10dp"/>
+
+
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_section_title_margin_top"
+            android:layout_marginTop="18dp"
             android:text="@string/app_home_shortcut"
             android:textColor="?attr/textColor"
-            android:textSize="@dimen/home_section_title_text_size"
-            android:textStyle="bold" />
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_Shortcuts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_shortcut_margin_top"
-            android:nestedScrollingEnabled="false"
+            android:layout_marginTop="12dp"
             android:overScrollMode="never"
-            tools:listitem="@layout/item_shortcut" />
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_shortcut"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_recent_header_margin_top"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_home_deck_recent"
-                android:textColor="?attr/textColor"
-                android:textSize="@dimen/home_section_title_text_size"
-                android:textStyle="bold" />
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:textColor="?attr/textColor"/>
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_seeAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/app_home_deck_all"
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
-                android:padding="0dp"
                 android:stateListAnimator="@null"
-                android:text="@string/app_home_deck_all"
+                android:textStyle="bold"
                 android:textColor="?attr/iconBlue"
-                android:textStyle="bold" />
+                android:padding="0dp"/>
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_deckRecently"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/home_recent_list_margin_top"
+            android:layout_marginTop="12dp"
             android:clipToPadding="false"
-            android:paddingHorizontal="@dimen/home_recent_list_padding_horizontal"
-            tools:listitem="@layout/item_recent_deck" />
+            android:paddingHorizontal="2dp"
+            tools:listitem="@layout/item_recent_deck"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

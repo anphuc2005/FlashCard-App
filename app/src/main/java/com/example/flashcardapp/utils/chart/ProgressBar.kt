@@ -14,13 +14,22 @@ class ProgressBar @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private var progress = 85f // 0-100
+    private val cornerRadius = 24f
 
-    private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = getAttrColor(context, R.attr.iconBlueBackground)
+    private lateinit var trackPaint: Paint
+    private lateinit var fillPaint: Paint
+
+    init {
+        initializePaints(context)
     }
 
-    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = getAttrColor(context, R.attr.iconBlue)
+    private fun initializePaints(context: Context) {
+        trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = getAttrColor(context, R.attr.iconBlueBackground)
+        }
+        fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = getAttrColor(context, R.attr.iconBlue)
+        }
     }
 
     private fun getAttrColor(context: Context, attrRes: Int): Int {
@@ -30,7 +39,6 @@ class ProgressBar @JvmOverloads constructor(
         return color
     }
 
-    private val cornerRadius = 24f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)

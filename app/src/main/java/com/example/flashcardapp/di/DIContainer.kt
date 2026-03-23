@@ -3,7 +3,6 @@ package com.example.flashcardapp.di
 import android.content.Context
 import com.example.flashcardapp.data.database.FlashCardDatabase
 import com.example.flashcardapp.network.RetrofitClient
-import com.example.flashcardapp.repository.ChatbotRepository
 import com.example.flashcardapp.repository.DeckRepository
 import com.example.flashcardapp.repository.FlashCardRepository
 import com.example.flashcardapp.viewmodel.ViewModelFactory
@@ -27,15 +26,10 @@ object DIContainer {
             database.flashCardDao()
         )
 
-        val chatbotRepository = ChatbotRepository(
-            RetrofitClient.chatbotApiService,
-            database.chatMessageDao()
-        )
 
         return ViewModelFactory(
             deckRepository,
             flashCardRepository,
-            chatbotRepository
         )
     }
 }

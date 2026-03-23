@@ -1,14 +1,14 @@
-package com.example.flashcardapp
+package com.example.flashcardapp.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ActivitySplashBinding
 import com.example.flashcardapp.ui.feature.splash.SplashViewModel
 import com.example.flashcardapp.ui.feature.splash.SplashViewModelFactory
@@ -28,7 +28,10 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Initialize ViewModel with Application
-        viewModel = ViewModelProvider(this, SplashViewModelFactory(application)).get(SplashViewModel::class.java)
+        viewModel = ViewModelProvider(
+            this,
+            SplashViewModelFactory(application)
+        ).get(SplashViewModel::class.java)
 
         observeSplashState()
     }
@@ -45,7 +48,8 @@ class SplashActivity : AppCompatActivity() {
                             if (!hasNavigated) {
                                 hasNavigated = true
                                 delay(NAVIGATION_DELAY_MS)
-                                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                                // Route to AuthActivity (onboarding flow)
+                                startActivity(Intent(this@SplashActivity, AuthActivity::class.java))
                                 finish()
                             }
                         }
@@ -53,7 +57,8 @@ class SplashActivity : AppCompatActivity() {
                             if (!hasNavigated) {
                                 hasNavigated = true
                                 delay(NAVIGATION_DELAY_MS)
-                                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                                // Route to AuthActivity (login flow)
+                                startActivity(Intent(this@SplashActivity, AuthActivity::class.java))
                                 finish()
                             }
                         }
@@ -61,6 +66,7 @@ class SplashActivity : AppCompatActivity() {
                             if (!hasNavigated) {
                                 hasNavigated = true
                                 delay(NAVIGATION_DELAY_MS)
+                                // Route to MainActivity (home flow)
                                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                                 finish()
                             }

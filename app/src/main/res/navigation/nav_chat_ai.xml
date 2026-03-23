@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_chat_ai"
+    app:startDestination="@id/chatAIFragment">
+
+    <fragment
+        android:id="@+id/chatAIFragment"
+        android:name="com.example.flashcardapp.ui.module_chatAI_fragment.ChatAIFragment"
+        android:label="fragment_chat_a_i"
+        tools:layout="@layout/fragment_chat_a_i" />
+</navigation>

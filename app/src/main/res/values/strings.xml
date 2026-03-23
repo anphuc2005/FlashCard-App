@@ -105,4 +105,9 @@
     <string name="register_terms_suffix"> của chúng tôi.</string>
     <string name="document_terms_title">Điều khoản dịch vụ</string>
     <string name="document_privacy_title">Chính sách bảo mật</string>
+
+    <!-- Chat AI Strings -->
+    <string name="back">Quay lại</string>
+    <string name="attach">Đính kèm</string>
+    <string name="send">Gửi</string>
 </resources>
