@@ -24,8 +24,8 @@ class AuthRepositoryImpl(
         return remoteDataSource.forgotPassword(request)
     }
 
-    override fun saveLoginSession(accessToken: String?) {
-        sessionStore.saveLoginSession(accessToken)
+    override fun saveLoginSession(accessToken: String?, refreshToken: String?) {
+        sessionStore.saveLoginSession(accessToken, refreshToken)
     }
 
     override fun clearLoginSession() {

@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentOtpVerificationBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class OtpVerificationFragment : Fragment(R.layout.fragment_otp_verification) {
 
@@ -23,7 +21,6 @@ class OtpVerificationFragment : Fragment(R.layout.fragment_otp_verification) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentOtpVerificationBinding.bind(view)
-        hideMainChrome()
         setupListeners()
         setupOtpInputs()
         startResendCountdown()
@@ -97,11 +94,6 @@ class OtpVerificationFragment : Fragment(R.layout.fragment_otp_verification) {
     private fun otpCode(): String {
         return listOf(binding.inputOtp1, binding.inputOtp2, binding.inputOtp3, binding.inputOtp4)
             .joinToString(separator = "") { it.text?.toString().orEmpty().trim() }
-    }
-
-    private fun hideMainChrome() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
-        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 
     private companion object {

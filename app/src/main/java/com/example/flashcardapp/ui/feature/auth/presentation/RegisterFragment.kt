@@ -23,8 +23,6 @@ import com.example.flashcardapp.databinding.FragmentRegisterBinding
 import com.example.flashcardapp.ui.activity.DocumentViewerActivity
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
 import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
@@ -45,11 +43,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         setupTermsText()
         setupListeners()
         observeViewModel()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideMainChrome()
     }
 
     override fun onDestroyView() {
@@ -185,11 +178,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private fun renderLoading(isLoading: Boolean) {
         binding.buttonRegister.isEnabled = !isLoading
         binding.buttonRegister.alpha = if (isLoading) 0.7f else 1f
-    }
-
-    private fun hideMainChrome() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
-        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 
     private companion object {

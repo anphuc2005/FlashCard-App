@@ -1,5 +1,6 @@
 package com.example.flashcardapp.ui.feature.auth.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -12,12 +13,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
+import com.example.flashcardapp.ui.activity.MainActivity
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
 import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
+// LoginFragment nhận thông tin đăng nhập và chuyển sang Main khi thành công.
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private var _binding: FragmentLoginBinding? = null
@@ -34,11 +35,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         setupPasswordToggle(binding.layoutPassword, binding.inputPassword)
         setupListeners()
         observeViewModel()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideMainChrome()
     }
 
     override fun onDestroyView() {
@@ -81,7 +77,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                                // Xóa auth khỏi back stack sau khi vào app chính.
+                                startActivity(
+                                    Intent(requireContext(), MainActivity::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    }
+                                )
+                                requireActivity().finish()
                             }
 
                             is AuthOperationState.Error -> {
@@ -99,10 +102,5 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private fun renderLoading(isLoading: Boolean) {
         binding.buttonLogin.isEnabled = !isLoading
         binding.buttonLogin.alpha = if (isLoading) 0.7f else 1f
-    }
-
-    private fun hideMainChrome() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
-        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 }

@@ -5,6 +5,27 @@
     android:layout_height="match_parent"
     android:background="?attr/mainBackground">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.07" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.93" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.965" />
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerOnboarding"
         android:layout_width="0dp"
@@ -29,9 +50,6 @@
         android:id="@+id/buttonPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/onboarding_page_padding_horizontal"
-        android:layout_marginEnd="@dimen/onboarding_page_padding_horizontal"
-        android:layout_marginBottom="@dimen/onboarding_page_padding_bottom"
         android:background="@drawable/bg_onboarding_button"
         android:fontFamily="sans-serif-medium"
         android:insetTop="0dp"
@@ -47,8 +65,8 @@
         android:textSize="@dimen/onboarding_button_text_size"
         app:backgroundTint="@null"
         app:cornerRadius="@dimen/onboarding_button_corner_radius"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

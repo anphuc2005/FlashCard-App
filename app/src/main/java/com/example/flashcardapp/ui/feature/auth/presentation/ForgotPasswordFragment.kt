@@ -14,8 +14,6 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
 import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
 class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
@@ -33,11 +31,6 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
         setupListeners()
         observeViewModel()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideMainChrome()
     }
 
     override fun onDestroyView() {
@@ -92,10 +85,5 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     private fun renderLoading(isLoading: Boolean) {
         binding.buttonSendVerificationCode.isEnabled = !isLoading
         binding.buttonSendVerificationCode.alpha = if (isLoading) 0.7f else 1f
-    }
-
-    private fun hideMainChrome() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
-        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 }

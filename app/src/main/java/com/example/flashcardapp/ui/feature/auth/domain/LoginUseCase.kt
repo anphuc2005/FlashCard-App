@@ -9,7 +9,10 @@ class LoginUseCase(
 ) {
     suspend operator fun invoke(request: LoginRequest): Result<LoginResponse> {
         return repository.login(request).onSuccess { response ->
-            repository.saveLoginSession(response.accessToken)
+            repository.saveLoginSession(
+                accessToken = response.accessToken,
+                refreshToken = response.refreshToken
+            )
         }
     }
 }

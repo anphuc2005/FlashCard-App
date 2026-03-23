@@ -38,7 +38,7 @@ class DocumentViewerActivity : AppCompatActivity() {
         val toolbarTopPadding = binding.toolbar.paddingTop
         val rootBottomPadding = binding.root.paddingBottom
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.toolbar.updatePadding(top = toolbarTopPadding + systemBars.top)
             binding.root.updatePadding(bottom = rootBottomPadding + systemBars.bottom)

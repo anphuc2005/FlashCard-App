@@ -10,9 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.flashcardapp.AppSessionManager
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentOnboardingBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
+/** Hiển thị onboarding và lưu cờ đã xem trước khi sang auth. */
 class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
 
     private var _binding: FragmentOnboardingBinding? = null
@@ -51,11 +50,6 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
         updateBottomUi(binding.viewPagerOnboarding.currentItem)
     }
 
-    override fun onResume() {
-        super.onResume()
-        hideMainChrome()
-    }
-
     override fun onDestroyView() {
         binding.viewPagerOnboarding.unregisterOnPageChangeCallback(pageChangeCallback)
         binding.viewPagerOnboarding.adapter = null
@@ -64,13 +58,9 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
     }
 
     private fun navigateToLogin() {
+        // Lưu trạng thái đã xem onboarding trước khi chuyển sang login.
         AppSessionManager(requireContext()).markOnboardingCompleted()
         findNavController().navigate(R.id.action_onboardingFragment_to_loginFragment)
-    }
-
-    private fun hideMainChrome() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
-        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 
     private fun setupIndicators() {

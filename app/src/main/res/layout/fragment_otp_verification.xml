@@ -75,7 +75,7 @@
                 android:contentDescription="@null"
                 android:maxHeight="@dimen/otp_icon_size"
                 android:maxWidth="@dimen/otp_icon_size"
-                android:src="@drawable/ic_otp_mail" />
+                android:src="@drawable/ic_gmail" />
         </FrameLayout>
 
         <TextView

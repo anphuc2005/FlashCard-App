@@ -2,15 +2,23 @@ package com.example.flashcardapp
 
 import android.content.Context
 
+// AppSessionManager lưu onboarding, token và trạng thái đăng nhập trên máy.
 class AppSessionManager(context: Context) {
 
+    // SharedPreferences là nơi lưu session local của app.
     private val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     val hasOnboarded: Boolean
         get() = prefs.getBoolean(KEY_HAS_ONBOARDED, prefs.getBoolean(LEGACY_KEY_ONBOARDING_COMPLETED, false))
 
     val isLoggedIn: Boolean
-        get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
+        get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false) && !accessToken.isNullOrBlank()
+
+    val accessToken: String?
+        get() = prefs.getString(KEY_ACCESS_TOKEN, null)
+
+    val refreshToken: String?
+        get() = prefs.getString(KEY_REFRESH_TOKEN, null)
 
     fun markOnboardingCompleted() {
         prefs.edit()
@@ -19,13 +27,20 @@ class AppSessionManager(context: Context) {
             .apply()
     }
 
-    fun saveLoginSession(accessToken: String?) {
+    // Lưu token và cờ đăng nhập sau khi login thành công.
+    fun saveLoginSession(accessToken: String?, refreshToken: String?) {
+        val hasAccessToken = !accessToken.isNullOrBlank()
         prefs.edit().apply {
-            putBoolean(KEY_IS_LOGGED_IN, true)
-            if (accessToken.isNullOrBlank()) {
-                remove(KEY_ACCESS_TOKEN)
-            } else {
+            putBoolean(KEY_IS_LOGGED_IN, hasAccessToken)
+            if (hasAccessToken) {
                 putString(KEY_ACCESS_TOKEN, accessToken)
+            } else {
+                remove(KEY_ACCESS_TOKEN)
+            }
+            if (refreshToken.isNullOrBlank()) {
+                remove(KEY_REFRESH_TOKEN)
+            } else {
+                putString(KEY_REFRESH_TOKEN, refreshToken)
             }
             apply()
         }
@@ -35,6 +50,7 @@ class AppSessionManager(context: Context) {
         prefs.edit()
             .putBoolean(KEY_IS_LOGGED_IN, false)
             .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_REFRESH_TOKEN)
             .apply()
     }
 
@@ -44,5 +60,6 @@ class AppSessionManager(context: Context) {
         private const val LEGACY_KEY_ONBOARDING_COMPLETED = "onboarding_completed"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
         private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
     }
 }

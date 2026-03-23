@@ -7,16 +7,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.example.flashcardapp.R
-import com.example.flashcardapp.databinding.ActivityLearningBinding
+import com.example.flashcardapp.databinding.ActivityChatAiBinding
 
-class LearningActivity : AppCompatActivity() {
+class ChatAIActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLearningBinding
+    private lateinit var binding: ActivityChatAiBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityLearningBinding.inflate(layoutInflater)
+        binding = ActivityChatAiBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -24,7 +24,8 @@ class LearningActivity : AppCompatActivity() {
             insets
         }
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_learning_host) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_chatAI_host) as NavHostFragment
         navHostFragment.navController
     }
 }
+

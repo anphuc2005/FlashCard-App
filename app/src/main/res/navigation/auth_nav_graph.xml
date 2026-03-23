@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/auth_nav_graph"
+    app:startDestination="@id/onboardingFragment">
+
+    <!-- Onboarding Screen -->
+    <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="com.example.flashcardapp.ui.feature.onboarding.OnboardingFragment"
+        tools:layout="@layout/fragment_onboarding">
+        <action
+            android:id="@+id/action_onboardingFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/onboardingFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Login Screen -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.LoginFragment"
+        android:label="@string/app_login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+    </fragment>
+
+    <!-- Register Screen -->
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.RegisterFragment"
+        android:label="@string/app_register"
+        tools:layout="@layout/fragment_register">
+        <!-- Navigate to OTP Verification -->
+        <action
+            android:id="@+id/action_registerFragment_to_otpVerificationFragment"
+            app:destination="@id/otpVerificationFragment" />
+    </fragment>
+
+    <!-- Forgot Password Screen -->
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.ForgotPasswordFragment"
+        android:label="@string/app_forgot_pass"
+        tools:layout="@layout/fragment_forgot_password">
+        <!-- Navigate to OTP Verification -->
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_otpVerificationFragment"
+            app:destination="@id/otpVerificationFragment" />
+    </fragment>
+
+    <!-- OTP Verification Screen -->
+    <fragment
+        android:id="@+id/otpVerificationFragment"
+        android:name="com.example.flashcardapp.ui.feature.auth.presentation.OtpVerificationFragment"
+        android:label="@string/app_otp"
+        tools:layout="@layout/fragment_otp_verification">
+        <!-- Navigate back to Login (after OTP verification) -->
+        <action
+            android:id="@+id/action_otpVerificationFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/auth_nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+</navigation>
+

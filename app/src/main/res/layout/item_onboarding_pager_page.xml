@@ -3,21 +3,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/mainBackground"
-    android:paddingStart="@dimen/onboarding_page_padding_horizontal"
-    android:paddingTop="@dimen/onboarding_page_padding_top"
-    android:paddingEnd="@dimen/onboarding_page_padding_horizontal"
-    android:paddingBottom="@dimen/onboarding_page_padding_bottom">
+    android:background="?attr/mainBackground">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.07" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.93" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.94" />
 
     <ImageButton
         android:id="@+id/buttonBack"
         android:layout_width="@dimen/onboarding_icon_button_size"
         android:layout_height="@dimen/onboarding_icon_button_size"
+        android:layout_marginTop="@dimen/auth_screen_padding_top"
         android:background="@android:color/transparent"
         android:contentDescription="@string/common_back"
         android:padding="@dimen/onboarding_icon_button_padding"
         android:src="@drawable/ic_onboarding_back"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/textColor" />
 
@@ -30,7 +48,7 @@
         android:textSize="@dimen/onboarding_action_text_size"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/buttonBack"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
         app:layout_constraintTop_toTopOf="@id/buttonBack" />
 
     <ImageView
@@ -41,10 +59,10 @@
         android:adjustViewBounds="true"
         android:contentDescription="@null"
         android:scaleType="fitCenter"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintTop_toBottomOf="@id/buttonBack"
-        app:layout_constraintWidth_percent="0.72" />
+        app:layout_constraintWidth_percent="0.66" />
 
     <TextView
         android:id="@+id/textTitle"
@@ -58,8 +76,8 @@
         android:textColor="?attr/textColor"
         android:textSize="@dimen/onboarding_title_text_size"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintTop_toBottomOf="@id/imageOnboarding" />
 
     <TextView
@@ -74,10 +92,10 @@
         android:maxLines="4"
         android:textColor="?attr/subTitleColor"
         android:textSize="@dimen/onboarding_description_text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintTop_toBottomOf="@id/textTitle"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintVertical_bias="0.18" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
