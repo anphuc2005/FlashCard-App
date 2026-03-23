@@ -97,7 +97,9 @@ class HomeFragment : Fragment() {
 
                     // Update user info
                     binding.apply {
-                        tvHello.text = state.userGreeting
+                        tvHello.text = state.userGreeting.ifBlank {
+                            getString(com.example.flashcardapp.R.string.home_welcome_back)
+                        }
                         tvStreak.text = state.userStreak.toString()
                     }
 
