@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme (Dark). -->
-    <style name="Base.Theme.FlashCarđApp" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.FlashCardApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Gradient background colors -->
         <item name="colorOnBackground">@color/md_theme_dark_main_background</item>
         <item name="gradientBackground1">@color/md_theme_dard_background1</item>
@@ -19,7 +19,7 @@
         <item name="android:textColor">@color/md_theme_dark_text</item>
         <item name="textColor">@color/md_theme_dark_text</item>
 
-        <!-- Loading gradient background (dùng chung với light) -->
+        <!-- Loading gradient background -->
         <item name="loadingBackground1">@color/md_theme_light_loading_background1</item>
         <item name="loadingBackground2">@color/md_theme_light_loading_background2</item>
 
@@ -50,5 +50,11 @@
 
         <!-- Nav bar active color -->
         <item name="navBarActive">@color/md_navbar_active</item>
+    </style>
+
+    <style name="Theme.FlashCardApp" parent="Base.Theme.FlashCardApp" />
+
+    <style name="Theme.FlashCardApp.Splash" parent="Theme.FlashCardApp">
+        <item name="android:windowBackground">@drawable/bg_splash_screen</item>
     </style>
 </resources>

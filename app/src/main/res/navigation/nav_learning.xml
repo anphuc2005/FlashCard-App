@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_learning"
+    app:startDestination="@id/deckDetailFragment">
+
+    <fragment
+        android:id="@+id/deckDetailFragment"
+        android:name="com.example.flashcardapp.ui.module_learn_fragment.DeckDetailFragment"
+        android:label="fragment_deck_detail"
+        tools:layout="@layout/fragment_deck_detail" >
+        <action
+            android:id="@+id/action_deckDetailFragment_to_sessionSettingFragment"
+            app:destination="@id/sessionSettingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sessionSettingFragment"
+        android:name="com.example.flashcardapp.ui.module_learn_fragment.SessionSettingFragment"
+        android:label="fragment_session_setting"
+        tools:layout="@layout/fragment_session_setting" >
+        <action
+            android:id="@+id/action_sessionSettingFragment_to_frontCardFragment"
+            app:destination="@id/frontCardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/frontCardFragment"
+        android:name="com.example.flashcardapp.ui.module_learn_fragment.FrontCardFragment"
+        android:label="fragment_front_card"
+        tools:layout="@layout/fragment_front_card" >
+        <action
+            android:id="@+id/action_frontCardFragment_to_backCardFragment"
+            app:destination="@id/backCardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/backCardFragment"
+        android:name="com.example.flashcardapp.ui.module_learn_fragment.BackCardFragment"
+        android:label="fragment_back_card"
+        tools:layout="@layout/fragment_back_card" >
+        <action
+            android:id="@+id/action_backCardFragment_to_studyResultFragment"
+            app:destination="@id/studyResultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/studyResultFragment"
+        android:name="com.example.flashcardapp.ui.module_learn_fragment.StudyResultFragment"
+        android:label="fragment_study_result"
+        tools:layout="@layout/fragment_study_result" />
+</navigation>

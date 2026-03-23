@@ -11,7 +11,7 @@
         android:id="@+id/cardIcon"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:backgroundTint="?attr/iconBlueBackground"
+        app:cardBackgroundColor="?attr/iconBlueBackground"
         app:cardCornerRadius="10dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp">
@@ -21,8 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="14dp"
-            android:src="@drawable/ic_1"
-            app:tint="?attr/iconBlue" />
+            android:src="@drawable/ic_1"/>
     </com.google.android.material.card.MaterialCardView>
 
     <TextView

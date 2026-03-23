@@ -1,0 +1,20 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/splash_progress_corner_radius" />
+            <solid android:color="@color/splash_progress_track" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="@dimen/splash_progress_corner_radius" />
+                <gradient
+                    android:angle="0"
+                    android:centerColor="@color/splash_progress_center"
+                    android:endColor="@color/splash_progress_end"
+                    android:startColor="@color/splash_progress_start" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

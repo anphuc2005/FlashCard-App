@@ -23,15 +23,14 @@
             app:cardCornerRadius="10dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
-            android:backgroundTint="?attr/iconBlueBackground">
+            app:cardBackgroundColor="?attr/iconBlueBackground">
 
             <ImageView
                 android:id="@+id/imgIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="14dp"
-                android:src="@drawable/ic_create"
-                android:tint="?attr/iconBlue" />
+                android:src="@drawable/ic_create" />
         </com.google.android.material.card.MaterialCardView>
 
         <TextView

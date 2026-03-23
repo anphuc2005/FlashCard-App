@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.FlashCarđApp" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.FlashCardApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Gradient background colors -->
         <item name="colorOnBackground">@color/md_theme_light_background1</item>
         <item name="gradientBackground1">@color/md_theme_light_background1</item>
@@ -27,7 +27,6 @@
         <item name="buttonBottomNavActive">@color/md_button_bottom_nav_active</item>
         <item name="buttonBottomNavInactive">@color/md_button_bottom_nav_inactive</item>
 
-
         <!-- Sub title -->
         <item name="subTitleColor">@color/md_sub_title</item>
 
@@ -45,10 +44,13 @@
         <item name="iconYellowBackground">@color/md_icon_yellow_background</item>
         <item name="iconPurpleBackground">@color/md_icon_purple_background</item>
 
-
         <!-- Nav bar active color -->
         <item name="navBarActive">@color/md_navbar_active</item>
     </style>
 
-    <style name="Theme.FlashCarđApp" parent="Base.Theme.FlashCarđApp" />
+    <style name="Theme.FlashCardApp" parent="Base.Theme.FlashCardApp" />
+
+    <style name="Theme.FlashCardApp.Splash" parent="Theme.FlashCardApp">
+        <item name="android:windowBackground">@drawable/bg_splash_screen</item>
+    </style>
 </resources>
