@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.AddDeckContainerActivity"

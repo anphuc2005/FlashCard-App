@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.flashcardapp.AppSessionManager
+import com.example.flashcardapp.MainActivity
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ActivitySplashBinding
 import com.example.flashcardapp.ui.feature.splash.SplashViewModel

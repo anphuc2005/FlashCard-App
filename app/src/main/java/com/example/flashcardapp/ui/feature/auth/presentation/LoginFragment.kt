@@ -11,9 +11,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.flashcardapp.MainActivity
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
-import com.example.flashcardapp.ui.activity.MainActivity
 import com.example.flashcardapp.ui.feature.auth.di.AuthDependencyProvider
 import com.example.flashcardapp.ui.feature.auth.state.AuthOperationState
 import kotlinx.coroutines.launch

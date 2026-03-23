@@ -34,17 +34,9 @@ object RetrofitClient {
             .build()
     }
 
-    private val geminiRetrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://generativelanguage.googleapis.com/")
-            .client(defaultClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
     val authApiService: AuthApiService by lazy { retrofit.create(AuthApiService::class.java) }
     val deckApiService: DeckApiService by lazy { retrofit.create(DeckApiService::class.java) }
-    val geminiApiService: GeminiApiService by lazy { geminiRetrofit.create(GeminiApiService::class.java) }
+    val chatbotApiService: ChatbotApiService by lazy { retrofit.create(ChatbotApiService::class.java) }
 
     private fun provideAccessToken(): String? {
         check(::appContext.isInitialized) {
