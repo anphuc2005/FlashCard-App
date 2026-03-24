@@ -38,6 +38,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_bot"
             android:background="@drawable/bg_avatar_square"
+            android:contentDescription="@string/ai_avatar"
             app:tint="?attr/iconBlue" />
 
         <!-- Title and Status -->
@@ -52,7 +53,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AI Study Buddy"
+                android:text="@string/ai_study_buddy"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="#0F1F3C" />
@@ -60,7 +61,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ACTIVE NOW"
+                android:text="@string/active_now"
                 android:textAllCaps="true"
                 android:textSize="11sp"
                 android:textStyle="bold"
@@ -77,6 +78,7 @@
         android:clipToPadding="false"
         android:paddingHorizontal="12dp"
         android:paddingTop="10dp"
+        android:paddingBottom="80dp"
         app:layout_constraintBottom_toTopOf="@+id/inputBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,9 +104,10 @@
         android:layout_height="72dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="12dp"
-        android:paddingBottom="12dp"
-        android:background="@android:color/transparent"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingVertical="8dp"
+        android:background="?attr/colorOnBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -112,50 +115,59 @@
         <!-- Attach Button -->
         <ImageButton
             android:id="@+id/btnAttach"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_add"
             android:background="@android:color/transparent"
             android:contentDescription="@string/attach"
+            android:scaleType="centerInside"
             app:tint="?attr/buttonColor" />
 
         <!-- Message Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilMessage"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
             app:boxBackgroundColor="#FFFFFF"
             app:boxCornerRadiusTopStart="20dp"
             app:boxCornerRadiusTopEnd="20dp"
             app:boxCornerRadiusBottomStart="20dp"
             app:boxCornerRadiusBottomEnd="20dp"
-            app:boxStrokeWidth="0dp"
-            app:startIconDrawable="@drawable/ic_chat"
-            app:startIconTint="#9AA6B6">
+            app:boxStrokeColor="#E0E0E0"
+            app:boxStrokeWidth="1dp"
+            app:hintTextColor="#9AA6B6"
+            android:hint="@string/ask_anything">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMessage"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Ask anything about your deck..."
-                android:paddingHorizontal="12dp"
+                android:layout_height="match_parent"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:inputType="text|textMultiLine"
+                android:maxLines="3"
                 android:textSize="14sp"
-                android:textColor="#0F1F3C"
-                android:textColorHint="#9AA6B6" />
+                android:textColor="?attr/textColor"
+                android:gravity="start|top"
+                android:backgroundTint="@android:color/transparent" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Send Button -->
         <ImageButton
             android:id="@+id/btnSend"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
             android:src="@drawable/ic_send"
             android:background="@android:color/transparent"
-            android:contentDescription="@string/send" />
+            android:contentDescription="@string/send"
+            android:scaleType="centerInside" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

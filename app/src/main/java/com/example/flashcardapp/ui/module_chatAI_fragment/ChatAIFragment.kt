@@ -16,6 +16,7 @@ import com.example.flashcardapp.ui.adapter.ChatMessageAdapter
 import com.example.flashcardapp.viewmodel.ChatAIViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import android.content.Context
 
 class ChatAIFragment : Fragment() {
 
@@ -46,11 +47,11 @@ class ChatAIFragment : Fragment() {
     private fun setupViewModel() {
         val geminiRepository = GeminiRepository(
             RetrofitClient.geminiApiService,
-            BuildConfig.OPENAI_API_KEY
+            BuildConfig.GEMINI_API_KEY
         )
         viewModel = ViewModelProvider(
             this,
-            ChatAIViewModelFactory(geminiRepository)
+            ChatAIViewModelFactory(geminiRepository, requireContext())
         )[ChatAIViewModel::class.java]
     }
 
@@ -92,7 +93,6 @@ class ChatAIFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.isLoading.collectLatest { isLoading ->
-                binding.progressBarChat.visibility = if (isLoading) View.VISIBLE else View.GONE
                 binding.etMessage.isEnabled = !isLoading
                 binding.btnSend.isEnabled = !isLoading
             }
@@ -121,10 +121,12 @@ class ChatAIFragment : Fragment() {
     }
 }
 
-class ChatAIViewModelFactory(private val repository: GeminiRepository) :
-    ViewModelProvider.Factory {
+class ChatAIViewModelFactory(
+    private val repository: GeminiRepository,
+    private val context: Context
+) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        return ChatAIViewModel(repository) as T
+        return ChatAIViewModel(repository, context) as T
     }
 }

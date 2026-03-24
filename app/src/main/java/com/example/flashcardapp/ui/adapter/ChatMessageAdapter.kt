@@ -3,6 +3,7 @@ package com.example.flashcardapp.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -34,15 +35,19 @@ class ChatMessageAdapter : ListAdapter<ChatMessage, ChatMessageAdapter.ChatMessa
             with(binding) {
                 tvMessage.text = message.text
 
+                val layoutParams = messageContainer.layoutParams as FrameLayout.LayoutParams
                 if (message.isUser) {
+                    layoutParams.gravity = android.view.Gravity.END
                     tvMessage.setBackgroundResource(R.drawable.bg_message_user)
                     tvMessage.setTextColor(root.context.getColor(android.R.color.white))
                     progressBar.visibility = View.GONE
                     tvError.visibility = View.GONE
                 } else {
+                    layoutParams.gravity = android.view.Gravity.START
                     tvMessage.setBackgroundResource(R.drawable.bg_message_ai)
                     tvMessage.setTextColor(root.context.getColor(android.R.color.black))
                 }
+                messageContainer.layoutParams = layoutParams
 
                 when (message.status) {
                     MessageStatus.SENDING -> {
@@ -56,7 +61,7 @@ class ChatMessageAdapter : ListAdapter<ChatMessage, ChatMessageAdapter.ChatMessa
                     MessageStatus.ERROR -> {
                         progressBar.visibility = View.GONE
                         tvError.visibility = View.VISIBLE
-                        tvError.text = "Lỗi: ${message.text}"
+                        tvError.text = root.context.getString(R.string.error_message, message.text)
                     }
                 }
             }

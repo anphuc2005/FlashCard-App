@@ -2,13 +2,19 @@ package com.example.flashcardapp.network
 
 import com.example.flashcardapp.utils.Constants
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
     private val defaultClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
@@ -20,7 +26,7 @@ object RetrofitClient {
         .build()
 
     private val geminiRetrofit = Retrofit.Builder()
-        .baseUrl("https://generativelanguage.googleapis.com/")
+        .baseUrl(Constants.GEMINI_BASE_URL)
         .client(defaultClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -29,3 +35,5 @@ object RetrofitClient {
     val deckApiService: DeckApiService = retrofit.create(DeckApiService::class.java)
     val geminiApiService: GeminiApiService = geminiRetrofit.create(GeminiApiService::class.java)
 }
+
+

@@ -110,4 +110,11 @@
     <string name="back">Quay lại</string>
     <string name="attach">Đính kèm</string>
     <string name="send">Gửi</string>
+    <string name="ai_study_buddy">AI Study Buddy</string>
+    <string name="active_now">Active now</string>
+    <string name="ask_anything">Ask anything about your deck...</string>
+    <string name="ai_avatar">AI Avatar</string>
+    <string name="retry">Thử lại</string>
+    <string name="delete">Xóa</string>
+    <string name="error_message">Lỗi: %s</string>
 </resources>

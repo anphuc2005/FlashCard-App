@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
 }
 
 val localProperties = Properties()
@@ -23,10 +24,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+
         buildConfigField(
             "String",
-            "OPENAI_API_KEY",
-            "\"${localProperties["OPENAI_API_KEY"]?.toString()?.trim() ?: ""}\""
+            "GEMINI_API_KEY",
+            "\"${localProperties["GEMINI_API_KEY"]?.toString()?.trim() ?: ""}\""
         )
     }
 
@@ -65,8 +67,12 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.androidx.fragment)
+    
+    // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     implementation(libs.glide)
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)

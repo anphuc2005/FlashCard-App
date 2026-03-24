@@ -7,8 +7,9 @@ import androidx.room.PrimaryKey
 data class ChatMessageEntity(
     @PrimaryKey
     val id: String,
-    val message: String,
-    val sender: String, // "user" or "bot"
-    val timestamp: String? = null
+    val text: String,
+    val isUser: Boolean,
+    val timestamp: Long = System.currentTimeMillis(),
+    val status: String = "SUCCESS"
 )
 
