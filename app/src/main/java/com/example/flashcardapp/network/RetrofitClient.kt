@@ -25,15 +25,15 @@ object RetrofitClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private val geminiRetrofit = Retrofit.Builder()
-        .baseUrl(Constants.GEMINI_BASE_URL)
+    private val groqRetrofit = Retrofit.Builder()
+        .baseUrl(Constants.GROQ_BASE_URL)
         .client(defaultClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     val authApiService: AuthApiService = retrofit.create(AuthApiService::class.java)
     val deckApiService: DeckApiService = retrofit.create(DeckApiService::class.java)
-    val geminiApiService: GeminiApiService = geminiRetrofit.create(GeminiApiService::class.java)
+    val groqApiService: GroqApiService = groqRetrofit.create(GroqApiService::class.java)
 }
 
 

@@ -30,6 +30,12 @@ android {
             "GEMINI_API_KEY",
             "\"${localProperties["GEMINI_API_KEY"]?.toString()?.trim() ?: ""}\""
         )
+
+        buildConfigField(
+            "String",
+            "GROQ_API_KEY",
+            "\"${localProperties["GROQ_API_KEY"]?.toString()?.trim() ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -76,4 +82,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("com.vladsch.flexmark:flexmark:0.64.8")
 }

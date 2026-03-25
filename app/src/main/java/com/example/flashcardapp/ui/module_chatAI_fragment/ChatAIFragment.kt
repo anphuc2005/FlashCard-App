@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.BuildConfig
 import com.example.flashcardapp.databinding.FragmentChatAIBinding
 import com.example.flashcardapp.network.RetrofitClient
-import com.example.flashcardapp.repository.GeminiRepository
+import com.example.flashcardapp.repository.GroqRepository
 import com.example.flashcardapp.ui.adapter.ChatMessageAdapter
 import com.example.flashcardapp.viewmodel.ChatAIViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -45,13 +45,13 @@ class ChatAIFragment : Fragment() {
     }
 
     private fun setupViewModel() {
-        val geminiRepository = GeminiRepository(
-            RetrofitClient.geminiApiService,
-            BuildConfig.GEMINI_API_KEY
+        val groqRepository = GroqRepository(
+            RetrofitClient.groqApiService,
+            BuildConfig.GROQ_API_KEY
         )
         viewModel = ViewModelProvider(
             this,
-            ChatAIViewModelFactory(geminiRepository, requireContext())
+            ChatAIViewModelFactory(groqRepository, requireContext())
         )[ChatAIViewModel::class.java]
     }
 
@@ -122,7 +122,7 @@ class ChatAIFragment : Fragment() {
 }
 
 class ChatAIViewModelFactory(
-    private val repository: GeminiRepository,
+    private val repository: GroqRepository,
     private val context: Context
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")

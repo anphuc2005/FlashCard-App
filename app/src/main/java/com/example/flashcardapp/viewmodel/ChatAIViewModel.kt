@@ -7,7 +7,8 @@ import com.example.flashcardapp.data.database.ChatMessageDatabase
 import com.example.flashcardapp.data.entity.ChatMessageEntity
 import com.example.flashcardapp.data.model.ChatMessage
 import com.example.flashcardapp.data.model.MessageStatus
-import com.example.flashcardapp.repository.GeminiRepository
+import com.example.flashcardapp.repository.GroqRepository
+import com.example.flashcardapp.utils.MarkdownConverter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ChatAIViewModel(
-    private val geminiRepository: GeminiRepository,
+    private val groqRepository: GroqRepository,
     context: Context
 ) : ViewModel() {
 
@@ -108,13 +109,15 @@ class ChatAIViewModel(
             // Lưu tin nhắn AI loading vào database
             messageDAO.insertMessage(sendingMessage.toEntity())
 
-            val result = geminiRepository.sendMessage(userText, _messages.value)
+            val result = groqRepository.sendMessage(userText, _messages.value)
 
             result.onSuccess { aiResponse ->
                 // Cập nhật tin nhắn AI thành SUCCESS
+                // Convert markdown response sang plain text
+                val plainTextResponse = MarkdownConverter.markdownToPlainText(aiResponse)
                 val successMessage = ChatMessage(
                     id = aiMessageId,
-                    text = aiResponse,
+                    text = plainTextResponse,
                     isUser = false,
                     status = MessageStatus.SUCCESS
                 )

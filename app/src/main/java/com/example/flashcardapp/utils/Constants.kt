@@ -7,6 +7,7 @@ object Constants {
     const val FLASHCARD_TABLE = "flashcard_table"
     const val CHAT_MESSAGE_TABLE = "chat_message_table"
     const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
+    const val GROQ_BASE_URL = "https://api.groq.com/openai/v1/"
 
     // Intent keys
     const val DECK_ID_KEY = "deck_id"
