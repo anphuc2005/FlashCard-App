@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/chatAIFragment"
-        android:name="com.example.flashcardapp.ui.module_chatAI_fragment.ChatAIFragment"
+        android:name="com.example.flashcardapp.presentation.feature.aiChat.ChatAIFragment"
         android:label="fragment_chat_a_i"
         tools:layout="@layout/fragment_chat_a_i" />
 </navigation>

@@ -14,10 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FlashCardApp">
         <activity
-            android:name=".ui.activity.LearningActivity"
+            android:name=".presentation.feature.learning.LearningActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.DocumentViewerActivity"
+            android:name=".presentation.main.DocumentViewerActivity"
             android:exported="false" />
 <!--        <activity-->
 <!--            android:name=".ui.activity.SplashActivity"-->
@@ -32,7 +32,7 @@
 <!--            android:name=".ui.activity.MainActivity"-->
 <!--            android:exported="false" />-->
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".presentation.main.MainActivity"
             android:theme="@style/Theme.FlashCardApp.Splash"
             android:exported="true">
             <intent-filter>
@@ -41,16 +41,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.SplashActivity"
+            android:name=".presentation.main.SplashActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.AddDeckContainerActivity"
+            android:name=".presentation.feature.addDeck.AddDeckContainerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.AuthActivity"
+            android:name=".presentation.feature.aiChat.ChatAIActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.ChatAIActivity"
+            android:name=".presentation.feature.auth.AuthActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
     </application>

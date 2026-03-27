@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.fragment.HomeFragment"
+    tools:context=".presentation.feature.home.HomeFragment"
     android:background="?attr/colorOnBackground">
 
     <LinearLayout
@@ -181,7 +181,7 @@
                         android:textStyle="bold"/>
                 </LinearLayout>
 
-                <com.example.flashcardapp.utils.chart.ProgressBar
+                <com.example.flashcardapp.core.utils.chart.ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="match_parent"
                     android:layout_height="16dp"

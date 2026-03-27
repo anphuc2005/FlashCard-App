@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.module_learn_fragment.BackCardFragment"
+    tools:context=".presentation.feature.learning.BackCardFragment"
     android:background="?attr/colorOnBackground">
 
     <LinearLayout
@@ -83,7 +83,7 @@
                 android:textColor="#2E6BFF" />
         </LinearLayout>
 
-        <com.example.flashcardapp.utils.chart.ProgressBar
+        <com.example.flashcardapp.core.utils.chart.ProgressBar
             android:id="@+id/progressBar"
             style="@style/Widget.Material3.LinearProgressIndicator"
             android:layout_width="match_parent"

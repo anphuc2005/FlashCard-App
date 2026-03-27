@@ -38,7 +38,7 @@
                 android:textColor="#2E6BFF"/>
         </LinearLayout>
 
-        <com.example.flashcardapp.utils.chart.ProgressBar
+        <com.example.flashcardapp.core.utils.chart.ProgressBar
             android:id="@+id/prog2"
             android:layout_width="match_parent"
             android:layout_height="10dp"

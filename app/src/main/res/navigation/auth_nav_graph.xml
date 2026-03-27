@@ -8,7 +8,7 @@
     <!-- Onboarding Screen -->
     <fragment
         android:id="@+id/onboardingFragment"
-        android:name="com.example.flashcardapp.ui.feature.onboarding.OnboardingFragment"
+        android:name="com.example.flashcardapp.presentation.feature.onboarding.OnboardingFragment"
         tools:layout="@layout/fragment_onboarding">
         <action
             android:id="@+id/action_onboardingFragment_to_loginFragment"
@@ -20,7 +20,7 @@
     <!-- Login Screen -->
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.presentation.LoginFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.LoginFragment"
         android:label="@string/app_login"
         tools:layout="@layout/fragment_login">
         <!-- Navigate to Register -->
@@ -42,7 +42,7 @@
     <!-- Register Screen -->
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.presentation.RegisterFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.RegisterFragment"
         android:label="@string/app_register"
         tools:layout="@layout/fragment_register">
         <!-- Navigate to OTP Verification -->
@@ -54,7 +54,7 @@
     <!-- Forgot Password Screen -->
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.presentation.ForgotPasswordFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.ForgotPasswordFragment"
         android:label="@string/app_forgot_pass"
         tools:layout="@layout/fragment_forgot_password">
         <!-- Navigate to OTP Verification -->
@@ -66,7 +66,7 @@
     <!-- OTP Verification Screen -->
     <fragment
         android:id="@+id/otpVerificationFragment"
-        android:name="com.example.flashcardapp.ui.feature.auth.presentation.OtpVerificationFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.OtpVerificationFragment"
         android:label="@string/app_otp"
         tools:layout="@layout/fragment_otp_verification">
         <!-- Navigate back to Login (after OTP verification) -->
@@ -80,7 +80,7 @@
     <!-- Home Fragment (destination after login - exit point from auth flow) -->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.flashcardapp.ui.fragment.HomeFragment"
+        android:name="com.example.flashcardapp.presentation.feature.home.HomeFragment"
         android:label="@string/app_home_shortcut"
         tools:layout="@layout/fragment_home" />
 
