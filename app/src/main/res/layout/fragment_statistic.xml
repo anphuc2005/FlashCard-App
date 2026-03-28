@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.fragment.StatisticFragment"
+    tools:context=".presentation.feature.statistics.StatisticFragment"
     android:background="?attr/colorOnBackground">
 
     <androidx.core.widget.NestedScrollView
@@ -233,7 +233,7 @@
                     android:orientation="vertical"
                     android:padding="14dp">
 
-                    <com.example.flashcardapp.utils.chart.WeeklyBarChartView
+                    <com.example.flashcardapp.core.utils.chart.WeeklyBarChartView
                         android:id="@+id/weeklyChart"
                         android:layout_width="match_parent"
                         android:layout_height="120dp"

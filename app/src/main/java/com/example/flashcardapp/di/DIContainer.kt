@@ -1,12 +1,10 @@
 package com.example.flashcardapp.di
 
 import android.content.Context
-import com.example.flashcardapp.data.database.FlashCardDatabase
-import com.example.flashcardapp.network.RetrofitClient
-import com.example.flashcardapp.repository.ChatbotRepository
-import com.example.flashcardapp.repository.DeckRepository
-import com.example.flashcardapp.repository.FlashCardRepository
-import com.example.flashcardapp.viewmodel.ViewModelFactory
+import com.example.flashcardapp.data.datasource.local.database.FlashCardDatabase
+import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
+import com.example.flashcardapp.data.repository.DeckRepository
+import com.example.flashcardapp.data.repository.FlashCardRepository
 
 /**
  * Dependency Injection Container
@@ -14,28 +12,21 @@ import com.example.flashcardapp.viewmodel.ViewModelFactory
  */
 object DIContainer {
 
-    fun getViewModelFactory(context: Context): ViewModelFactory {
+    fun getDeckRepository(context: Context): DeckRepository {
         val database = FlashCardDatabase.getInstance(context)
 
-        val deckRepository = DeckRepository(
+        return DeckRepository(
             RetrofitClient.deckApiService,
             database.deckDao()
         )
+    }
 
-        val flashCardRepository = FlashCardRepository(
+    fun getFlashCardRepository(context: Context): FlashCardRepository {
+        val database = FlashCardDatabase.getInstance(context)
+
+        return FlashCardRepository(
             RetrofitClient.deckApiService,
             database.flashCardDao()
-        )
-
-        val chatbotRepository = ChatbotRepository(
-            RetrofitClient.chatbotApiService,
-            database.chatMessageDao()
-        )
-
-        return ViewModelFactory(
-            deckRepository,
-            flashCardRepository,
-            chatbotRepository
         )
     }
 }

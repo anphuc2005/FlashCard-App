@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.module_learn_fragment.FrontCardFragment"
+    tools:context=".presentation.feature.learning.FrontCardFragment"
     android:background="?attr/colorOnBackground">
 
     <LinearLayout
@@ -55,7 +55,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <com.example.flashcardapp.utils.chart.ProgressBar
+            <com.example.flashcardapp.core.utils.chart.ProgressBar
                 android:layout_width="0dp"
                 android:layout_height="10dp"
                 android:layout_marginTop="5dp"

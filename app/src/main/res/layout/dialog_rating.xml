@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="18dp"
+    android:background="@drawable/bg_dialog_round">
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_star_filled"
+        android:padding="15dp"
+        android:background="@drawable/bg_circle_soft"/>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="Đánh giá ứng dụng"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#1C1F2E"/>
+
+    <!-- 5 sao -->
+    <LinearLayout
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp">
+
+        <ImageView android:id="@+id/star1" style="@style/StarIcon.Filled"/>
+        <ImageView android:id="@+id/star2" style="@style/StarIcon.Filled"/>
+        <ImageView android:id="@+id/star3" style="@style/StarIcon.Filled"/>
+        <ImageView android:id="@+id/star4" style="@style/StarIcon.Filled"/>
+        <ImageView android:id="@+id/star5" style="@style/StarIcon.Outline"/>
+    </LinearLayout>
+
+    <!-- Nhận xét -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilComment"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:boxBackgroundColor="#F1F4F9"
+        app:boxCornerRadiusTopStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxStrokeWidth="0dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etComment"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="top|start"
+            android:hint="Nhận xét của bạn"
+            android:padding="12dp"
+            android:textSize="14sp"
+            android:textColor="#0F1F3C"
+            android:textColorHint="#9AA6B6"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Gửi -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubmit"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="16dp"
+        android:text="Gửi đánh giá"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:backgroundTint="#0A63E8"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="24dp"/>
+</LinearLayout>

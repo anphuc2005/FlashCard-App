@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/deckDetailFragment"
-        android:name="com.example.flashcardapp.ui.module_learn_fragment.DeckDetailFragment"
+        android:name="com.example.flashcardapp.presentation.feature.learning.DeckDetailFragment"
         android:label="fragment_deck_detail"
         tools:layout="@layout/fragment_deck_detail" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/sessionSettingFragment"
-        android:name="com.example.flashcardapp.ui.module_learn_fragment.SessionSettingFragment"
+        android:name="com.example.flashcardapp.presentation.feature.learning.SessionSettingFragment"
         android:label="fragment_session_setting"
         tools:layout="@layout/fragment_session_setting" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/frontCardFragment"
-        android:name="com.example.flashcardapp.ui.module_learn_fragment.FrontCardFragment"
+        android:name="com.example.flashcardapp.presentation.feature.learning.FrontCardFragment"
         android:label="fragment_front_card"
         tools:layout="@layout/fragment_front_card" >
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/backCardFragment"
-        android:name="com.example.flashcardapp.ui.module_learn_fragment.BackCardFragment"
+        android:name="com.example.flashcardapp.presentation.feature.learning.BackCardFragment"
         android:label="fragment_back_card"
         tools:layout="@layout/fragment_back_card" >
         <action
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/studyResultFragment"
-        android:name="com.example.flashcardapp.ui.module_learn_fragment.StudyResultFragment"
+        android:name="com.example.flashcardapp.presentation.feature.learning.StudyResultFragment"
         android:label="fragment_study_result"
         tools:layout="@layout/fragment_study_result" />
 </navigation>

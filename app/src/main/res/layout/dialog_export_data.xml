@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="18dp"
+    android:background="@drawable/bg_dialog_round">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xuất dữ liệu"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#1C1F2E"/>
+
+    <!-- Option CSV -->
+    <LinearLayout
+        android:id="@+id/rowCsv"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="14dp"
+        android:background="@drawable/bg_option_selected">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_file_csv"/>
+
+        <TextView
+            android:id="@+id/tvCsv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Định dạng CSV (.csv)"
+            android:textSize="15sp"
+            android:textColor="#1C1F2E"/>
+
+        <ImageView
+            android:id="@+id/radioCsv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_on"/>
+    </LinearLayout>
+
+    <!-- Option JSON -->
+    <LinearLayout
+        android:id="@+id/rowJson"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="14dp"
+        android:background="@drawable/bg_option_unselected">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_json"/>
+
+        <TextView
+            android:id="@+id/tvJson"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Định dạng JSON (.json)"
+            android:textSize="15sp"
+            android:textColor="#1C1F2E"/>
+
+        <ImageView
+            android:id="@+id/radioJson"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_off"/>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnExport"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginTop="16dp"
+        android:text="Xuất ngay"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:icon="@drawable/ic_download"
+        android:iconTint="#FFFFFF"
+        android:backgroundTint="#0A63E8"
+        android:textColor="#FFFFFF"
+        app:iconGravity="textStart"
+        app:cornerRadius="24dp"/>
+</LinearLayout>

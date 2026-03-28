@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
 }
 
 val localProperties = Properties()
@@ -23,10 +24,17 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+
         buildConfigField(
             "String",
-            "OPENAI_API_KEY",
-            "\"${localProperties["OPENAI_API_KEY"]?.toString()?.trim() ?: ""}\""
+            "GEMINI_API_KEY",
+            "\"${localProperties["GEMINI_API_KEY"]?.toString()?.trim() ?: ""}\""
+        )
+
+        buildConfigField(
+            "String",
+            "GROQ_API_KEY",
+            "\"${localProperties["GROQ_API_KEY"]?.toString()?.trim() ?: ""}\""
         )
     }
 
@@ -55,6 +63,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.gson)
@@ -67,11 +77,10 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.glide)
-    implementation(libs.androidx.navigation.fragment)
-    implementation(libs.androidx.navigation.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("com.vladsch.flexmark:flexmark:0.64.8")
 }

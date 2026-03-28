@@ -105,4 +105,18 @@
     <string name="register_terms_suffix"> của chúng tôi.</string>
     <string name="document_terms_title">Điều khoản dịch vụ</string>
     <string name="document_privacy_title">Chính sách bảo mật</string>
+
+    <!-- Chat AI Strings -->
+    <string name="back">Quay lại</string>
+    <string name="attach">Đính kèm</string>
+    <string name="send">Gửi</string>
+    <string name="ai_study_buddy">AI Study Buddy</string>
+    <string name="active_now">Active now</string>
+    <string name="ask_anything">Ask anything about your deck...</string>
+    <string name="ai_avatar">AI Avatar</string>
+    <string name="retry">Thử lại</string>
+    <string name="delete">Xóa</string>
+    <string name="error_message">Lỗi: %s</string>
+    <string name="reminder_notification_title">Đến giờ học rồi</string>
+    <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
 </resources>

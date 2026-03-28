@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/addDeckFragment"
-        android:name="com.example.flashcardapp.ui.module_add_fragment.AddDeckFragment"
+        android:name="com.example.flashcardapp.presentation.feature.addDeck.AddDeckFragment"
         android:label="Tạo Bộ Thẻ Mới"
         tools:layout="@layout/fragment_add_desk">
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/addCardFragment"
-        android:name="com.example.flashcardapp.ui.module_add_fragment.AddCardFragment"
+        android:name="com.example.flashcardapp.presentation.feature.addDeck.AddCardFragment"
         android:label="Thêm Thẻ"
         tools:layout="@layout/fragment_add_card" />
 

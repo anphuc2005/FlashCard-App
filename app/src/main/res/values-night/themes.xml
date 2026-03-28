@@ -12,6 +12,9 @@
         <!-- Component background -->
         <item name="componentBackground">@color/md_theme_dark_component_background</item>
 
+        <item name="bottomNavBackground">@color/md_theme_dark_bottomNav</item>"
+
+
         <!-- Card background -->
         <item name="cardBackgroundColor">@color/md_theme_dark_main_background</item>
 
