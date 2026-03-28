@@ -1,11 +1,16 @@
 package com.example.flashcardapp.presentation.feature.auth
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(
+    private val registerUseCase: RegisterUseCase
+) : ViewModel() {
 
     private val _formState = MutableStateFlow(RegisterFormState())
     val formState: StateFlow<RegisterFormState> = _formState.asStateFlow()
@@ -41,8 +46,17 @@ class RegisterViewModel : ViewModel() {
     fun submit() {
         if (validateForm()) {
             _uiState.value = AuthOperationState.Loading
-            // TODO: Implement register logic
-            _uiState.value = AuthOperationState.Success("Registration successful")
+            viewModelScope.launch {
+                val result = registerUseCase(email, password, fullName)
+                result.onSuccess {
+                    _uiState.value = AuthOperationState.Success("Registration successful")
+                }
+                result.onFailure { throwable ->
+                    _uiState.value = AuthOperationState.Error(
+                        throwable.message ?: "An unexpected error occurred"
+                    )
+                }
+            }
         }
     }
 
@@ -62,10 +76,16 @@ class RegisterViewModel : ViewModel() {
         if (email.isBlank()) {
             _formState.value = errors.copy(emailError = "Email is required")
             isValid = false
+        } else if (!email.contains("@")) {
+            _formState.value = errors.copy(emailError = "Invalid email format")
+            isValid = false
         }
 
         if (password.isBlank()) {
             _formState.value = errors.copy(passwordError = "Password is required")
+            isValid = false
+        } else if (password.length < 6) {
+            _formState.value = errors.copy(passwordError = "Password must be at least 6 characters")
             isValid = false
         }
 

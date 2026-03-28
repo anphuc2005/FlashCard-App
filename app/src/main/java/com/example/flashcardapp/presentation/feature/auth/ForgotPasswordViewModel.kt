@@ -1,11 +1,16 @@
 package com.example.flashcardapp.presentation.feature.auth
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.flashcardapp.domain.usecase.auth.ForgotPasswordUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class ForgotPasswordViewModel : ViewModel() {
+class ForgotPasswordViewModel(
+    private val forgotPasswordUseCase: ForgotPasswordUseCase
+) : ViewModel() {
 
     private val _formState = MutableStateFlow(ForgotPasswordFormState())
     val formState: StateFlow<ForgotPasswordFormState> = _formState.asStateFlow()
@@ -23,8 +28,17 @@ class ForgotPasswordViewModel : ViewModel() {
     fun submit() {
         if (validateForm()) {
             _uiState.value = AuthOperationState.Loading
-            // TODO: Implement forgot password logic
-            _uiState.value = AuthOperationState.Success("Verification code sent")
+            viewModelScope.launch {
+                val result = forgotPasswordUseCase(email)
+                result.onSuccess {
+                    _uiState.value = AuthOperationState.Success("Verification code sent to your email")
+                }
+                result.onFailure { throwable ->
+                    _uiState.value = AuthOperationState.Error(
+                        throwable.message ?: "An unexpected error occurred"
+                    )
+                }
+            }
         }
     }
 
@@ -38,6 +52,9 @@ class ForgotPasswordViewModel : ViewModel() {
 
         if (email.isBlank()) {
             _formState.value = errors.copy(emailError = "Email is required")
+            isValid = false
+        } else if (!email.contains("@")) {
+            _formState.value = errors.copy(emailError = "Invalid email format")
             isValid = false
         }
 

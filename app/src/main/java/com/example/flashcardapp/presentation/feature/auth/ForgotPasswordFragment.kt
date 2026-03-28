@@ -5,13 +5,14 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
+import com.example.flashcardapp.di.AuthModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -21,12 +22,13 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ForgotPasswordViewModel by viewModels()
+    private lateinit var viewModel: ForgotPasswordViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentForgotPasswordBinding.bind(view)
 
+        setupViewModel()
         setupListeners()
         observeViewModel()
     }
@@ -39,6 +41,14 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private fun setupViewModel() {
+        val useCases = AuthModule.provideAuthUseCases(requireContext())
+        viewModel = ViewModelProvider(
+            this,
+            AuthViewModelFactory(useCases)
+        )[ForgotPasswordViewModel::class.java]
     }
 
     private fun setupListeners() {

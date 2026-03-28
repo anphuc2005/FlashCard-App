@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,14 +16,8 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentAccountBinding
 import com.example.flashcardapp.databinding.ItemSettingRowBinding
 import com.example.flashcardapp.presentation.feature.account.ExportDataDialog.ExportFormat
-import com.example.flashcardapp.presentation.feature.account.ExportDataDialog
-import com.example.flashcardapp.presentation.feature.account.LogoutConfirmDialog
-import com.example.flashcardapp.presentation.feature.account.NotificationDialog
-import com.example.flashcardapp.presentation.feature.account.RatingDialog
-import com.example.flashcardapp.presentation.feature.account.ReminderDialog
-import com.example.flashcardapp.presentation.feature.account.ReminderScheduler
-import com.example.flashcardapp.presentation.feature.account.ThemeDialog
 import com.example.flashcardapp.presentation.feature.account.ThemeDialog.ThemeOption
+import com.example.flashcardapp.presentation.feature.auth.AuthActivity
 
 class AccountFragment : Fragment() {
 
@@ -265,9 +258,9 @@ class AccountFragment : Fragment() {
         val dialog = LogoutConfirmDialog()
         dialog.listener = object : LogoutConfirmDialog.Listener {
             override fun onConfirmLogout() {
-                val intent: Intent = requireActivity().packageManager.getLaunchIntentForPackage(requireActivity().packageName) ?: return
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                val intent = Intent(requireContext(), AuthActivity::class.java)
                 startActivity(intent)
+                requireActivity().finish()
             }
         }
         dialog.show(childFragmentManager, "LogoutConfirmDialog")

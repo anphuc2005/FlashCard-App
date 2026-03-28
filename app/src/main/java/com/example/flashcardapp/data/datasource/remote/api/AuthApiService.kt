@@ -1,5 +1,6 @@
 package com.example.flashcardapp.data.datasource.remote.api
 
+import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
@@ -15,12 +16,12 @@ interface AuthApiService {
 
     // Update these endpoint paths to match your backend auth module.
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+    suspend fun login(@Body request: LoginRequest): Response<ApiResponse<LoginResponse>>
 
     @POST("auth/register")
-    suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
+    suspend fun register(@Body request: RegisterRequest): Response<ApiResponse<RegisterResponse>>
 
     @POST("auth/forgot-password")
-    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<ForgotPasswordResponse>
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<ApiResponse<ForgotPasswordResponse>>
 }
 

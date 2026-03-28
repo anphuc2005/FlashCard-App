@@ -15,8 +15,8 @@ class DeckRepository(
     suspend fun getAllDecksFromApi(): Result<List<Deck>> {
         return try {
             val response = deckApiService.getAllDecks()
-            if (response.success && response.data != null) {
-                // Lưu vào local database
+            if (response.isSuccess() && response.data != null) {
+                // ...existing code...
                 response.data.forEach { deck ->
                     val deckEntity = DeckEntity(
                         id = deck.id,
@@ -45,7 +45,7 @@ class DeckRepository(
     suspend fun getDeckByIdFromApi(id: String): Result<Deck> {
         return try {
             val response = deckApiService.getDeckById(id)
-            if (response.success && response.data != null) {
+            if (response.isSuccess() && response.data != null) {
                 val deckEntity = DeckEntity(
                     id = response.data.id,
                     name = response.data.name,
@@ -67,7 +67,7 @@ class DeckRepository(
     suspend fun createDeck(deck: Deck): Result<Deck> {
         return try {
             val response = deckApiService.createDeck(deck)
-            if (response.success && response.data != null) {
+            if (response.isSuccess() && response.data != null) {
                 val deckEntity = DeckEntity(
                     id = response.data.id,
                     name = response.data.name,
@@ -89,7 +89,7 @@ class DeckRepository(
     suspend fun updateDeck(id: String, deck: Deck): Result<Deck> {
         return try {
             val response = deckApiService.updateDeck(id, deck)
-            if (response.success && response.data != null) {
+            if (response.isSuccess() && response.data != null) {
                 val deckEntity = DeckEntity(
                     id = response.data.id,
                     name = response.data.name,
@@ -111,7 +111,7 @@ class DeckRepository(
     suspend fun deleteDeck(id: String): Result<String> {
         return try {
             val response = deckApiService.deleteDeck(id)
-            if (response.success) {
+            if (response.isSuccess()) {
                 deckDao.deleteDeckById(id)
                 Result.success(response.message ?: "Deleted successfully")
             } else {

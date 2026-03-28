@@ -1,17 +1,20 @@
 package com.example.flashcardapp.presentation.feature.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
+import com.example.flashcardapp.di.AuthModule
+import com.example.flashcardapp.presentation.main.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -21,12 +24,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: LoginViewModel by viewModels()
+    private lateinit var viewModel: LoginViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentLoginBinding.bind(view)
 
+        setupViewModel()
         setupListeners()
         observeViewModel()
     }
@@ -39,6 +43,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private fun setupViewModel() {
+        val useCases = AuthModule.provideAuthUseCases(requireContext())
+        viewModel = ViewModelProvider(
+            this,
+            AuthViewModelFactory(useCases)
+        )[LoginViewModel::class.java]
     }
 
     private fun setupListeners() {
@@ -76,7 +88,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
                                 viewModel.resetUiState()
-                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                                val intent = Intent(requireContext(), MainActivity::class.java)
+                                startActivity(intent)
+                                requireActivity().finish()
                             }
 
                             is AuthOperationState.Error -> {

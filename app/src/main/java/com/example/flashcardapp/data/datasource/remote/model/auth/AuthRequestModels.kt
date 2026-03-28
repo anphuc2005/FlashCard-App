@@ -6,10 +6,9 @@ data class LoginRequest(
 )
 
 data class RegisterRequest(
-    val fullName: String,
+    val displayName: String,
     val email: String,
-    val password: String,
-    val confirmPassword: String
+    val password: String
 )
 
 data class ForgotPasswordRequest(

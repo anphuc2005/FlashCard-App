@@ -13,13 +13,14 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentRegisterBinding
+import com.example.flashcardapp.di.AuthModule
 import com.example.flashcardapp.presentation.main.DocumentViewerActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -30,12 +31,13 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: RegisterViewModel by viewModels()
+    private lateinit var viewModel: RegisterViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentRegisterBinding.bind(view)
 
+        setupViewModel()
         setupTermsText()
         setupListeners()
         observeViewModel()
@@ -49,6 +51,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private fun setupViewModel() {
+        val useCases = AuthModule.provideAuthUseCases(requireContext())
+        viewModel = ViewModelProvider(
+            this,
+            AuthViewModelFactory(useCases)
+        )[RegisterViewModel::class.java]
     }
 
     private fun setupListeners() {
