@@ -9,6 +9,8 @@
         <!-- Main background -->
         <item name="mainBackground">@color/md_theme_light_main_background</item>
 
+        <item name="bottomNavBackground">@color/md_theme_light_bottomNav</item>"
+
         <!-- Component background -->
         <item name="componentBackground">@color/md_theme_light_component_background</item>
 

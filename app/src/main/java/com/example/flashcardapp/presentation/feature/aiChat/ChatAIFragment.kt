@@ -1,6 +1,5 @@
 package com.example.flashcardapp.presentation.feature.aiChat
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,9 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.flashcardapp.BuildConfig
-import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
-import com.example.flashcardapp.data.repository.GroqRepository
+import com.example.flashcardapp.di.ChatModule
+import com.example.flashcardapp.domain.usecase.chat.ChatUseCases
 import com.example.flashcardapp.databinding.FragmentChatAIBinding
 import com.example.flashcardapp.presentation.common.adapter.ChatMessageAdapter
 import kotlinx.coroutines.flow.collectLatest
@@ -46,13 +44,10 @@ class ChatAIFragment : Fragment() {
     }
 
     private fun setupViewModel() {
-        val groqRepository = GroqRepository(
-            RetrofitClient.groqApiService,
-            BuildConfig.GROQ_API_KEY
-        )
+        val useCases = ChatModule.provideChatUseCases(requireContext())
         viewModel = ViewModelProvider(
             this,
-            ChatAIViewModelFactory(groqRepository, requireContext())
+            ChatAIViewModelFactory(useCases)
         )[ChatAIViewModel::class.java]
     }
 
@@ -123,11 +118,10 @@ class ChatAIFragment : Fragment() {
 }
 
 class ChatAIViewModelFactory(
-    private val repository: GroqRepository,
-    private val context: Context
+    private val useCases: ChatUseCases
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ChatAIViewModel(repository, context) as T
+        return ChatAIViewModel(useCases) as T
     }
 }

@@ -14,6 +14,11 @@
     <color name="md_theme_light_loading_background1">#2563EB</color>
     <color name="md_theme_light_loading_background2">#22D3EE</color>
 
+    <color name="md_theme_light_bottomNav">#FFFFFFFF</color>
+    <color name="md_theme_dark_bottomNav">#1E293BF2</color>
+
+
+
     <!-- Splash -->
     <color name="splash_background_base">#F4F8FF</color>
     <color name="splash_background_glow_start">#807DB7FF</color>
@@ -107,4 +112,9 @@
     <color name="chip_selector">#EAF2FF</color>
     <color name="switch_thumb">#2E6BFF</color>
     <color name="switch_track">#99C2FF</color>
+
+    <color name="switch_thumb_blue">#0A63E8</color>
+    <color name="switch_track_blue">#99BFF5</color>
+    <color name="switch_thumb_gray">#FFFFFF</color>
+    <color name="switch_track_gray">#D9DDE2</color>
 </resources>

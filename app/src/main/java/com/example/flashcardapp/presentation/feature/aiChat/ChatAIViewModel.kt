@@ -1,14 +1,9 @@
 package com.example.flashcardapp.presentation.feature.aiChat
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.data.datasource.local.database.ChatMessageDatabase
-import com.example.flashcardapp.data.datasource.local.entity.ChatMessageEntity
 import com.example.flashcardapp.domain.model.ChatMessage
-import com.example.flashcardapp.data.model.ChatMessage as DataChatMessage
-import com.example.flashcardapp.data.model.MessageStatus as DataMessageStatus
-import com.example.flashcardapp.data.repository.GroqRepository
+import com.example.flashcardapp.domain.usecase.chat.ChatUseCases
 import com.example.flashcardapp.utils.MarkdownConverter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +16,7 @@ enum class MessageStatus {
 }
 
 class ChatAIViewModel(
-    private val groqRepository: GroqRepository,
-    context: Context
+    private val useCases: ChatUseCases
 ) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
@@ -34,49 +28,16 @@ class ChatAIViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    private val messageDAO = ChatMessageDatabase.getDatabase(context).chatMessageDao()
-
     init {
-        loadChatHistory()
+        observeMessages()
     }
 
-    private fun loadChatHistory() {
+    private fun observeMessages() {
         viewModelScope.launch {
-            messageDAO.getAllMessages().collect { entities ->
-                val messages = entities
-                    .map { it.toChatMessage() }
-                    .sortedBy { it.timestamp }
-                _messages.value = messages
+            useCases.observeMessages().collect { messages ->
+                _messages.value = messages.sortedBy { it.timestamp }
             }
         }
-    }
-
-    private fun ChatMessageEntity.toChatMessage(): ChatMessage {
-        return ChatMessage(
-            id = this.id,
-            message = this.text,
-            sender = if (this.isUser) "user" else "bot",
-            timestamp = this.timestamp.toString()
-        )
-    }
-
-    private fun ChatMessage.toEntity(): ChatMessageEntity {
-        return ChatMessageEntity(
-            id = this.id,
-            text = this.message,
-            isUser = this.sender == "user",
-            timestamp = this.timestamp?.toLongOrNull() ?: System.currentTimeMillis()
-        )
-    }
-
-    private fun ChatMessage.toDataModel(): DataChatMessage {
-        return DataChatMessage(
-            id = this.id,
-            text = this.message,
-            isUser = this.sender == "user",
-            timestamp = this.timestamp?.toLongOrNull() ?: System.currentTimeMillis(),
-            status = DataMessageStatus.SUCCESS
-        )
     }
 
     /**
@@ -90,17 +51,15 @@ class ChatAIViewModel(
             id = UUID.randomUUID().toString(),
             message = userText,
             sender = "user",
-            timestamp = System.currentTimeMillis().toString()
+            timestamp = System.currentTimeMillis()
         )
         _messages.value = _messages.value + userMessage
         _error.value = null
 
-        // Lưu tin nhắn user vào database
         viewModelScope.launch {
-            messageDAO.insertMessage(userMessage.toEntity())
+            useCases.saveMessage(userMessage)
         }
 
-        // Gửi request đến AI
         viewModelScope.launch {
             _isLoading.value = true
 
@@ -110,16 +69,15 @@ class ChatAIViewModel(
                 id = aiMessageId,
                 message = "Đang suy nghĩ...",
                 sender = "bot",
-                timestamp = System.currentTimeMillis().toString()
+                timestamp = System.currentTimeMillis()
             )
             _messages.value = _messages.value + sendingMessage
 
-            // Lưu tin nhắn AI loading vào database
-            messageDAO.insertMessage(sendingMessage.toEntity())
+            useCases.saveMessage(sendingMessage)
 
-            val result = groqRepository.sendMessage(
+            val result = useCases.sendMessage(
                 userMessage = userText,
-                chatHistory = _messages.value.map { it.toDataModel() }
+                history = _messages.value
             )
 
             result.onSuccess { aiResponse ->
@@ -130,7 +88,7 @@ class ChatAIViewModel(
                     id = aiMessageId,
                     message = plainTextResponse,
                     sender = "bot",
-                    timestamp = System.currentTimeMillis().toString()
+                    timestamp = System.currentTimeMillis()
                 )
                 _messages.value = _messages.value.map { message ->
                     if (message.id == aiMessageId) {
@@ -139,9 +97,8 @@ class ChatAIViewModel(
                         message
                     }
                 }
-                // Lưu tin nhắn AI SUCCESS vào database
                 viewModelScope.launch {
-                    messageDAO.insertMessage(successMessage.toEntity())
+                    useCases.saveMessage(successMessage)
                 }
             }
 
@@ -151,7 +108,7 @@ class ChatAIViewModel(
                     id = aiMessageId,
                     message = "Xin lỗi, có lỗi xảy ra: ${exception.message}",
                     sender = "bot",
-                    timestamp = System.currentTimeMillis().toString()
+                    timestamp = System.currentTimeMillis()
                 )
                 _messages.value = _messages.value.map { message ->
                     if (message.id == aiMessageId) {
@@ -160,9 +117,8 @@ class ChatAIViewModel(
                         message
                     }
                 }
-                // Lưu tin nhắn AI ERROR vào database
                 viewModelScope.launch {
-                    messageDAO.insertMessage(errorMessage.toEntity())
+                    useCases.saveMessage(errorMessage)
                 }
                 _error.value = exception.message ?: "Unknown error"
             }
@@ -178,7 +134,7 @@ class ChatAIViewModel(
         _messages.value = emptyList()
         _error.value = null
         viewModelScope.launch {
-            messageDAO.deleteAllMessages()
+            useCases.clearMessages()
         }
     }
 
@@ -191,7 +147,7 @@ class ChatAIViewModel(
 
         if (messageToDelete != null) {
             viewModelScope.launch {
-                messageDAO.deleteMessage(messageToDelete.toEntity())
+                useCases.deleteMessage(messageToDelete.id)
             }
         }
     }

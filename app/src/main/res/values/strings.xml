@@ -117,4 +117,6 @@
     <string name="retry">Thử lại</string>
     <string name="delete">Xóa</string>
     <string name="error_message">Lỗi: %s</string>
+    <string name="reminder_notification_title">Đến giờ học rồi</string>
+    <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
 </resources>

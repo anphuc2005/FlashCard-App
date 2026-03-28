@@ -10,6 +10,8 @@
     <!-- Component background -->
     <attr name="componentBackground" format="color" />
 
+    <attr name="bottomNavBackground" format="color" />"
+
     <!-- Text -->
     <attr name="textColor" format="color" />
 

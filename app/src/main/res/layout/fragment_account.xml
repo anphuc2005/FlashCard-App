@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.fragment.AccountFragment"
+    tools:context=".presentation.feature.account.AccountFragment"
     android:background="?attr/colorOnBackground">
 
     <LinearLayout
@@ -72,16 +72,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/user"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_avatar_circle"
+                    android:clipToOutline="true" />
 
-                <ImageView
-                    android:id="@+id/avatarBadge"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                <ImageButton
+                    android:id="@+id/btnEditAvatar"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="bottom|end"
-                    android:layout_margin="4dp"
                     android:src="@drawable/ic_check"
-                    />
+                    android:background="@drawable/bg_avatar_badge"
+                    android:clipToOutline="true" />
             </FrameLayout>
 
             <TextView
@@ -128,8 +130,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <include layout="@layout/item_setting_row" android:id="@+id/rowDaily" />
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEF1F6"/>
                     <include layout="@layout/item_setting_row" android:id="@+id/rowReminder" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

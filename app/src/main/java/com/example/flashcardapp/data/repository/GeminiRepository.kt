@@ -2,30 +2,49 @@ package com.example.flashcardapp.data.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import com.example.flashcardapp.data.datasource.local.dao.ChatMessageDao
+import com.example.flashcardapp.data.datasource.local.entity.ChatMessageEntity
+import com.example.flashcardapp.data.datasource.remote.api.GeminiApiService
 import com.example.flashcardapp.data.datasource.remote.model.GeminiContent
 import com.example.flashcardapp.data.datasource.remote.model.GeminiPart
 import com.example.flashcardapp.data.datasource.remote.model.GeminiRequest
-import com.example.flashcardapp.data.datasource.remote.api.GeminiApiService
+import com.example.flashcardapp.domain.model.ChatMessage
+import com.example.flashcardapp.domain.repository.ChatRepository
 import com.example.flashcardapp.utils.TopicValidator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
-/**
- * Repository giao tiếp với Gemini thông qua Retrofit
- */
+/** Chat repository implementation using Gemini backend and local cache. */
 class GeminiRepository(
     private val apiService: GeminiApiService,
-    private val apiKey: String
-) {
+    private val apiKey: String,
+    private val chatMessageDao: ChatMessageDao
+) : ChatRepository {
 
-    /**
-     * Gửi tin nhắn đơn giản không có lịch sử
-     */
-    suspend fun sendSimpleMessage(userMessage: String): Result<String> =
+    override fun observeMessages(): Flow<List<ChatMessage>> =
+        chatMessageDao.getAllMessages()
+            .map { entities ->
+                entities.sortedBy { it.timestamp }.map { it.toDomain() }
+            }
+
+    override suspend fun saveMessage(message: ChatMessage) {
+        chatMessageDao.insertMessage(message.toEntity())
+    }
+
+    override suspend fun deleteMessageById(id: String) {
+        chatMessageDao.getMessageById(id)?.let { chatMessageDao.deleteMessage(it) }
+    }
+
+    override suspend fun clearMessages() {
+        chatMessageDao.deleteAllMessages()
+    }
+
+    override suspend fun sendMessage(userMessage: String, chatHistory: List<ChatMessage>): Result<String> =
         withContext(Dispatchers.IO) {
             try {
-                // Kiểm tra câu hỏi có liên quan đến FlashCard không
                 if (!TopicValidator.isFlashCardRelated(userMessage)) {
                     return@withContext Result.success(TopicValidator.getOutOfTopicMessage())
                 }
@@ -59,5 +78,20 @@ class GeminiRepository(
                 Result.failure(e)
             }
         }
+
+    private fun ChatMessageEntity.toDomain(): ChatMessage = ChatMessage(
+        id = id,
+        message = text,
+        sender = if (isUser) "user" else "bot",
+        timestamp = timestamp
+    )
+
+    private fun ChatMessage.toEntity(): ChatMessageEntity = ChatMessageEntity(
+        id = id,
+        text = message,
+        isUser = sender == "user",
+        timestamp = timestamp,
+        status = "SUCCESS"
+    )
 }
 
