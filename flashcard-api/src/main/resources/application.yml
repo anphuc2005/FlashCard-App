@@ -1,0 +1,72 @@
+# ====================================
+# FLASHCARD API - Application Config
+# ====================================
+
+server:
+  port: 8080
+
+# ====================================
+# MongoDB Configuration
+# ====================================
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/flashcard_db}
+
+# ====================================
+# JWT Configuration
+# ====================================
+app:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:Rmxhc2hjYXJkQXBpU2VjcmV0S2V5UmVwbGFjZWRXaXRoVmFsaWRCYXNlNjRQbGVhc2VDaGFuZ2VBQkNERUYxMjM0NTY3ODkw}
+    # Access token expiration: 1 hour (in milliseconds)
+    access-token-expiration: 3600000
+    # Refresh token expiration: 7 days (in milliseconds)
+    refresh-token-expiration: 604800000
+
+  # ====================================
+  # Social Login Configuration
+  # ====================================
+  social:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID}
+    facebook:
+      app-id: ${FACEBOOK_APP_ID}
+      app-secret: ${FACEBOOK_APP_SECRET}
+
+  # ====================================
+  # Cloudinary Configuration
+  # Images are uploaded to Cloudinary, then the URL is stored in MongoDB
+  # ====================================
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME}
+    api-key: ${CLOUDINARY_API_KEY}
+    api-secret: ${CLOUDINARY_API_SECRET}
+
+# ====================================
+# Springdoc / Swagger UI Configuration
+# ====================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+  info:
+    title: Flashcard API
+    description: RESTful API for Mobile Flashcard Application (Offline-First)
+    version: 1.0.0
+    contact:
+      name: Flashcard Team
+
+# ====================================
+# Logging (Optional - helpful for dev)
+# ====================================
+logging:
+  level:
+    root: INFO
+    com.flashcard: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.data.mongodb: DEBUG
