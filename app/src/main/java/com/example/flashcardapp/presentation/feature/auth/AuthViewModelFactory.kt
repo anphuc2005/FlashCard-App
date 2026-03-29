@@ -11,6 +11,8 @@ class AuthViewModelFactory(private val useCases: AuthUseCases) : ViewModelProvid
             LoginViewModel::class.java -> LoginViewModel(useCases.login) as T
             RegisterViewModel::class.java -> RegisterViewModel(useCases.register) as T
             ForgotPasswordViewModel::class.java -> ForgotPasswordViewModel(useCases.forgotPassword) as T
+            OtpVerificationViewModel::class.java -> OtpVerificationViewModel(useCases.verifyOtp) as T
+            ResetPasswordViewModel::class.java -> ResetPasswordViewModel(useCases.resetPassword) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

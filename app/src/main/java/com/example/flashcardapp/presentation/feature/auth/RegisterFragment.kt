@@ -21,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentRegisterBinding
 import com.example.flashcardapp.di.AuthModule
+import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.main.DocumentViewerActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -32,6 +33,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: RegisterViewModel
+    private var loadingDialog: LoadingDialogFragment? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -166,16 +168,30 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 launch {
                     viewModel.uiState.collect { state ->
                         when (state) {
-                            AuthOperationState.Idle -> renderLoading(false)
-                            AuthOperationState.Loading -> renderLoading(true)
+                            AuthOperationState.Idle -> {
+                                renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
+                            }
+                            AuthOperationState.Loading -> {
+                                renderLoading(true)
+                                if (loadingDialog == null || loadingDialog?.isVisible == false) {
+                                    loadingDialog = LoadingDialogFragment.newInstance("Đang tạo tài khoản...")
+                                    loadingDialog?.show(childFragmentManager, "LoadingDialog")
+                                }
+                            }
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
                                 viewModel.resetUiState()
                                 findNavController().navigate(R.id.action_registerFragment_to_otpVerificationFragment)
                             }
 
                             is AuthOperationState.Error -> {
                                 renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                                 viewModel.resetUiState()
                             }

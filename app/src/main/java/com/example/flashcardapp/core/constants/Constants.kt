@@ -1,7 +1,8 @@
 package com.example.flashcardapp.core.constants
 
 object Constants {
-    const val BASE_URL = "https://api.tolalinhne.site/api/v1/"
+//    const val BASE_URL = "https://api.tolalinhne.site/api/v1/"
+    const val BASE_URL = "http://10.0.2.2:8080/api/v1/"
     const val DATABASE_NAME = "flashcard_database"
     const val DECK_TABLE = "deck_table"
     const val FLASHCARD_TABLE = "flashcard_table"

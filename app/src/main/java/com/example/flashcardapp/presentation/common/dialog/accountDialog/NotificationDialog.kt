@@ -1,16 +1,15 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.app.Dialog
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
-import com.example.flashcardapp.databinding.DialogNotificationBinding
 import androidx.core.graphics.drawable.toDrawable
+import androidx.fragment.app.DialogFragment
 import com.example.flashcardapp.R
+import com.example.flashcardapp.databinding.DialogNotificationBinding
 
 class NotificationDialog : DialogFragment() {
 
@@ -26,7 +25,7 @@ class NotificationDialog : DialogFragment() {
     private var study = true
     private var newDeck = false
     private var achievement = true
-    
+
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

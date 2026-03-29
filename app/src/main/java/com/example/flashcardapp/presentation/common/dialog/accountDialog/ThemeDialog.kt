@@ -1,15 +1,14 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.app.Dialog
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.DialogThemeBinding
-import androidx.core.graphics.drawable.toDrawable
 
 class ThemeDialog : DialogFragment() {
 

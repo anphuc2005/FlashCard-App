@@ -1,4 +1,4 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -58,4 +57,3 @@ object ReminderNotificationHelper {
         manager.createNotificationChannel(channel)
     }
 }
-

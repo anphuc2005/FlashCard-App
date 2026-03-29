@@ -5,40 +5,38 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
-import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
+import com.example.flashcardapp.databinding.FragmentResetPasswordBinding
 import com.example.flashcardapp.di.AuthModule
-import com.example.flashcardapp.presentation.common.dialog.authDialog.CheckEmailDialogFragment
+import com.example.flashcardapp.presentation.common.dialog.authDialog.SuccessDialogFragment
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
-class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
+class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password) {
 
-    private var _binding: FragmentForgotPasswordBinding? = null
+    private var _binding: FragmentResetPasswordBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: ForgotPasswordViewModel
+    private lateinit var viewModel: ResetPasswordViewModel
+    private var emailArg: String? = null
+    private var otpArg: String? = null
     private var loadingDialog: LoadingDialogFragment? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentForgotPasswordBinding.bind(view)
+        _binding = FragmentResetPasswordBinding.bind(view)
+
+        emailArg = arguments?.getString(OtpVerificationFragment.ARG_EMAIL)
+        otpArg = arguments?.getString(OtpVerificationFragment.ARG_OTP)
 
         setupViewModel()
         setupListeners()
         observeViewModel()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideMainChrome()
     }
 
     override fun onDestroyView() {
@@ -51,19 +49,17 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
         viewModel = ViewModelProvider(
             this,
             AuthViewModelFactory(useCases)
-        )[ForgotPasswordViewModel::class.java]
+        )[ResetPasswordViewModel::class.java]
+        viewModel.setContext(emailArg, otpArg)
     }
 
     private fun setupListeners() {
-        binding.buttonBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
-        binding.buttonSendVerificationCode.setOnClickListener {
-            viewModel.submit()
-        }
-        binding.inputEmail.doAfterTextChanged {
-            viewModel.onEmailChanged(it?.toString().orEmpty())
-        }
+        binding.btnBack.setOnClickListener { findNavController().popBackStack() }
+        binding.btnCancel.setOnClickListener { findNavController().popBackStack(R.id.loginFragment, false) }
+        binding.btnUpdate.setOnClickListener { viewModel.submit() }
+
+        binding.etNewPass.doAfterTextChanged { viewModel.onNewPasswordChanged(it?.toString().orEmpty()) }
+        binding.etConfirmPass.doAfterTextChanged { viewModel.onConfirmPasswordChanged(it?.toString().orEmpty()) }
     }
 
     private fun observeViewModel() {
@@ -71,7 +67,8 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.formState.collect { state ->
-                        binding.layoutEmail.error = state.emailError
+                        binding.tilNewPass.error = state.passwordError
+                        binding.tilConfirmPass.error = state.confirmPasswordError
                     }
                 }
 
@@ -86,7 +83,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                             AuthOperationState.Loading -> {
                                 renderLoading(true)
                                 if (loadingDialog == null || loadingDialog?.isVisible == false) {
-                                    loadingDialog = LoadingDialogFragment.newInstance("Đang gửi mã xác minh...")
+                                    loadingDialog = LoadingDialogFragment.newInstance("Đang đặt lại mật khẩu...")
                                     loadingDialog?.show(childFragmentManager, "LoadingDialog")
                                 }
                             }
@@ -94,9 +91,9 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                                 renderLoading(false)
                                 loadingDialog?.dismiss()
                                 loadingDialog = null
-                                showCheckEmailDialog(state.email)
+                                viewModel.resetUiState()
+                                showSuccessDialog()
                             }
-
                             is AuthOperationState.Error -> {
                                 renderLoading(false)
                                 loadingDialog?.dismiss()
@@ -112,36 +109,19 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     }
 
     private fun renderLoading(isLoading: Boolean) {
-        binding.buttonSendVerificationCode.isEnabled = !isLoading
-        binding.buttonSendVerificationCode.alpha = if (isLoading) 0.7f else 1f
+        binding.btnUpdate.isEnabled = !isLoading
+        binding.btnUpdate.alpha = if (isLoading) 0.7f else 1f
     }
 
-    private fun showCheckEmailDialog(email: String?) {
-        val dialog = CheckEmailDialogFragment.newInstance(email)
-        dialog.setOnUnderstandClickListener {
-            navigateToOtp(email)
-            viewModel.resetUiState()
+    private fun showSuccessDialog() {
+        val dialog = SuccessDialogFragment.newInstance(
+            title = getString(R.string.reset_password_success_title),
+            message = getString(R.string.reset_password_success_message),
+            buttonText = getString(R.string.app_login)
+        )
+        dialog.setOnContinueClickListener {
+            findNavController().navigate(R.id.action_resetPasswordFragment_to_loginFragment)
         }
-        dialog.setOnResendClickListener {
-            viewModel.submit()
-        }
-        dialog.show(childFragmentManager, "CheckEmailDialog")
-    }
-
-    private fun navigateToOtp(email: String?) {
-        if (findNavController().currentDestination?.id == R.id.forgotPasswordFragment) {
-            val args = Bundle().apply {
-                putString(OtpVerificationFragment.ARG_EMAIL, email)
-            }
-            findNavController().navigate(
-                R.id.action_forgotPasswordFragment_to_otpVerificationFragment,
-                args
-            )
-        }
-    }
-
-    private fun hideMainChrome() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
-        requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
+        dialog.show(childFragmentManager, "SuccessDialog")
     }
 }

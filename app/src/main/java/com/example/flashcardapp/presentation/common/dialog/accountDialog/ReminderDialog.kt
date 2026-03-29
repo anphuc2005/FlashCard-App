@@ -1,14 +1,14 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.app.Dialog
 import android.app.TimePickerDialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.DialogReminderBinding
@@ -16,8 +16,6 @@ import com.google.android.material.color.MaterialColors
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.content.ContextCompat
 
 /** Dialog that controls reminder time and enable state. */
 class ReminderDialog : DialogFragment() {

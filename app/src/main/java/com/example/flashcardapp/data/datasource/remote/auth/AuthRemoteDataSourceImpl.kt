@@ -5,10 +5,15 @@ import com.example.flashcardapp.core.utils.NetworkErrorHandler
 import com.example.flashcardapp.data.datasource.remote.api.AuthApiService
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordResponse
+import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -31,14 +36,43 @@ class AuthRemoteDataSourceImpl(
 
     override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse> {
         return withContext(Dispatchers.IO) {
-            executeRequest("forgotPassword", request) { authApiService.forgotPassword(request) }
+            executeRequest(
+                methodName = "forgotPassword",
+                request = request,
+                allowEmptyData = true,
+                emptyMapper = { api -> ForgotPasswordResponse(message = api.message ?: "Success") }
+            ) { authApiService.forgotPassword(request) }
+        }
+    }
+
+    override suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse> {
+        return withContext(Dispatchers.IO) {
+            executeRequest(
+                methodName = "verifyOtp",
+                request = request,
+                allowEmptyData = true,
+                emptyMapper = { api -> VerifyOtpResponse(message = api.message ?: "Success") }
+            ) { authApiService.verifyOtp(request) }
+        }
+    }
+
+    override suspend fun resetPassword(request: ResetPasswordRequest): Result<ResetPasswordResponse> {
+        return withContext(Dispatchers.IO) {
+            executeRequest(
+                methodName = "resetPassword",
+                request = request,
+                allowEmptyData = true,
+                emptyMapper = { api -> ResetPasswordResponse(message = api.message ?: "Success") }
+            ) { authApiService.resetPassword(request) }
         }
     }
 
     private suspend fun <T, R> executeRequest(
         methodName: String,
         request: T,
-        apiCall: suspend () -> Response<com.example.flashcardapp.data.datasource.remote.model.ApiResponse<R>>
+        allowEmptyData: Boolean = false,
+        emptyMapper: ((ApiResponse<R>) -> R)? = null,
+        apiCall: suspend () -> Response<ApiResponse<R>>
     ): Result<R> {
         return try {
             Log.d("AuthRemoteDataSource", "Starting $methodName request with: $request")
@@ -56,9 +90,14 @@ class AuthRemoteDataSourceImpl(
                         Log.d("AuthRemoteDataSource", "$methodName success with data")
                         Result.success(it)
                     } ?: run {
-                        val errorMsg = "Response data is empty"
-                        Log.e("AuthRemoteDataSource", errorMsg)
-                        Result.failure(IllegalStateException(errorMsg))
+                        if (allowEmptyData && emptyMapper != null) {
+                            Log.d("AuthRemoteDataSource", "$methodName success without data, using emptyMapper")
+                            Result.success(emptyMapper(apiResponse))
+                        } else {
+                            val errorMsg = "Response data is empty"
+                            Log.e("AuthRemoteDataSource", errorMsg)
+                            Result.failure(IllegalStateException(errorMsg))
+                        }
                     }
                 } else {
                     val errorMsg = apiResponse?.message ?: "Auth request failed"

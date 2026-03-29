@@ -15,8 +15,15 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentAccountBinding
 import com.example.flashcardapp.databinding.ItemSettingRowBinding
-import com.example.flashcardapp.presentation.feature.account.ExportDataDialog.ExportFormat
-import com.example.flashcardapp.presentation.feature.account.ThemeDialog.ThemeOption
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog.ExportFormat
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.LogoutConfirmDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.RatingDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog.ThemeOption
 import com.example.flashcardapp.presentation.feature.auth.AuthActivity
 
 class AccountFragment : Fragment() {

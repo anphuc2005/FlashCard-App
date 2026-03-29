@@ -1,10 +1,11 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.RequiresPermission
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
 
 /** Receives alarm events and shows reminder notification when enabled. */
 class ReminderReceiver : BroadcastReceiver() {
@@ -30,4 +31,3 @@ class ReminderReceiver : BroadcastReceiver() {
         const val EXTRA_STUDY_ENABLED = "extra_study_enabled"
     }
 }
-

@@ -10,6 +10,8 @@ import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
 import com.example.flashcardapp.domain.usecase.auth.ForgotPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.LoginUseCase
 import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
+import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
+import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
 
 object AuthModule {
     
@@ -22,7 +24,9 @@ object AuthModule {
         return AuthUseCases(
             login = LoginUseCase(repository),
             register = RegisterUseCase(repository),
-            forgotPassword = ForgotPasswordUseCase(repository)
+            forgotPassword = ForgotPasswordUseCase(repository),
+            verifyOtp = VerifyOtpUseCase(repository),
+            resetPassword = ResetPasswordUseCase(repository)
         )
     }
 }

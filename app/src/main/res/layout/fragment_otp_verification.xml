@@ -3,21 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="24dp"
     android:background="?attr/colorOnBackground">
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineContentStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.07" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineContentEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.93" />
 
     <ImageButton
         android:id="@+id/buttonBack"
@@ -28,7 +15,7 @@
         android:contentDescription="@string/common_back"
         android:padding="@dimen/auth_back_button_padding"
         android:src="@drawable/ic_onboarding_back"
-        app:layout_constraintStart_toStartOf="@id/guidelineContentStart"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/textColor" />
 
@@ -38,23 +25,9 @@
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/otp_content_margin_top"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guidelineContentEnd"
-        app:layout_constraintStart_toStartOf="@id/guidelineContentStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/buttonBack">
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guidelineInnerStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.10" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guidelineInnerEnd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.90" />
 
         <FrameLayout
             android:id="@+id/iconContainer"
@@ -62,6 +35,7 @@
             android:layout_height="0dp"
             android:background="@drawable/bg_otp_icon_container"
             app:layout_constraintDimensionRatio="1:1"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -88,8 +62,9 @@
             android:textColor="?attr/textColor"
             android:textSize="@dimen/otp_title_text_size"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@id/guidelineInnerEnd"
-            app:layout_constraintStart_toStartOf="@id/guidelineInnerStart"
+            android:layout_marginHorizontal="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iconContainer" />
 
         <TextView
@@ -101,38 +76,28 @@
             android:text="@string/otp_subtitle"
             android:textColor="?attr/subTitleColor"
             android:textSize="@dimen/otp_subtitle_text_size"
-            app:layout_constraintEnd_toEndOf="@id/guidelineInnerEnd"
-            app:layout_constraintStart_toStartOf="@id/guidelineInnerStart"
+            android:layout_marginHorizontal="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textOtpTitle" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/otpBoxesRow"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/otp_boxes_margin_top"
-            app:layout_constraintEnd_toEndOf="@id/guidelineInnerEnd"
-            app:layout_constraintStart_toStartOf="@id/guidelineInnerStart"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textOtpSubtitle">
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guidelineOtpRowStart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.02" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guidelineOtpRowEnd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.98" />
 
             <EditText
                 android:id="@+id/inputOtp1"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginEnd="@dimen/otp_box_spacing"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_otp_digit_box"
                 android:gravity="center"
                 android:importantForAutofill="no"
@@ -140,22 +105,15 @@
                 android:maxLength="1"
                 android:textColor="@color/otp_digit_color"
                 android:textCursorDrawable="@null"
-                android:textSize="@dimen/otp_digit_text_size"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@id/inputOtp2"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="@id/guidelineOtpRowStart"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                android:textSize="@dimen/otp_digit_text_size" />
 
             <EditText
                 android:id="@+id/inputOtp2"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/otp_box_spacing"
-                android:layout_marginEnd="@dimen/otp_box_spacing"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_otp_digit_box"
                 android:gravity="center"
                 android:importantForAutofill="no"
@@ -163,21 +121,15 @@
                 android:maxLength="1"
                 android:textColor="@color/otp_digit_color"
                 android:textCursorDrawable="@null"
-                android:textSize="@dimen/otp_digit_text_size"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@id/inputOtp3"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@id/inputOtp1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                android:textSize="@dimen/otp_digit_text_size" />
 
             <EditText
                 android:id="@+id/inputOtp3"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/otp_box_spacing"
-                android:layout_marginEnd="@dimen/otp_box_spacing"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_otp_digit_box"
                 android:gravity="center"
                 android:importantForAutofill="no"
@@ -185,20 +137,15 @@
                 android:maxLength="1"
                 android:textColor="@color/otp_digit_color"
                 android:textCursorDrawable="@null"
-                android:textSize="@dimen/otp_digit_text_size"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@id/inputOtp4"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@id/inputOtp2"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                android:textSize="@dimen/otp_digit_text_size" />
 
             <EditText
                 android:id="@+id/inputOtp4"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/otp_box_spacing"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_otp_digit_box"
                 android:gravity="center"
                 android:importantForAutofill="no"
@@ -206,15 +153,39 @@
                 android:maxLength="1"
                 android:textColor="@color/otp_digit_color"
                 android:textCursorDrawable="@null"
-                android:textSize="@dimen/otp_digit_text_size"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toEndOf="@id/guidelineOtpRowEnd"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@id/inputOtp3"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp5"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp6"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textNoCode"
@@ -225,8 +196,8 @@
             android:text="@string/otp_no_code"
             android:textColor="?attr/subTitleColor"
             android:textSize="@dimen/otp_resend_text_size"
-            app:layout_constraintEnd_toEndOf="@id/guidelineInnerEnd"
-            app:layout_constraintStart_toStartOf="@id/guidelineInnerStart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/otpBoxesRow" />
 
         <TextView
@@ -239,8 +210,8 @@
             android:textColor="?attr/buttonColor"
             android:textSize="@dimen/otp_resend_text_size"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@id/guidelineInnerEnd"
-            app:layout_constraintStart_toStartOf="@id/guidelineInnerStart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textNoCode" />
 
         <com.google.android.material.button.MaterialButton
@@ -259,8 +230,8 @@
             android:textSize="@dimen/auth_button_text_size"
             android:textStyle="bold"
             app:cornerRadius="@dimen/otp_button_corner_radius"
-            app:layout_constraintEnd_toEndOf="@id/guidelineInnerEnd"
-            app:layout_constraintStart_toStartOf="@id/guidelineInnerStart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textResendCode" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

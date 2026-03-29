@@ -3,7 +3,10 @@ package com.example.flashcardapp.presentation.feature.auth
 sealed class AuthOperationState {
     object Idle : AuthOperationState()
     object Loading : AuthOperationState()
-    data class Success(val message: String = "") : AuthOperationState()
+    data class Success(
+        val message: String = "",
+        val email: String? = null
+    ) : AuthOperationState()
     data class Error(val message: String) : AuthOperationState()
 }
 
@@ -21,5 +24,10 @@ data class RegisterFormState(
 
 data class ForgotPasswordFormState(
     val emailError: String? = null
+)
+
+data class ResetPasswordFormState(
+    val passwordError: String? = null,
+    val confirmPasswordError: String? = null
 )
 

@@ -1,11 +1,10 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import java.util.Calendar
 
 /** Schedules/cancels the daily reminder alarm. */
@@ -48,4 +47,3 @@ object ReminderScheduler {
         return trigger.timeInMillis
     }
 }
-

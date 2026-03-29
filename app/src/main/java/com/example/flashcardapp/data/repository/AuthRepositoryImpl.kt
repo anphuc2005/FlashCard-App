@@ -8,6 +8,10 @@ import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpResponse
 import com.example.flashcardapp.domain.repository.AuthRepository as DomainAuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +33,14 @@ class AuthRepositoryImpl(
 
     override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse> = withContext(ioDispatcher) {
         remoteDataSource.forgotPassword(request)
+    }
+
+    override suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse> = withContext(ioDispatcher) {
+        remoteDataSource.verifyOtp(request)
+    }
+
+    override suspend fun resetPassword(request: ResetPasswordRequest): Result<ResetPasswordResponse> = withContext(ioDispatcher) {
+        remoteDataSource.resetPassword(request)
     }
 
     override fun saveLoginSession(accessToken: String?) {

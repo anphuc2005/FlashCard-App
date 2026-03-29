@@ -31,7 +31,10 @@ class ForgotPasswordViewModel(
             viewModelScope.launch {
                 val result = forgotPasswordUseCase(email)
                 result.onSuccess {
-                    _uiState.value = AuthOperationState.Success("Verification code sent to your email")
+                    _uiState.value = AuthOperationState.Success(
+                        message = "Verification code sent to your email",
+                        email = email
+                    )
                 }
                 result.onFailure { throwable ->
                     _uiState.value = AuthOperationState.Error(

@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
 import com.example.flashcardapp.di.AuthModule
+import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.main.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,6 +26,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: LoginViewModel
+    private var loadingDialog: LoadingDialogFragment? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -83,10 +85,22 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 launch {
                     viewModel.uiState.collect { state ->
                         when (state) {
-                            AuthOperationState.Idle -> renderLoading(false)
-                            AuthOperationState.Loading -> renderLoading(true)
+                            AuthOperationState.Idle -> {
+                                renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
+                            }
+                            AuthOperationState.Loading -> {
+                                renderLoading(true)
+                                if (loadingDialog == null || loadingDialog?.isVisible == false) {
+                                    loadingDialog = LoadingDialogFragment.newInstance("Đang đăng nhập...")
+                                    loadingDialog?.show(childFragmentManager, "LoadingDialog")
+                                }
+                            }
                             is AuthOperationState.Success -> {
                                 renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
                                 viewModel.resetUiState()
                                 val intent = Intent(requireContext(), MainActivity::class.java)
                                 startActivity(intent)
@@ -95,6 +109,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
                             is AuthOperationState.Error -> {
                                 renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                                 viewModel.resetUiState()
                             }

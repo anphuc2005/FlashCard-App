@@ -13,7 +13,13 @@ typealias LoginResponse = AuthResponse
 typealias RegisterResponse = AuthResponse
 
 data class ForgotPasswordResponse(
-    val requestId: String,
     val message: String
 )
 
+data class VerifyOtpResponse(
+    val message: String
+)
+
+data class ResetPasswordResponse(
+    val message: String
+)

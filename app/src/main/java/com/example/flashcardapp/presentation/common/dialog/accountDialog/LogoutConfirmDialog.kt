@@ -1,4 +1,4 @@
-package com.example.flashcardapp.presentation.feature.account
+package com.example.flashcardapp.presentation.common.dialog.accountDialog
 
 import android.app.Dialog
 import android.graphics.Color
