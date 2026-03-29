@@ -3,6 +3,9 @@ package com.flashcard.controller;
 import com.flashcard.dto.request.LoginRequest;
 import com.flashcard.dto.request.RegisterRequest;
 import com.flashcard.dto.request.SocialLoginRequest;
+import com.flashcard.dto.request.ForgotPasswordRequest;
+import com.flashcard.dto.request.VerifyOtpRequest;
+import com.flashcard.dto.request.ResetPasswordRequest;
 import com.flashcard.dto.response.ApiResponse;
 import com.flashcard.dto.response.AuthResponse;
 import com.flashcard.service.AuthService;
@@ -45,6 +48,34 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+    }
+
+    // ─────────────────────────
+    // FORGOT PASSWORD
+    // ─────────────────────────
+
+    @Operation(summary = "Step 1: Request OTP for password reset")
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        authService.processForgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("OTP sent to your email", null));
+    }
+
+    @Operation(summary = "Step 2: Verify OTP")
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<Void>> verifyOtp(
+            @Valid @RequestBody VerifyOtpRequest request) {
+        authService.verifyOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("OTP is valid", null));
+    }
+
+    @Operation(summary = "Step 3: Reset password")
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Password reset successfully", null));
     }
 
     // ─────────────────────────
