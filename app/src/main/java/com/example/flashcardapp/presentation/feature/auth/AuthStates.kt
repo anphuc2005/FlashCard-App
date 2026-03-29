@@ -28,6 +28,14 @@ data class ForgotPasswordFormState(
 
 data class ResetPasswordFormState(
     val passwordError: String? = null,
-    val confirmPasswordError: String? = null
+    val confirmPasswordError: String? = null,
+    val strength: PasswordStrength = PasswordStrength.EMPTY
 )
 
+enum class PasswordStrength(val label: String, val activeSegments: Int) {
+    EMPTY("Nhập mật khẩu", 0),
+    WEAK("Yếu", 1),
+    FAIR("Trung bình", 2),
+    GOOD("Tốt", 3),
+    STRONG("Rất mạnh", 4)
+}

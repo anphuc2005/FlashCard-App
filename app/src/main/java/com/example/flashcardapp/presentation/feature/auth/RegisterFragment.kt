@@ -185,7 +185,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                                 loadingDialog?.dismiss()
                                 loadingDialog = null
                                 viewModel.resetUiState()
-                                findNavController().navigate(R.id.action_registerFragment_to_otpVerificationFragment)
+                                findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                             }
 
                             is AuthOperationState.Error -> {
@@ -211,6 +211,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
         requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
+
 
     private companion object {
         const val TERMS_ASSET_PATH = "docs/terms_of_service.html"

@@ -1,8 +1,10 @@
 package com.example.flashcardapp.presentation.feature.auth
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -13,8 +15,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentResetPasswordBinding
 import com.example.flashcardapp.di.AuthModule
-import com.example.flashcardapp.presentation.common.dialog.authDialog.SuccessDialogFragment
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.example.flashcardapp.presentation.common.dialog.authDialog.SuccessDialogFragment
 import kotlinx.coroutines.launch
 
 class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password) {
@@ -69,6 +71,7 @@ class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password) {
                     viewModel.formState.collect { state ->
                         binding.tilNewPass.error = state.passwordError
                         binding.tilConfirmPass.error = state.confirmPasswordError
+                        renderStrength(state.strength)
                     }
                 }
 
@@ -111,6 +114,30 @@ class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password) {
     private fun renderLoading(isLoading: Boolean) {
         binding.btnUpdate.isEnabled = !isLoading
         binding.btnUpdate.alpha = if (isLoading) 0.7f else 1f
+    }
+
+    private fun renderStrength(strength: PasswordStrength) {
+        val inactiveColor = Color.parseColor("#E5E9F1")
+        val activeColorRes = when (strength) {
+            PasswordStrength.EMPTY -> R.color.md_icon_gray
+            PasswordStrength.WEAK -> R.color.md_icon_red
+            PasswordStrength.FAIR -> R.color.md_icon_orange
+            PasswordStrength.GOOD -> R.color.md_icon_green
+            PasswordStrength.STRONG -> R.color.md_icon_blue
+        }
+
+        val activeColor = ContextCompat.getColor(requireContext(), activeColorRes)
+        val labelColor = if (strength == PasswordStrength.EMPTY)
+            ContextCompat.getColor(requireContext(), R.color.md_sub_title) else activeColor
+
+        binding.tvStrengthLabel.text = strength.label
+        binding.tvStrengthLabel.setTextColor(labelColor)
+
+        listOf(binding.seg1, binding.seg2, binding.seg3, binding.seg4)
+            .forEachIndexed { index, view ->
+                val color = if (index < strength.activeSegments) activeColor else inactiveColor
+                view.setBackgroundColor(color)
+            }
     }
 
     private fun showSuccessDialog() {

@@ -3,6 +3,7 @@ package com.example.flashcardapp.presentation.feature.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
+import com.example.flashcardapp.presentation.feature.auth.PasswordStrength
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -75,10 +76,28 @@ class ResetPasswordViewModel(
 
         _formState.value = ResetPasswordFormState(
             passwordError = passwordError,
-            confirmPasswordError = confirmError
+            confirmPasswordError = confirmError,
+            strength = evaluateStrength(newPass)
         )
         return isValid
     }
+
+    private fun evaluateStrength(password: String): PasswordStrength {
+        if (password.isBlank()) return PasswordStrength.EMPTY
+
+        var score = 0
+        if (password.length >= 8) score++
+        if (password.length >= 12) score++
+        if (password.any { it.isLowerCase() }) score++
+        if (password.any { it.isUpperCase() }) score++
+        if (password.any { it.isDigit() }) score++
+        if (password.any { !it.isLetterOrDigit() }) score++
+
+        return when {
+            score >= 5 -> PasswordStrength.STRONG
+            score >= 4 -> PasswordStrength.GOOD
+            score >= 3 -> PasswordStrength.FAIR
+            else -> PasswordStrength.WEAK
+        }
+    }
 }
-
-

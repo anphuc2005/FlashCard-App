@@ -1,9 +1,12 @@
 package com.example.flashcardapp.presentation.common.dialog.authDialog
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.DialogCheckEmailBinding
@@ -21,6 +24,16 @@ class CheckEmailDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_FlashCardApp)
         email = arguments?.getString(ARG_EMAIL)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.apply {
+            setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            setDimAmount(0.5f)
+        }
     }
 
     override fun onCreateView(

@@ -265,12 +265,13 @@ class AccountFragment : Fragment() {
         val dialog = LogoutConfirmDialog()
         dialog.listener = object : LogoutConfirmDialog.Listener {
             override fun onConfirmLogout() {
-                val intent = Intent(requireContext(), AuthActivity::class.java)
+                val intent = Intent(requireContext(), AuthActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
                 startActivity(intent)
-                requireActivity().finish()
+                requireActivity().finishAffinity()
             }
         }
         dialog.show(childFragmentManager, "LogoutConfirmDialog")
     }
 }
-

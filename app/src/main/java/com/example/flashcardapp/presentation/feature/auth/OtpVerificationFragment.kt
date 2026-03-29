@@ -55,6 +55,44 @@ class OtpVerificationFragment : Fragment(R.layout.fragment_otp_verification) {
         binding.buttonConfirmOtp.setOnClickListener {
             verifyOtp()
         }
+        setupOtpInputs()
+    }
+
+    private fun setupOtpInputs() {
+        val otpInputs = listOf(
+            binding.inputOtp1,
+            binding.inputOtp2,
+            binding.inputOtp3,
+            binding.inputOtp4,
+            binding.inputOtp5,
+            binding.inputOtp6
+        )
+
+        for (i in otpInputs.indices) {
+            val currentInput = otpInputs[i]
+            val nextInput = if (i < otpInputs.size - 1) otpInputs[i + 1] else null
+            val prevInput = if (i > 0) otpInputs[i - 1] else null
+
+            currentInput.addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (s?.length == 1) {
+                        nextInput?.requestFocus()
+                    }
+                }
+                override fun afterTextChanged(s: android.text.Editable?) {}
+            })
+
+            currentInput.setOnKeyListener { _, keyCode, event ->
+                if (event.action == android.view.KeyEvent.ACTION_DOWN && keyCode == android.view.KeyEvent.KEYCODE_DEL) {
+                    if (currentInput.text.isNullOrEmpty()) {
+                        prevInput?.text?.clear()
+                        prevInput?.requestFocus()
+                    }
+                }
+                false
+            }
+        }
     }
 
     private fun verifyOtp() {

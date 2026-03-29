@@ -45,10 +45,9 @@
         android:name="com.example.flashcardapp.presentation.feature.auth.RegisterFragment"
         android:label="@string/app_register"
         tools:layout="@layout/fragment_register">
-        <!-- Navigate to OTP Verification -->
         <action
-            android:id="@+id/action_registerFragment_to_otpVerificationFragment"
-            app:destination="@id/otpVerificationFragment" />
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <!-- Forgot Password Screen -->
