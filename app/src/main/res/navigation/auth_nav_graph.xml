@@ -20,7 +20,7 @@
     <!-- Login Screen -->
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.flashcardapp.presentation.feature.auth.LoginFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.login.LoginFragment"
         android:label="@string/app_login"
         tools:layout="@layout/fragment_login">
         <!-- Navigate to Register -->
@@ -42,7 +42,7 @@
     <!-- Register Screen -->
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.flashcardapp.presentation.feature.auth.RegisterFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.register.RegisterFragment"
         android:label="@string/app_register"
         tools:layout="@layout/fragment_register">
         <action
@@ -53,7 +53,7 @@
     <!-- Forgot Password Screen -->
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.flashcardapp.presentation.feature.auth.ForgotPasswordFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.forgotpassword.ForgotPasswordFragment"
         android:label="@string/app_forgot_pass"
         tools:layout="@layout/fragment_forgot_password">
         <!-- Navigate to OTP Verification -->
@@ -65,7 +65,7 @@
     <!-- OTP Verification Screen -->
     <fragment
         android:id="@+id/otpVerificationFragment"
-        android:name="com.example.flashcardapp.presentation.feature.auth.OtpVerificationFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.otp.OtpVerificationFragment"
         android:label="@string/app_otp"
         tools:layout="@layout/fragment_otp_verification">
         <!-- Navigate back to Login (after OTP verification) -->
@@ -77,7 +77,7 @@
     <!-- Reset Password Screen -->
     <fragment
         android:id="@+id/resetPasswordFragment"
-        android:name="com.example.flashcardapp.presentation.feature.auth.ResetPasswordFragment"
+        android:name="com.example.flashcardapp.presentation.feature.auth.resetpassword.ResetPasswordFragment"
         android:label="@string/app_reset_password"
         tools:layout="@layout/fragment_reset_password">
         <action

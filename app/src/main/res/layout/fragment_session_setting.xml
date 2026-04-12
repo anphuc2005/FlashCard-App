@@ -7,39 +7,49 @@
     tools:context=".presentation.feature.learning.SessionSettingFragment"
     android:background="?attr/colorOnBackground">
 
-    <LinearLayout
-        android:id="@+id/header"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="12dp"
-        android:background="#FFFFFF"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="1dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:strokeWidth="0dp"
+        android:backgroundTint="?attr/componentBackground">
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_back"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Cài đặt phiên học"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="#0F1F3C"/>
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_back"/>
 
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
-    </LinearLayout>
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Cài đặt phiên học"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="?attr/textColor"/>
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
@@ -47,7 +57,7 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="10dp"
         android:paddingBottom="90dp"
-        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@+id/btnStart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -94,7 +104,7 @@
                 android:layout_marginTop="18dp"
                 android:text="Thứ tự"
                 android:textStyle="bold"
-                android:textColor="#0F1F3C"
+                android:textColor="?attr/textColor"
                 android:textSize="14sp"/>
 
             <LinearLayout
@@ -130,7 +140,7 @@
                             android:layout_weight="1"
                             android:layout_marginStart="10dp"
                             android:text="Ngẫu nhiên"
-                            android:textColor="#0F1F3C"
+                            android:textColor="?attr/textColor"
                             android:textSize="14sp"
                             android:textStyle="bold"/>
 
@@ -168,8 +178,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="10dp"
-                            android:text="Theo thứ tự"
-                            android:textColor="#4A5668"
+                            android:text="?attr/textColor"
+                            android:textColor="?attr/textColor"
                             android:textSize="14sp"
                             android:textStyle="bold"/>
 
@@ -188,7 +198,7 @@
                 android:layout_marginTop="18dp"
                 android:text="Loại thẻ"
                 android:textStyle="bold"
-                android:textColor="#0F1F3C"
+                android:textColor="?attr/textColor"
                 android:textSize="14sp"/>
 
             <com.google.android.material.chip.ChipGroup
@@ -240,7 +250,8 @@
                 android:layout_marginTop="8dp"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="0dp"
+                android:background="?attr/componentBackground">
 
                 <ImageView
                     android:layout_width="match_parent"

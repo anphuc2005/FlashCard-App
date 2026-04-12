@@ -1,4 +1,8 @@
-package com.example.flashcardapp.presentation.feature.auth
+package com.example.flashcardapp.presentation.feature.auth.register
+
+import com.example.flashcardapp.presentation.feature.auth.*
+import com.example.flashcardapp.presentation.feature.auth.AuthViewModelFactory
+import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigurator
 
 import android.graphics.Color
 import android.os.Bundle
@@ -20,7 +24,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentRegisterBinding
-import com.example.flashcardapp.di.AuthModule
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.main.DocumentViewerActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -56,7 +60,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     }
 
     private fun setupViewModel() {
-        val useCases = AuthModule.provideAuthUseCases(requireContext())
+        val appContainer = (requireActivity().application as FlashcardApp).container
+        val useCases = appContainer.authUseCases
         viewModel = ViewModelProvider(
             this,
             AuthViewModelFactory(useCases)

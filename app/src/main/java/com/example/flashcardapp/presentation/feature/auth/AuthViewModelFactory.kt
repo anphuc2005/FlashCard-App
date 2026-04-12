@@ -3,6 +3,11 @@ package com.example.flashcardapp.presentation.feature.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
+import com.example.flashcardapp.presentation.feature.auth.login.LoginViewModel
+import com.example.flashcardapp.presentation.feature.auth.register.RegisterViewModel
+import com.example.flashcardapp.presentation.feature.auth.forgotpassword.ForgotPasswordViewModel
+import com.example.flashcardapp.presentation.feature.auth.otp.OtpVerificationViewModel
+import com.example.flashcardapp.presentation.feature.auth.resetpassword.ResetPasswordViewModel
 
 class AuthViewModelFactory(private val useCases: AuthUseCases) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")

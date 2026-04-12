@@ -1,26 +1,36 @@
-package com.example.flashcardapp.presentation.feature.auth
+package com.example.flashcardapp.presentation.feature.auth.register
 
-import android.util.Log
+import com.example.flashcardapp.presentation.feature.auth.*
+import com.example.flashcardapp.presentation.feature.auth.AuthViewModelFactory
+import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigurator
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.domain.usecase.auth.LoginUseCase
+import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class LoginViewModel(
-    private val loginUseCase: LoginUseCase
+class RegisterViewModel(
+    private val registerUseCase: RegisterUseCase
 ) : ViewModel() {
 
-    private val _formState = MutableStateFlow(LoginFormState())
-    val formState: StateFlow<LoginFormState> = _formState.asStateFlow()
+    private val _formState = MutableStateFlow(RegisterFormState())
+    val formState: StateFlow<RegisterFormState> = _formState.asStateFlow()
 
     private val _uiState = MutableStateFlow<AuthOperationState>(AuthOperationState.Idle)
     val uiState: StateFlow<AuthOperationState> = _uiState.asStateFlow()
 
+    private var fullName = ""
     private var email = ""
     private var password = ""
+    private var confirmPassword = ""
+
+    fun onFullNameChanged(newFullName: String) {
+        fullName = newFullName
+        validateForm()
+    }
 
     fun onEmailChanged(newEmail: String) {
         email = newEmail
@@ -32,18 +42,20 @@ class LoginViewModel(
         validateForm()
     }
 
+    fun onConfirmPasswordChanged(newConfirmPassword: String) {
+        confirmPassword = newConfirmPassword
+        validateForm()
+    }
+
     fun submit() {
         if (validateForm()) {
             _uiState.value = AuthOperationState.Loading
             viewModelScope.launch {
-                Log.d("LoginViewModel", "Attempting login with email: $email")
-                val result = loginUseCase(email, password)
+                val result = registerUseCase(email, password, fullName)
                 result.onSuccess {
-                    Log.d("LoginViewModel", "Login successful. Token: ${it.accessToken.take(20)}...")
-                    _uiState.value = AuthOperationState.Success("Login successful")
+                    _uiState.value = AuthOperationState.Success("Registration successful")
                 }
                 result.onFailure { throwable ->
-                    Log.e("LoginViewModel", "Login failed: ${throwable.message}", throwable)
                     _uiState.value = AuthOperationState.Error(
                         throwable.message ?: "An unexpected error occurred"
                     )
@@ -57,8 +69,13 @@ class LoginViewModel(
     }
 
     private fun validateForm(): Boolean {
-        val errors = LoginFormState()
+        val errors = RegisterFormState()
         var isValid = true
+
+        if (fullName.isBlank()) {
+            _formState.value = errors.copy(fullNameError = "Full name is required")
+            isValid = false
+        }
 
         if (email.isBlank()) {
             _formState.value = errors.copy(emailError = "Email is required")
@@ -76,8 +93,13 @@ class LoginViewModel(
             isValid = false
         }
 
+        if (confirmPassword != password) {
+            _formState.value = errors.copy(confirmPasswordError = "Passwords do not match")
+            isValid = false
+        }
+
         if (isValid) {
-            _formState.value = LoginFormState()
+            _formState.value = RegisterFormState()
         }
 
         return isValid

@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.di.ChatModule
 import com.example.flashcardapp.domain.usecase.chat.ChatUseCases
@@ -78,26 +80,30 @@ class ChatAIFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewModel.messages.collectLatest { messages ->
-                adapter.submitList(messages)
-                if (messages.isNotEmpty()) {
-                    binding.recyclerViewChat.scrollToPosition(messages.size - 1)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    viewModel.messages.collectLatest { messages ->
+                        adapter.submitList(messages)
+                        if (messages.isNotEmpty()) {
+                            binding.recyclerViewChat.scrollToPosition(messages.size - 1)
+                        }
+                    }
                 }
-            }
-        }
 
-        lifecycleScope.launch {
-            viewModel.isLoading.collectLatest { isLoading ->
-                binding.etMessage.isEnabled = !isLoading
-                binding.btnSend.isEnabled = !isLoading
-            }
-        }
+                launch {
+                    viewModel.isLoading.collectLatest { isLoading ->
+                        binding.etMessage.isEnabled = !isLoading
+                        binding.btnSend.isEnabled = !isLoading
+                    }
+                }
 
-        lifecycleScope.launch {
-            viewModel.error.collectLatest { error ->
-                if (error != null) {
-                    showError(error)
+                launch {
+                    viewModel.error.collectLatest { error ->
+                        if (error != null) {
+                            showError(error)
+                        }
+                    }
                 }
             }
         }
@@ -110,18 +116,5 @@ class ChatAIFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        fun newInstance() = ChatAIFragment()
-    }
-}
-
-class ChatAIViewModelFactory(
-    private val useCases: ChatUseCases
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ChatAIViewModel(useCases) as T
     }
 }

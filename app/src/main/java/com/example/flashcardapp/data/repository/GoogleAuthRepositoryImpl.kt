@@ -1,7 +1,7 @@
 package com.example.flashcardapp.data.repository
 
 import com.example.flashcardapp.data.datasource.local.session.AuthSessionStore
-import com.example.flashcardapp.data.datasource.remote.auth.AuthRemoteDataSource
+import com.example.flashcardapp.data.datasource.remote.api.AuthApiService
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
@@ -12,35 +12,37 @@ import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordR
 import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpResponse
-import com.example.flashcardapp.domain.repository.AuthRepository as DomainAuthRepository
+import com.example.flashcardapp.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AuthRepositoryImpl(
-    private val remoteDataSource: AuthRemoteDataSource,
+class GoogleAuthRepositoryImpl(
+    private val authApiService: AuthApiService,
     private val sessionStore: AuthSessionStore,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : DomainAuthRepository {
+) : AuthRepository {
 
     override suspend fun login(request: LoginRequest): Result<LoginResponse> = withContext(ioDispatcher) {
-        remoteDataSource.login(request)
+        // Here we would call a specific Google Auth endpoint through authApiService.
+        // For now, it's a placeholder until the API is implemented.
+        Result.failure(NotImplementedError("Google login is not yet implemented via API"))
     }
 
-    override suspend fun register(request: RegisterRequest): Result<RegisterResponse> = withContext(ioDispatcher) {
-        remoteDataSource.register(request)
+    override suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
+        return Result.failure(UnsupportedOperationException("Google Auth does not support manual registration"))
     }
 
-    override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse> = withContext(ioDispatcher) {
-        remoteDataSource.forgotPassword(request)
+    override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse> {
+        return Result.failure(UnsupportedOperationException("Google Auth does not support forgot password"))
     }
 
-    override suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse> = withContext(ioDispatcher) {
-        remoteDataSource.verifyOtp(request)
+    override suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse> {
+        return Result.failure(UnsupportedOperationException("Google Auth does not support verifying OTP"))
     }
 
-    override suspend fun resetPassword(request: ResetPasswordRequest): Result<ResetPasswordResponse> = withContext(ioDispatcher) {
-        remoteDataSource.resetPassword(request)
+    override suspend fun resetPassword(request: ResetPasswordRequest): Result<ResetPasswordResponse> {
+        return Result.failure(UnsupportedOperationException("Google Auth does not support password resetting"))
     }
 
     override fun saveLoginSession(accessToken: String?) {

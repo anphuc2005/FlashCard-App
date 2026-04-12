@@ -1,4 +1,8 @@
-package com.example.flashcardapp.presentation.feature.auth
+package com.example.flashcardapp.presentation.feature.auth.resetpassword
+
+import com.example.flashcardapp.presentation.feature.auth.*
+import com.example.flashcardapp.presentation.feature.auth.AuthViewModelFactory
+import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigurator
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

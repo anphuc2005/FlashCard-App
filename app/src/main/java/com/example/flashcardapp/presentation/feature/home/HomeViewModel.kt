@@ -76,46 +76,26 @@ class HomeViewModel : ViewModel() {
             ),
             Shortcut(
                 id = "2",
-                title = "Tìm kiếm",
-                iconResId = com.example.flashcardapp.R.drawable.ic_search_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_red_background,
-                action = "SEARCH"
-            ),
-            Shortcut(
-                id = "3",
-                title = "Danh sách",
-                iconResId = com.example.flashcardapp.R.drawable.ic_deck_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_orange_background,
-                action = "LIST"
-            ),
-            Shortcut(
-                id = "4",
-                title = "Cài đặt",
-                iconResId = com.example.flashcardapp.R.drawable.ic_setting_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_purple_background,
-                action = "SETTINGS"
-            ),
-            Shortcut(
-                id = "5",
                 title = "Thông báo",
                 iconResId = com.example.flashcardapp.R.drawable.ic_notif_shortcut,
                 backgroundResId = com.example.flashcardapp.R.color.md_icon_yellow_background,
-                action = "SETTINGS"
+                action = "NOTIFICATIONS"
             ),
             Shortcut(
-                id = "6",
-                title = "Thống kê",
-                iconResId = com.example.flashcardapp.R.drawable.ic_stats_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_green_background,
-                action = "SETTINGS"
+                id = "3",
+                title = "Xuất dữ liệu",
+                iconResId = com.example.flashcardapp.R.drawable.ic_export_data_shortcut,
+                backgroundResId = com.example.flashcardapp.R.color.md_icon_red_background,
+                action = "EXPORT_DATA"
             ),
             Shortcut(
-                id = "7",
-                title = "Cá nhân",
-                iconResId = com.example.flashcardapp.R.drawable.ic_account_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_blue_background,
-                action = "SETTINGS"
+                id = "4",
+                title = "Giao diện",
+                iconResId = com.example.flashcardapp.R.drawable.ic_theme_shortcut,
+                backgroundResId = com.example.flashcardapp.R.color.md_icon_purple_background,
+                action = "CHANGE_THEME"
             )
+
         )
 
         _uiState.value = _uiState.value.copy(shortcuts = shortcuts)
@@ -129,4 +109,3 @@ class HomeViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(error = null)
     }
 }
-

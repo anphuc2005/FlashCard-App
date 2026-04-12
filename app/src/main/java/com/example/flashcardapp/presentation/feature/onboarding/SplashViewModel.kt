@@ -3,7 +3,7 @@ package com.example.flashcardapp.presentation.feature.onboarding
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.AppSessionManager
+import com.example.flashcardapp.FlashcardApp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +36,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
 
             // After loading completes, check user status
             delay(COMPLETION_DELAY_MS)
-            val sessionManager = AppSessionManager(getApplication())
+            val sessionManager = (getApplication<Application>() as FlashcardApp).container.sessionManager
 
             val nextState = when {
                 !sessionManager.hasOnboarded -> SplashState.NavigateToOnBoarding

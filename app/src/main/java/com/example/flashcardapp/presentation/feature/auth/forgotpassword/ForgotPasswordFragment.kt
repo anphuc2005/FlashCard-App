@@ -1,6 +1,10 @@
-package com.example.flashcardapp.presentation.feature.auth
+package com.example.flashcardapp.presentation.feature.auth.forgotpassword
 
-import android.content.Intent
+import com.example.flashcardapp.presentation.feature.auth.*
+import com.example.flashcardapp.presentation.feature.auth.AuthViewModelFactory
+import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigurator
+import com.example.flashcardapp.presentation.feature.auth.otp.OtpVerificationFragment
+
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -12,25 +16,25 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
-import com.example.flashcardapp.databinding.FragmentLoginBinding
-import com.example.flashcardapp.di.AuthModule
+import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
+import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.presentation.common.dialog.authDialog.CheckEmailDialogFragment
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
-import com.example.flashcardapp.presentation.main.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
-class LoginFragment : Fragment(R.layout.fragment_login) {
+class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
-    private var _binding: FragmentLoginBinding? = null
+    private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: LoginViewModel
+    private lateinit var viewModel: ForgotPasswordViewModel
     private var loadingDialog: LoadingDialogFragment? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentLoginBinding.bind(view)
+        _binding = FragmentForgotPasswordBinding.bind(view)
 
         setupViewModel()
         setupListeners()
@@ -48,27 +52,23 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     private fun setupViewModel() {
-        val useCases = AuthModule.provideAuthUseCases(requireContext())
+        val appContainer = (requireActivity().application as FlashcardApp).container
+        val useCases = appContainer.authUseCases
         viewModel = ViewModelProvider(
             this,
             AuthViewModelFactory(useCases)
-        )[LoginViewModel::class.java]
+        )[ForgotPasswordViewModel::class.java]
     }
 
     private fun setupListeners() {
-        binding.textRegisterNow.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+        binding.buttonBack.setOnClickListener {
+            findNavController().popBackStack()
         }
-        binding.textForgotPassword.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
+        binding.buttonSendVerificationCode.setOnClickListener {
+            viewModel.submit()
         }
-        binding.buttonLogin.setOnClickListener { viewModel.submit() }
-
         binding.inputEmail.doAfterTextChanged {
             viewModel.onEmailChanged(it?.toString().orEmpty())
-        }
-        binding.inputPassword.doAfterTextChanged {
-            viewModel.onPasswordChanged(it?.toString().orEmpty())
         }
     }
 
@@ -78,7 +78,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 launch {
                     viewModel.formState.collect { state ->
                         binding.layoutEmail.error = state.emailError
-                        binding.layoutPassword.error = state.passwordError
                     }
                 }
 
@@ -93,7 +92,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             AuthOperationState.Loading -> {
                                 renderLoading(true)
                                 if (loadingDialog == null || loadingDialog?.isVisible == false) {
-                                    loadingDialog = LoadingDialogFragment.newInstance("Đang đăng nhập...")
+                                    loadingDialog = LoadingDialogFragment.newInstance("Đang gửi mã xác minh...")
                                     loadingDialog?.show(childFragmentManager, "LoadingDialog")
                                 }
                             }
@@ -101,10 +100,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                                 renderLoading(false)
                                 loadingDialog?.dismiss()
                                 loadingDialog = null
-                                viewModel.resetUiState()
-                                val intent = Intent(requireContext(), MainActivity::class.java)
-                                startActivity(intent)
-                                requireActivity().finish()
+                                showCheckEmailDialog(state.email)
                             }
 
                             is AuthOperationState.Error -> {
@@ -122,8 +118,32 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     private fun renderLoading(isLoading: Boolean) {
-        binding.buttonLogin.isEnabled = !isLoading
-        binding.buttonLogin.alpha = if (isLoading) 0.7f else 1f
+        binding.buttonSendVerificationCode.isEnabled = !isLoading
+        binding.buttonSendVerificationCode.alpha = if (isLoading) 0.7f else 1f
+    }
+
+    private fun showCheckEmailDialog(email: String?) {
+        val dialog = CheckEmailDialogFragment.newInstance(email)
+        dialog.setOnUnderstandClickListener {
+            navigateToOtp(email)
+            viewModel.resetUiState()
+        }
+        dialog.setOnResendClickListener {
+            viewModel.submit()
+        }
+        dialog.show(childFragmentManager, "CheckEmailDialog")
+    }
+
+    private fun navigateToOtp(email: String?) {
+        if (findNavController().currentDestination?.id == R.id.forgotPasswordFragment) {
+            val args = Bundle().apply {
+                putString(OtpVerificationFragment.ARG_EMAIL, email)
+            }
+            findNavController().navigate(
+                R.id.action_forgotPasswordFragment_to_otpVerificationFragment,
+                args
+            )
+        }
     }
 
     private fun hideMainChrome() {
@@ -131,4 +151,3 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 }
-

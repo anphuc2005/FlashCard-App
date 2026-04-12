@@ -12,10 +12,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavOptions
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentHomeBinding
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
+import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
 import com.example.flashcardapp.presentation.common.adapter.RecentDeckAdapter
 import com.example.flashcardapp.presentation.common.adapter.ShortcutAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -43,6 +51,7 @@ class HomeFragment : Fragment() {
         setupAdapters()
         observeUiState()
         setupListeners()
+
     }
 
     private fun setupAdapters() {
@@ -125,20 +134,21 @@ class HomeFragment : Fragment() {
             btnSeeAll.setOnClickListener {
                 navigateToAllDecks()
             }
+
         }
     }
 
     private fun handleShortcutClick(action: String?) {
         when (action) {
             "CREATE" -> navigateToCreateDeck()
-            "SEARCH" -> navigateToSearch()
-            "LIST" -> navigateToAllDecks()
-            "SETTINGS" -> navigateToSettings()
+            "NOTIFICATIONS" -> showNotifications()
+            "EXPORT_DATA" -> showExportDataDialog()
+            "CHANGE_THEME" -> showChangeThemeDialog()
+            else -> {}
         }
     }
 
     private fun showError(@Suppress("UNUSED_PARAMETER") error: String) {
-        // TODO: Show error message using Snackbar or Toast
         viewModel.clearError()
     }
 
@@ -146,34 +156,37 @@ class HomeFragment : Fragment() {
         val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
             putExtra("DECK_ID", deckId)
         }
-        requireActivity().startActivity(intent)
+        startActivity(intent)
     }
 
     private fun navigateToAllDecks() {
-        // TODO: Navigate to all decks screen
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(findNavController().graph.findStartDestination().id, false)
+            .setLaunchSingleTop(true)
+            .setRestoreState(true)
+            .build()
+        findNavController().navigate(R.id.deckFragment, null, navOptions)
     }
 
     private fun navigateToCreateDeck() {
-        // TODO: Navigate to create deck screen
+        startActivity(Intent(requireContext(), AddDeckContainerActivity::class.java))
     }
 
-    private fun navigateToSearch() {
-        // TODO: Navigate to search screen
+    private fun showNotifications() {
+        NotificationDialog().show(childFragmentManager, "NotificationDialog")
+    }
+    private fun showExportDataDialog(){
+        ExportDataDialog().show(childFragmentManager, "ExportDataDialog")
     }
 
-    private fun navigateToSettings() {
-        // TODO: Navigate to settings screen
+    private fun showChangeThemeDialog(){
+        ThemeDialog().show(childFragmentManager, "ChangeThemeDialog")
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    companion object {
-        @JvmStatic
-        @Suppress("UNUSED")
-        fun newInstance() = HomeFragment()
-    }
 }
-

@@ -14,7 +14,7 @@
         android:text="Giao diện"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:textColor="#1C1F2E" />
+        android:textColor="?attr/textColor" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -34,7 +34,7 @@
             android:text="Hồ sơ"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#0F1F3C" />
+            android:textColor="?attr/textColor" />
 
         <ImageButton
             android:id="@+id/btnSettings"
@@ -94,7 +94,7 @@
                 android:text="Nguyễn Văn A"
                 android:textStyle="bold"
                 android:textSize="18sp"
-                android:textColor="#0F1F3C" />
+                android:textColor="?attr/textColor" />
 
             <TextView
                 android:id="@+id/memberSince"
