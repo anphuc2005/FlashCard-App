@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.databinding.FragmentDeckBinding
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.common.adapter.DeckAdapter
+import com.example.flashcardapp.presentation.feature.learning.LearningActivity
 import kotlinx.coroutines.launch
 
 class DeckFragment : Fragment() {
@@ -51,12 +52,11 @@ class DeckFragment : Fragment() {
     private fun setupRecyclerView() {
         deckAdapter = DeckAdapter(
             onItemClick = { deck ->
-                // Handle deck item click - navigate to study/detail screen
+                val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
+                    putExtra("DECK_ID", deck.id)
+                }
+                startActivity(intent)
                 Toast.makeText(requireContext(), "Opening ${deck.name}", Toast.LENGTH_SHORT).show()
-            },
-            onMenuClick = { deck ->
-                // Handle deck menu click
-                Toast.makeText(requireContext(), "Menu for ${deck.name}", Toast.LENGTH_SHORT).show()
             }
         )
 

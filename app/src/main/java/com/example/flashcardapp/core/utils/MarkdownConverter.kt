@@ -1,8 +1,10 @@
 package com.example.flashcardapp.utils
 
+import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.ast.Node
+import com.vladsch.flexmark.util.data.MutableDataSet
 
 /**
  * Utility class để convert markdown sang plain text hoặc HTML
@@ -10,8 +12,24 @@ import com.vladsch.flexmark.util.ast.Node
  */
 object MarkdownConverter {
     
-    private val parser = Parser.builder().build()
-    private val htmlRenderer = HtmlRenderer.builder().build()
+    private val options = MutableDataSet().set(
+        Parser.EXTENSIONS, listOf(TablesExtension.create())
+    )
+    
+    private val parser = Parser.builder(options).build()
+    private val htmlRenderer = HtmlRenderer.builder(options).build()
+
+    /**
+     * Convert markdown string sang thẻ HTML (hỗ trợ cả Table)
+     */
+    fun markdownToHtml(markdownText: String): String {
+        return try {
+            val document: Node = parser.parse(markdownText)
+            htmlRenderer.render(document)
+        } catch (e: Exception) {
+            markdownText
+        }
+    }
 
     /**
      * Convert markdown string sang plain text (loại bỏ tất cả formatting markdown)
