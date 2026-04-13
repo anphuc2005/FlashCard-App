@@ -25,6 +25,7 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.Reminde
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog.ThemeOption
 import com.example.flashcardapp.presentation.feature.auth.AuthActivity
+import com.example.flashcardapp.FlashcardApp
 
 class AccountFragment : Fragment() {
 
@@ -265,11 +266,14 @@ class AccountFragment : Fragment() {
         val dialog = LogoutConfirmDialog()
         dialog.listener = object : LogoutConfirmDialog.Listener {
             override fun onConfirmLogout() {
+                val sessionManager = (requireActivity().application as FlashcardApp).container.sessionManager
+                sessionManager.clearLoginSession()
+
                 val intent = Intent(requireContext(), AuthActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    putExtra("OPEN_LOGIN", true)
                 }
                 startActivity(intent)
-                requireActivity().finishAffinity()
             }
         }
         dialog.show(childFragmentManager, "LogoutConfirmDialog")

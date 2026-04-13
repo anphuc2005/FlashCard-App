@@ -158,59 +158,9 @@
                 android:layout_marginTop="10dp"
                 android:paddingHorizontal="0dp"
                 android:paddingVertical="8dp"
-                app:singleSelection="false"
+                app:singleSelection="true"
                 app:chipSpacingHorizontal="8dp"
-                app:chipSpacingVertical="8dp">
-
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ngoại ngữ"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:checked="true"
-                    app:chipBackgroundColor="@color/chip_selector"
-                    app:chipStrokeWidth="0dp"
-                    app:checkedIconVisible="false"
-                    app:chipMinHeight="40dp"
-                    android:textColor="@color/chip_text_selector"
-                    android:textSize="13sp"/>
-
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Kinh tế"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    app:chipBackgroundColor="@color/chip_selector"
-                    app:chipStrokeWidth="0dp"
-                    app:checkedIconVisible="false"
-                    app:chipMinHeight="40dp"
-                    android:textColor="@color/chip_text_selector"
-                    android:textSize="13sp"/>
-
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Công nghệ"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    app:chipBackgroundColor="@color/chip_selector"
-                    app:chipStrokeWidth="0dp"
-                    app:checkedIconVisible="false"
-                    app:chipMinHeight="40dp"
-                    android:textColor="@color/chip_text_selector"
-                    android:textSize="13sp"/>
-
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Kỹ năng mềm"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    app:chipBackgroundColor="@color/chip_selector"
-                    app:chipStrokeWidth="0dp"
-                    app:checkedIconVisible="false"
-                    app:chipMinHeight="40dp"
-                    android:textColor="@color/chip_text_selector"
-                    android:textSize="13sp"/>
-            </com.google.android.material.chip.ChipGroup>
+                app:chipSpacingVertical="8dp" />
 
             <!-- Toggle công khai -->
             <com.google.android.material.card.MaterialCardView

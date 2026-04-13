@@ -12,28 +12,28 @@ class FlashCardRepository(
 ) {
 
     // Lấy tất cả thẻ từ API theo Deck ID
-    suspend fun getCardsByDeckIdFromApi(deckId: String): Result<List<FlashCard>> {
-        return try {
-            val response = deckApiService.getCardsByDeckId(deckId)
-            if (response.isSuccess() && response.data != null) {
-                // Lưu vào local database
-                response.data.forEach { card ->
-                    val cardEntity = FlashCardEntity(
-                        id = card.id,
-                        question = card.question,
-                        answer = card.answer,
-                        deckId = card.deckId
-                    )
-                    flashCardDao.insertCard(cardEntity)
-                }
-                Result.success(response.data)
-            } else {
-                Result.failure(Exception(response.message ?: "Unknown error"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+//    suspend fun getCardsByDeckIdFromApi(deckId: String): Result<List<FlashCard>> {
+//        return try {
+//            val response = deckApiService.getCardsByDeckId(deckId)
+//            if (response.isSuccess() && response.data != null) {
+//                // Lưu vào local database
+//                response.data.forEach { card ->
+//                    val cardEntity = FlashCardEntity(
+//                        id = card.id,
+//                        question = card.question,
+//                        answer = card.answer,
+//                        deckId = card.deckId
+//                    )
+//                    flashCardDao.insertCard(cardEntity)
+//                }
+//                Result.success(response.data)
+//            } else {
+//                Result.failure(Exception(response.message ?: "Unknown error"))
+//            }
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
 
     // Lấy thẻ từ local database theo Deck ID
     fun getCardsByDeckIdFromDb(deckId: String): Flow<List<FlashCardEntity>> {

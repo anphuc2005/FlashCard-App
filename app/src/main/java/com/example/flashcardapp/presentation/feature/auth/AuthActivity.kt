@@ -18,6 +18,14 @@ class AuthActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.auth_nav_host) as NavHostFragment
         val navController = navHostFragment.navController
+        val navGraph = navController.navInflater.inflate(R.navigation.auth_nav_graph)
+
+        val openLogin = intent.getBooleanExtra("OPEN_LOGIN", false)
+        if (openLogin) {
+            navGraph.setStartDestination(R.id.loginFragment)
+        } else {
+            navGraph.setStartDestination(R.id.onboardingFragment)
+        }
+        navController.graph = navGraph
     }
 }
-

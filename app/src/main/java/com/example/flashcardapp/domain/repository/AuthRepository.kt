@@ -1,5 +1,7 @@
 package com.example.flashcardapp.domain.repository
 
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
@@ -13,6 +15,7 @@ import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpRespo
 
 interface AuthRepository {
     suspend fun login(request: LoginRequest): Result<LoginResponse>
+    suspend fun googleLogin(request: GoogleLoginRequest): Result<GoogleLoginResponse>
     suspend fun register(request: RegisterRequest): Result<RegisterResponse>
     suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse>
     suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse>

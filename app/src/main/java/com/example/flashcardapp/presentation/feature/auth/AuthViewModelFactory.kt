@@ -13,7 +13,7 @@ class AuthViewModelFactory(private val useCases: AuthUseCases) : ViewModelProvid
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
-            LoginViewModel::class.java -> LoginViewModel(useCases.login) as T
+            LoginViewModel::class.java -> LoginViewModel(useCases.login, useCases.googleLogin) as T
             RegisterViewModel::class.java -> RegisterViewModel(useCases.register) as T
             ForgotPasswordViewModel::class.java -> ForgotPasswordViewModel(useCases.forgotPassword) as T
             OtpVerificationViewModel::class.java -> OtpVerificationViewModel(useCases.verifyOtp) as T

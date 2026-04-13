@@ -123,4 +123,5 @@
     <string name="error_message">Lỗi: %s</string>
     <string name="reminder_notification_title">Đến giờ học rồi</string>
     <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
+    <string name="default_web_client_id">268254732177-0tfv2j6eauspfpt36uio6dkpp235ashc.apps.googleusercontent.com</string>
 </resources>

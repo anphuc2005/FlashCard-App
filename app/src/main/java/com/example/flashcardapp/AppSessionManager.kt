@@ -12,6 +12,9 @@ class AppSessionManager(context: Context) {
     val isLoggedIn: Boolean
         get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
 
+    val accessToken: String?
+        get() = prefs.getString(KEY_ACCESS_TOKEN, null)
+
     fun markOnboardingCompleted() {
         prefs.edit()
             .putBoolean(KEY_HAS_ONBOARDED, true)

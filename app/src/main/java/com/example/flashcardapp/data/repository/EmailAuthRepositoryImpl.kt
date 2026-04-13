@@ -7,6 +7,8 @@ import com.example.flashcardapp.data.datasource.remote.api.AuthApiService
 import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterRequest
@@ -29,6 +31,10 @@ class EmailAuthRepositoryImpl(
 
     override suspend fun login(request: LoginRequest): Result<LoginResponse> = withContext(ioDispatcher) {
         executeRequest("login", request) { authApiService.login(request) }
+    }
+
+    override suspend fun googleLogin(request: GoogleLoginRequest): Result<GoogleLoginResponse> = withContext(ioDispatcher) {
+        executeRequest("googleLogin", request) { authApiService.googleLogin(request) }
     }
 
     override suspend fun register(request: RegisterRequest): Result<RegisterResponse> = withContext(ioDispatcher) {

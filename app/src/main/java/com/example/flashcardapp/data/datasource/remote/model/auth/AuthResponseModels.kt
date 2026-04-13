@@ -23,3 +23,13 @@ data class VerifyOtpResponse(
 data class ResetPasswordResponse(
     val message: String
 )
+
+data class GoogleLoginResponse(
+    val accessToken: String,
+    val refreshToken: String?,
+    val email: String,
+    val displayName: String,
+    val avatarUrl: String?,
+    val isNewUser: Boolean? = false
+)
+
