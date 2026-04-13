@@ -84,4 +84,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("com.vladsch.flexmark:flexmark:0.64.8")
     implementation("com.vladsch.flexmark:flexmark-ext-tables:0.64.8")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

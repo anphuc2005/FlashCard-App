@@ -9,16 +9,20 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.databinding.FragmentDeckBinding
-import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.common.adapter.DeckAdapter
+import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import androidx.fragment.app.viewModels
 import kotlinx.coroutines.launch
 
 class DeckFragment : Fragment() {
 
     private lateinit var binding: FragmentDeckBinding
-    private lateinit var deckViewModel: DeckViewModel
+    private val deckViewModel: DeckViewModel by viewModels {
+        DeckViewModelFactory((requireActivity().application as FlashcardApp).container.deckRepository)
+    }
     private lateinit var deckAdapter: DeckAdapter
 
     override fun onCreateView(
@@ -31,9 +35,6 @@ class DeckFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Create ViewModel with mock data for testing layout
-        deckViewModel = DeckViewModel(null)  // Pass null since we don't use repository
 
         // Initialize RecyclerView with DeckAdapter
         setupRecyclerView()
@@ -52,6 +53,8 @@ class DeckFragment : Fragment() {
     private fun setupRecyclerView() {
         deckAdapter = DeckAdapter(
             onItemClick = { deck ->
+                deckViewModel.updateDeckLastStudied(deck)
+                
                 val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
                     putExtra("DECK_ID", deck.id)
                 }

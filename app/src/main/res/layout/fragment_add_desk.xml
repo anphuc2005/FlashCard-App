@@ -262,8 +262,9 @@
                         android:id="@+id/switchPublic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:thumbTint="@color/switch_thumb"
-                        app:trackTint="@color/switch_track" />
+                        android:checked="false"
+                        app:thumbTint="@color/switch_thumb_gray"
+                        app:trackTint="@color/switch_track_gray" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

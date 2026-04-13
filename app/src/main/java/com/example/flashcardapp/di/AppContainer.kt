@@ -14,6 +14,7 @@ import com.example.flashcardapp.domain.usecase.auth.LoginUseCase
 import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
 
 /**
  * Dependency Injection Container
@@ -55,5 +56,13 @@ class AppContainer(private val applicationContext: Context) {
             verifyOtp = VerifyOtpUseCase(authRepository),
             resetPassword = ResetPasswordUseCase(authRepository)
         )
+    }
+
+    val addFlashCardUseCase: AddFlashCardUseCase by lazy {
+        AddFlashCardUseCase(flashCardRepository)
+    }
+
+    val addDeckUseCase: com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase by lazy {
+        com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase(deckRepository)
     }
 }

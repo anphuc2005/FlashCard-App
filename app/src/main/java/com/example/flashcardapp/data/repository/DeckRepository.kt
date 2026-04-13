@@ -64,21 +64,33 @@ class DeckRepository(
     }
 
     // Tạo bộ thẻ mới
-    suspend fun createDeck(deck: Deck): Result<Deck> {
+    suspend fun createDeck(deck: Deck, isPublic: Boolean = true): Result<Deck> {
         return try {
-            val response = deckApiService.createDeck(deck)
-            if (response.isSuccess() && response.data != null) {
+            if (isPublic) {
+                val response = deckApiService.createDeck(deck)
+                if (response.isSuccess() && response.data != null) {
+                    val deckEntity = DeckEntity(
+                        id = response.data.id,
+                        name = response.data.name,
+                        description = response.data.description,
+                        createdAt = response.data.createdAt,
+                        updatedAt = response.data.updatedAt
+                    )
+                    deckDao.insertDeck(deckEntity)
+                    Result.success(response.data)
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } else {
                 val deckEntity = DeckEntity(
-                    id = response.data.id,
-                    name = response.data.name,
-                    description = response.data.description,
-                    createdAt = response.data.createdAt,
-                    updatedAt = response.data.updatedAt
+                    id = deck.id,
+                    name = deck.name,
+                    description = deck.description,
+                    createdAt = deck.createdAt,
+                    updatedAt = deck.updatedAt
                 )
                 deckDao.insertDeck(deckEntity)
-                Result.success(response.data)
-            } else {
-                Result.failure(Exception(response.message ?: "Unknown error"))
+                Result.success(deck)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -105,6 +117,18 @@ class DeckRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    // Cập nhật bộ thẻ tại local (Dành cho tracking lịch sử học tập)
+    suspend fun updateDeckLocal(deck: Deck) {
+        val deckEntity = DeckEntity(
+            id = deck.id,
+            name = deck.name,
+            description = deck.description,
+            createdAt = deck.createdAt,
+            updatedAt = deck.updatedAt
+        )
+        deckDao.updateDeck(deckEntity)
     }
 
     // Xóa bộ thẻ
