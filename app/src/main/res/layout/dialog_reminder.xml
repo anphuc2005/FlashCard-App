@@ -22,7 +22,7 @@
             android:text="Cài đặt nhắc nhở"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#1C1F2E"/>
+            android:textColor="?attr/textColor"/>
 
         <ImageView
             android:id="@+id/btnHistory"
@@ -103,7 +103,7 @@
             android:layout_weight="1"
             android:text="Bật thông báo"
             android:textSize="16sp"
-            android:textColor="#1C1F2E"/>
+            android:textColor="?attr/textColor"/>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchEnable"

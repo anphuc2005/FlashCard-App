@@ -45,6 +45,10 @@
     <string name="app_otp_no_receive">Bạn chưa nhận được mã</string>
     <string name="app_otp_resend">Gửi lại</string>
     <string name="app_otp_button">Xác nhận</string>
+    <string name="app_reset_password">Đặt lại mật khẩu</string>
+    <string name="dialog_check_email_message">Chúng tôi đã gửi mã xác minh đến %1$s. Vui lòng kiểm tra hộp thư (và cả thư rác).</string>
+    <string name="reset_password_success_title">Thành công!</string>
+    <string name="reset_password_success_message">Mật khẩu của bạn đã được thay đổi thành công. Bây giờ bạn có thể đăng nhập với mật khẩu mới.</string>
 
     <string name="app_home_shortcut">Lối tắt</string>
     <string name="app_home_deck_recent">Bộ thẻ gần đây</string>

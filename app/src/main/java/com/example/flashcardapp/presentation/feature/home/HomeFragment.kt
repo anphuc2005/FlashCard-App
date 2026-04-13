@@ -1,6 +1,7 @@
 package com.example.flashcardapp.presentation.feature.home
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,10 +13,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavOptions
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentHomeBinding
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
+import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
 import com.example.flashcardapp.presentation.common.adapter.RecentDeckAdapter
 import com.example.flashcardapp.presentation.common.adapter.ShortcutAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
+import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -27,6 +39,17 @@ class HomeFragment : Fragment() {
 
     private lateinit var shortcutAdapter: ShortcutAdapter
     private lateinit var recentDeckAdapter: RecentDeckAdapter
+    private var isExpandedRecentDecks = false
+
+    private var themeOption = ThemeDialog.ThemeOption.LIGHT
+    private var notifStudy = true
+    private var notifNewDeck = false
+    private var notifAchievement = true
+    private var exportFormat = ExportDataDialog.ExportFormat.CSV
+
+    private var reminderHour = 8
+    private var reminderMinute = 0
+    private var reminderEnabled = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,6 +66,7 @@ class HomeFragment : Fragment() {
         setupAdapters()
         observeUiState()
         setupListeners()
+
     }
 
     private fun setupAdapters() {
@@ -62,6 +86,18 @@ class HomeFragment : Fragment() {
         binding.rvDeckRecently.apply {
             adapter = recentDeckAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    val spacing = (12 * resources.displayMetrics.density).toInt()
+                    outRect.right = spacing
+                    outRect.bottom = spacing
+                }
+            })
         }
     }
 
@@ -73,7 +109,12 @@ class HomeFragment : Fragment() {
                     shortcutAdapter.submitList(state.shortcuts)
 
                     // Update recent decks
-                    recentDeckAdapter.submitList(state.recentDecks)
+                    val displayedDecks = if (isExpandedRecentDecks) {
+                        state.recentDecks
+                    } else {
+                        state.recentDecks.take(2)
+                    }
+                    recentDeckAdapter.submitList(displayedDecks)
 
                     // Update active deck info
                     state.activeDeck?.let { deck ->
@@ -123,22 +164,38 @@ class HomeFragment : Fragment() {
             }
 
             btnSeeAll.setOnClickListener {
-                navigateToAllDecks()
+                isExpandedRecentDecks = !isExpandedRecentDecks
+                
+                // Đổi chữ hiển thị của nút
+                btnSeeAll.text = if (isExpandedRecentDecks) "Thu gọn" else getString(R.string.app_home_deck_all)
+                
+                // Đổi LayoutManager: Nằm ngang khi thu gọn, Lưới 2 dòng cuộn ngang khi mở rộng
+                binding.rvDeckRecently.layoutManager = if (isExpandedRecentDecks) {
+                    GridLayoutManager(requireContext(), 2, GridLayoutManager.HORIZONTAL, false)
+                } else {
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                }
+
+                // Cập nhật lại danh sách hiển thị
+                val currentDecks = viewModel.uiState.value.recentDecks
+                val displayedDecks = if (isExpandedRecentDecks) currentDecks else currentDecks.take(2)
+                recentDeckAdapter.submitList(displayedDecks)
             }
+
         }
     }
 
     private fun handleShortcutClick(action: String?) {
         when (action) {
             "CREATE" -> navigateToCreateDeck()
-            "SEARCH" -> navigateToSearch()
-            "LIST" -> navigateToAllDecks()
-            "SETTINGS" -> navigateToSettings()
+            "NOTIFICATIONS" -> showNotifications()
+            "EXPORT_DATA" -> showExportDataDialog()
+            "CHANGE_THEME" -> showChangeThemeDialog()
+            else -> {}
         }
     }
 
     private fun showError(@Suppress("UNUSED_PARAMETER") error: String) {
-        // TODO: Show error message using Snackbar or Toast
         viewModel.clearError()
     }
 
@@ -146,34 +203,69 @@ class HomeFragment : Fragment() {
         val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
             putExtra("DECK_ID", deckId)
         }
-        requireActivity().startActivity(intent)
+        startActivity(intent)
     }
 
     private fun navigateToAllDecks() {
-        // TODO: Navigate to all decks screen
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(findNavController().graph.findStartDestination().id, false)
+            .setLaunchSingleTop(true)
+            .setRestoreState(true)
+            .build()
+        findNavController().navigate(R.id.deckFragment, null, navOptions)
     }
 
     private fun navigateToCreateDeck() {
-        // TODO: Navigate to create deck screen
+        startActivity(Intent(requireContext(), AddDeckContainerActivity::class.java))
     }
 
-    private fun navigateToSearch() {
-        // TODO: Navigate to search screen
+    private fun showNotifications() {
+        val dialog = NotificationDialog.newInstance(notifStudy, notifNewDeck, notifAchievement)
+        dialog.listener = object : NotificationDialog.Listener {
+            override fun onApply(study: Boolean, newDeck: Boolean, achievement: Boolean) {
+                notifStudy = study
+                notifNewDeck = newDeck
+                notifAchievement = achievement
+                ReminderScheduler.schedule(
+                    requireContext(),
+                    reminderHour,
+                    reminderMinute,
+                    reminderEnabled,
+                    notifStudy
+                )
+            }
+        }
+        dialog.show(childFragmentManager, "NotificationDialog")
+    }
+    
+    private fun showExportDataDialog(){
+        val dialog = ExportDataDialog.newInstance(exportFormat)
+        dialog.listener = object : ExportDataDialog.Listener {
+            override fun onExport(format: ExportDataDialog.ExportFormat) {
+                exportFormat = format
+            }
+        }
+        dialog.show(childFragmentManager, "ExportDataDialog")
     }
 
-    private fun navigateToSettings() {
-        // TODO: Navigate to settings screen
+    private fun showChangeThemeDialog(){
+        val dialog = ThemeDialog.newInstance(themeOption)
+        dialog.listener = object : ThemeDialog.Listener {
+            override fun onThemeSaved(option: ThemeDialog.ThemeOption) {
+                themeOption = option
+                when (option) {
+                    ThemeDialog.ThemeOption.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    ThemeDialog.ThemeOption.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+            }
+        }
+        dialog.show(childFragmentManager, "ChangeThemeDialog")
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    companion object {
-        @JvmStatic
-        @Suppress("UNUSED")
-        fun newInstance() = HomeFragment()
-    }
 }
-

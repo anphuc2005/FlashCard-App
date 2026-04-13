@@ -15,7 +15,7 @@ class FlashCardRepository(
     suspend fun getCardsByDeckIdFromApi(deckId: String): Result<List<FlashCard>> {
         return try {
             val response = deckApiService.getCardsByDeckId(deckId)
-            if (response.success && response.data != null) {
+            if (response.isSuccess() && response.data != null) {
                 // Lưu vào local database
                 response.data.forEach { card ->
                     val cardEntity = FlashCardEntity(

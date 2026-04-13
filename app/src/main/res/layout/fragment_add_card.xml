@@ -135,7 +135,8 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:layout_marginTop="14dp"
-                android:weightSum="2">
+                android:weightSum="2"
+                android:animateLayoutChanges="true">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardImage"
@@ -151,9 +152,11 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/bg_dash">
+                        android:background="@drawable/bg_dash"
+                        android:animateLayoutChanges="true">
 
                         <LinearLayout
+                            android:id="@+id/layoutImageEmpty"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
@@ -176,6 +179,13 @@
                                 android:textColor="?attr/subTitleColor"
                                 android:textSize="13sp"/>
                         </LinearLayout>
+                        
+                        <ImageView
+                            android:id="@+id/ivSelectedImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:visibility="gone" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -193,9 +203,11 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/bg_dash">
+                        android:background="@drawable/bg_dash"
+                        android:animateLayoutChanges="true">
 
                         <LinearLayout
+                            android:id="@+id/layoutAudioEmpty"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
@@ -216,6 +228,34 @@
                                 android:layout_marginTop="6dp"
                                 android:text="Âm thanh"
                                 android:textColor="#4A5668"
+                                android:textSize="13sp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutAudioSelected"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@drawable/ic_play"
+                                app:tint="#2E6BFF"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Đã chọn"
+                                android:textStyle="bold"
+                                android:textColor="#2E6BFF"
                                 android:textSize="13sp"/>
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>

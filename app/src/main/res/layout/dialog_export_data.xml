@@ -14,7 +14,7 @@
         android:text="Xuất dữ liệu"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:textColor="#1C1F2E"/>
+        android:textColor="?attr/textColor"/>
 
     <!-- Option CSV -->
     <LinearLayout

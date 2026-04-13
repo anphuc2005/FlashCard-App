@@ -7,9 +7,9 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import android.util.TypedValue
 import com.example.flashcardapp.R
 import com.example.flashcardapp.domain.model.ChatMessage
-import com.example.flashcardapp.data.datasource.local.entity.ChatMessageEntity
 import com.example.flashcardapp.databinding.ItemChatMessageBinding
 
 class ChatMessageAdapter : ListAdapter<ChatMessage, ChatMessageAdapter.ChatMessageViewHolder>(DiffCallback()) {
@@ -45,7 +45,9 @@ class ChatMessageAdapter : ListAdapter<ChatMessage, ChatMessageAdapter.ChatMessa
                 } else {
                     layoutParams.gravity = android.view.Gravity.START
                     tvMessage.setBackgroundResource(R.drawable.bg_message_ai)
-                    tvMessage.setTextColor(root.context.getColor(android.R.color.black))
+                    val typedValue = TypedValue()
+                    root.context.theme.resolveAttribute(android.R.attr.textColor, typedValue, true)
+                    tvMessage.setTextColor(typedValue.data)
                 }
                 messageContainer.layoutParams = layoutParams
                 progressBar.visibility = View.GONE

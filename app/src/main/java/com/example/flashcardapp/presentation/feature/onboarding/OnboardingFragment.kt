@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.example.flashcardapp.AppSessionManager
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentOnboardingBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -64,7 +64,7 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
     }
 
     private fun navigateToLogin() {
-        AppSessionManager(requireContext()).markOnboardingCompleted()
+        (requireActivity().application as FlashcardApp).container.sessionManager.markOnboardingCompleted()
         findNavController().navigate(R.id.action_onboardingFragment_to_loginFragment)
     }
 

@@ -1,0 +1,94 @@
+# ====================================
+# FLASHCARD API - Application Config
+# ====================================
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
+# ====================================
+# MongoDB Configuration
+# ====================================
+spring:
+  data:
+    mongodb:
+      # uri: mongodb://localhost:27017/flashcard_db
+      # URL Encoded Password (! = %21), Added flashcard_db database name
+      uri: mongodb+srv://flashcard_admin:PMLinh1412005%21@cluster0.mjfgjdh.mongodb.net/flashcard_db?appName=Cluster0
+
+  # ====================================
+  # Mail Configuration (For OTP)
+  # ====================================
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "plinh7009@gmail.com" # TODO: Replace with your actual email
+    password: "xignjljmkrgrflwp"    # TODO: Replace with your Google App Password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ====================================
+# JWT Configuration
+# ====================================
+app:
+  jwt:
+    # IMPORTANT: Replace this with a strong, unique Base64-encoded secret in production!
+    # Generate one with: openssl rand -base64 64
+    secret-key: "Rmxhc2hjYXJkQXBpU2VjcmV0S2V5UmVwbGFjZWRXaXRoVmFsaWRCYXNlNjRQbGVhc2VDaGFuZ2VBQkNERUYxMjM0NTY3ODkw"
+    # Access token expiration: 1 hour (in milliseconds)
+    access-token-expiration: 3600000
+    # Refresh token expiration: 7 days (in milliseconds)
+    refresh-token-expiration: 604800000
+
+  # ====================================
+  # Social Login Configuration
+  # ====================================
+  social:
+    google:
+      # Get from Google Cloud Console → APIs & Services → Credentials
+      client-id: "268254732177-0tfv2j6eauspfpt36uio6dkpp235ashc.apps.googleusercontent.com"
+    facebook:
+      # Get from Facebook Developers App Dashboard
+      app-id: "2292919361195731"
+      app-secret: "94a6660c5f78bcef2e022116ead692d5"
+
+  # ====================================
+  # Cloudinary Configuration
+  # Images are uploaded to Cloudinary, then the URL is stored in MongoDB
+  # ====================================
+  cloudinary:
+    cloud-name: "dypqb0cay"
+    api-key: "619379847469128"
+    api-secret: "qXgFGD-httzhGMkCBoy9YiIiLz8"
+
+# ====================================
+# Springdoc / Swagger UI Configuration
+# ====================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+  info:
+    title: Flashcard API
+    description: RESTful API for Mobile Flashcard Application (Offline-First)
+    version: 1.0.0
+    contact:
+      name: Flashcard Team
+
+# ====================================
+# Logging (Optional - helpful for dev)
+# ====================================
+logging:
+  level:
+    root: INFO
+    com.flashcard: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.data.mongodb: DEBUG

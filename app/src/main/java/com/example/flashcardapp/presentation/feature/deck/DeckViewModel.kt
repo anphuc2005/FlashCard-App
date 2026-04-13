@@ -27,7 +27,8 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
         if (deckRepository == null) {
             loadMockData()
         } else {
-            getAllDecks()
+            observeLocalDecks()
+            syncDecksFromApi()
         }
     }
 
@@ -40,29 +41,40 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
         _deckUiState.value = DeckUiState.Success(mockDecks)
     }
 
-    fun getAllDecks() {
+    private fun observeLocalDecks() {
         viewModelScope.launch {
-            _deckUiState.value = DeckUiState.Loading
-            if (deckRepository == null) {
-                loadMockData()
-                return@launch
+            if (deckRepository == null) return@launch
+            
+            deckRepository.getAllDecksFromDb().collect { entities ->
+                val decks = entities.map { entity ->
+                    Deck(
+                        id = entity.id,
+                        name = entity.name,
+                        description = entity.description,
+                        createdAt = entity.createdAt,
+                        updatedAt = entity.updatedAt
+                    )
+                }
+                
+                if (decks.isEmpty()) {
+                    _deckUiState.value = DeckUiState.Empty
+                } else {
+                    _deckUiState.value = DeckUiState.Success(decks)
+                }
             }
+        }
+    }
+
+    fun syncDecksFromApi() {
+        viewModelScope.launch {
+            if (deckRepository == null) return@launch
 
             try {
-                val result = deckRepository.getAllDecksFromApi()
-                result.onSuccess { decks ->
-                    _deckUiState.value = if (decks.isEmpty()) {
-                        DeckUiState.Empty
-                    } else {
-                        DeckUiState.Success(decks)
-                    }
-                }
-                result.onFailure { exception ->
-                    _deckUiState.value =
-                        DeckUiState.Error(exception.message ?: "Unknown error occurred")
-                }
+                // The repository fetches from API and inserts into Room DB.
+                // Our observeLocalDecks() will automatically pick up the changes.
+                deckRepository.getAllDecksFromApi()
             } catch (exception: Exception) {
-                _deckUiState.value = DeckUiState.Error(exception.message ?: "Unknown error")
+                // Optionally handle sync error without breaking local state
             }
         }
     }
@@ -77,7 +89,16 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
         viewModelScope.launch {
             if (deckRepository != null) {
                 deckRepository.deleteDeck(deckId)
-                getAllDecks()
+                // Flow from Room will automatically emit new list, no need to manually refresh
+            }
+        }
+    }
+
+    fun updateDeckLastStudied(deck: Deck) {
+        viewModelScope.launch {
+            if (deckRepository != null) {
+                val updatedDeck = deck.copy(updatedAt = System.currentTimeMillis().toString())
+                deckRepository.updateDeckLocal(updatedDeck)
             }
         }
     }

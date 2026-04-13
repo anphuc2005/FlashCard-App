@@ -1,6 +1,7 @@
 package com.example.flashcardapp.presentation.feature.aiChat
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.domain.model.ChatMessage
 import com.example.flashcardapp.domain.usecase.chat.ChatUseCases
@@ -162,6 +163,16 @@ class ChatAIViewModel(
         if (lastUserMessage != null) {
             sendMessage(lastUserMessage.message)
         }
+    }
+}
+
+
+class ChatAIViewModelFactory(
+    private val useCases: ChatUseCases
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return ChatAIViewModel(useCases) as T
     }
 }
 

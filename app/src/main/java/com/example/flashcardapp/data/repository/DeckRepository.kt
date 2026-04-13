@@ -15,8 +15,8 @@ class DeckRepository(
     suspend fun getAllDecksFromApi(): Result<List<Deck>> {
         return try {
             val response = deckApiService.getAllDecks()
-            if (response.success && response.data != null) {
-                // Lưu vào local database
+            if (response.isSuccess() && response.data != null) {
+                // ...existing code...
                 response.data.forEach { deck ->
                     val deckEntity = DeckEntity(
                         id = deck.id,
@@ -45,7 +45,7 @@ class DeckRepository(
     suspend fun getDeckByIdFromApi(id: String): Result<Deck> {
         return try {
             val response = deckApiService.getDeckById(id)
-            if (response.success && response.data != null) {
+            if (response.isSuccess() && response.data != null) {
                 val deckEntity = DeckEntity(
                     id = response.data.id,
                     name = response.data.name,
@@ -64,21 +64,33 @@ class DeckRepository(
     }
 
     // Tạo bộ thẻ mới
-    suspend fun createDeck(deck: Deck): Result<Deck> {
+    suspend fun createDeck(deck: Deck, isPublic: Boolean = true): Result<Deck> {
         return try {
-            val response = deckApiService.createDeck(deck)
-            if (response.success && response.data != null) {
+            if (isPublic) {
+                val response = deckApiService.createDeck(deck)
+                if (response.isSuccess() && response.data != null) {
+                    val deckEntity = DeckEntity(
+                        id = response.data.id,
+                        name = response.data.name,
+                        description = response.data.description,
+                        createdAt = response.data.createdAt,
+                        updatedAt = response.data.updatedAt
+                    )
+                    deckDao.insertDeck(deckEntity)
+                    Result.success(response.data)
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } else {
                 val deckEntity = DeckEntity(
-                    id = response.data.id,
-                    name = response.data.name,
-                    description = response.data.description,
-                    createdAt = response.data.createdAt,
-                    updatedAt = response.data.updatedAt
+                    id = deck.id,
+                    name = deck.name,
+                    description = deck.description,
+                    createdAt = deck.createdAt,
+                    updatedAt = deck.updatedAt
                 )
                 deckDao.insertDeck(deckEntity)
-                Result.success(response.data)
-            } else {
-                Result.failure(Exception(response.message ?: "Unknown error"))
+                Result.success(deck)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -89,7 +101,7 @@ class DeckRepository(
     suspend fun updateDeck(id: String, deck: Deck): Result<Deck> {
         return try {
             val response = deckApiService.updateDeck(id, deck)
-            if (response.success && response.data != null) {
+            if (response.isSuccess() && response.data != null) {
                 val deckEntity = DeckEntity(
                     id = response.data.id,
                     name = response.data.name,
@@ -107,11 +119,23 @@ class DeckRepository(
         }
     }
 
+    // Cập nhật bộ thẻ tại local (Dành cho tracking lịch sử học tập)
+    suspend fun updateDeckLocal(deck: Deck) {
+        val deckEntity = DeckEntity(
+            id = deck.id,
+            name = deck.name,
+            description = deck.description,
+            createdAt = deck.createdAt,
+            updatedAt = deck.updatedAt
+        )
+        deckDao.updateDeck(deckEntity)
+    }
+
     // Xóa bộ thẻ
     suspend fun deleteDeck(id: String): Result<String> {
         return try {
             val response = deckApiService.deleteDeck(id)
-            if (response.success) {
+            if (response.isSuccess()) {
                 deckDao.deleteDeckById(id)
                 Result.success(response.message ?: "Deleted successfully")
             } else {

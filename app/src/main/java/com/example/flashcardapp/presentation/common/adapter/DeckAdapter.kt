@@ -11,13 +11,12 @@ import com.example.flashcardapp.databinding.ItemDeckBinding
 import com.example.flashcardapp.domain.model.Deck
 
 class DeckAdapter(
-    private val onItemClick: (Deck) -> Unit,
-    private val onMenuClick: (Deck) -> Unit
+    private val onItemClick: (Deck) -> Unit
 ) : ListAdapter<Deck, DeckAdapter.DeckViewHolder>(DeckDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeckViewHolder {
         val binding = ItemDeckBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DeckViewHolder(binding, onItemClick, onMenuClick)
+        return DeckViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: DeckViewHolder, position: Int) {
@@ -26,8 +25,7 @@ class DeckAdapter(
 
     class DeckViewHolder(
         private val binding: ItemDeckBinding,
-        private val onItemClick: (Deck) -> Unit,
-        private val onMenuClick: (Deck) -> Unit
+        private val onItemClick: (Deck) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Deck) {
@@ -36,30 +34,28 @@ class DeckAdapter(
                 deckTitle.text = item.name
 
                 // Set stats: cards count and studied cards (mock: 50% studied)
-                val studiedCards = item.cardCount / 2
+                val studiedCards = if (item.cardCount > 0) item.cardCount / 2 else 0
                 @Suppress("SetTextI18n")
                 stats.text = "${item.cardCount} thẻ · Đã học $studiedCards"
 
                 // Set progress percentage (mock data)
-                val progressPercent = (studiedCards * 100) / item.cardCount
+                val progressPercent = if (item.cardCount > 0) (studiedCards * 100) / item.cardCount else 0
                 @Suppress("SetTextI18n")
                 root.findViewById<android.widget.TextView>(R.id.progressPercent)?.text = "$progressPercent%"
 
-                // Set progress bar progress (mock data) - convert to Float
+                // Set progress bar progress - convert to Float
                 progressBar.setProgress(progressPercent.toFloat())
 
-                // Set last studied text (mock data)
+                // Set last studied text using real date
+                val lastStudiedText = formatTimeAgo(item.updatedAt)
                 @Suppress("SetTextI18n")
-                lastStudied.text = "Học lần cuối: 2 giờ trước"
+                lastStudied.text = "Học lần cuối: $lastStudiedText"
 
                 // Click listeners
                 root.setOnClickListener {
                     onItemClick(item)
                 }
 
-                menuBtn.setOnClickListener {
-                    onMenuClick(item)
-                }
 
                 ctaLearn.setOnClickListener {
                     onItemClick(item)
@@ -75,6 +71,44 @@ class DeckAdapter(
 
         override fun areContentsTheSame(oldItem: Deck, newItem: Deck): Boolean {
             return oldItem == newItem
+        }
+    }
+
+    companion object {
+        private fun formatTimeAgo(timestampString: String?): String {
+            if (timestampString == null) return "Chưa từng học"
+            
+            var timeMillis: Long? = timestampString.toLongOrNull()
+            
+            if (timeMillis == null) {
+                try {
+                    val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault())
+                    format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                    timeMillis = format.parse(timestampString)?.time
+                } catch (e: Exception) {
+                    // Ignore
+                }
+            }
+            
+            if (timeMillis == null) return "Chưa từng học"
+            
+            val now = System.currentTimeMillis()
+            val diff = now - timeMillis
+            
+            if (diff < 0) return "Vừa xong"
+            
+            val minutes = diff / (60 * 1000)
+            if (minutes < 1) return "Vừa xong"
+            
+            val hours = minutes / 60
+            if (hours < 1) return "$minutes phút trước"
+            
+            val days = hours / 24
+            if (days < 1) return "$hours giờ trước"
+            
+            if (days < 30) return "$days ngày trước"
+            
+            return "${days / 30} tháng trước"
         }
     }
 }

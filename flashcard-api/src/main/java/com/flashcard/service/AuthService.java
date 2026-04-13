@@ -2,10 +2,17 @@ package com.flashcard.service;
 
 import com.flashcard.dto.request.LoginRequest;
 import com.flashcard.dto.request.RegisterRequest;
+import com.flashcard.dto.request.ForgotPasswordRequest;
+import com.flashcard.dto.request.VerifyOtpRequest;
+import com.flashcard.dto.request.ResetPasswordRequest;
 import com.flashcard.dto.response.AuthResponse;
 import com.flashcard.exception.DuplicateResourceException;
+import com.flashcard.exception.ResourceNotFoundException;
+import com.flashcard.exception.InvalidOtpException;
 import com.flashcard.model.AuthProvider;
+import com.flashcard.model.OtpToken;
 import com.flashcard.model.User;
+import com.flashcard.repository.OtpTokenRepository;
 import com.flashcard.repository.UserRepository;
 import com.flashcard.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +24,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * Authentication service: Local register/login + Social login (Google/Facebook).
@@ -42,6 +52,8 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final SocialAuthService socialAuthService;
+    private final OtpTokenRepository otpTokenRepository;
+    private final EmailService emailService;
 
     // ─────────────────────────
     // LOCAL AUTH
@@ -75,6 +87,84 @@ public class AuthService {
         );
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         return buildAuthResponse(user, false);
+    }
+
+    // ─────────────────────────
+    // FORGOT PASSWORD / OTP
+    // ─────────────────────────
+
+    public void processForgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.getEmail()));
+
+        // Validate that this user has a LOCAL provider (users who only logged in via Social don't have passwords to reset)
+        boolean hasLocalProvider = user.getAuthProviders().stream()
+                .anyMatch(p -> p.getProviderName() == AuthProvider.ProviderName.LOCAL);
+        
+        if (!hasLocalProvider) {
+            throw new InvalidOtpException("Account linked to social login. Please login with Google or Facebook.");
+        }
+
+        // Generate 6-digit OTP
+        String otpCode = String.format("%06d", new Random().nextInt(999999));
+
+        // Save OTP token (5 minutes expiration to allow password typing)
+        OtpToken otpToken = OtpToken.builder()
+                .email(user.getEmail())
+                .otpCode(otpCode)
+                .expirationTime(Instant.now().plus(5, ChronoUnit.MINUTES))
+                .isUsed(false)
+                .build();
+        
+        // Remove previous active OTPs for this email to prevent spam (optional but good practice)
+        // For simplicity we just save the new one, but one could delete old unused ones first.
+        otpTokenRepository.save(otpToken);
+
+        // Send email
+        emailService.sendOtpEmail(user.getEmail(), otpCode);
+        log.info("[Forgot Password] OTP sent to email: {}", user.getEmail());
+    }
+
+    public void verifyOtp(VerifyOtpRequest request) {
+        OtpToken otpToken = otpTokenRepository.findByEmailAndOtpCode(request.getEmail(), request.getOtpCode())
+                .orElseThrow(() -> new InvalidOtpException("Invalid OTP code"));
+
+        if (otpToken.isUsed()) {
+            throw new InvalidOtpException("OTP has already been used");
+        }
+
+        if (Instant.now().isAfter(otpToken.getExpirationTime())) {
+            throw new InvalidOtpException("OTP has expired");
+        }
+        
+        // OTP is valid - do not mark as used yet, wait for resetPassword call
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        // Re-verify the OTP first
+        OtpToken otpToken = otpTokenRepository.findByEmailAndOtpCode(request.getEmail(), request.getOtpCode())
+                .orElseThrow(() -> new InvalidOtpException("Invalid OTP code"));
+
+        if (otpToken.isUsed()) {
+            throw new InvalidOtpException("OTP has already been used");
+        }
+
+        if (Instant.now().isAfter(otpToken.getExpirationTime())) {
+            throw new InvalidOtpException("OTP has expired");
+        }
+
+        // Proceed to update password
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + request.getEmail()));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // Mark OTP as used
+        otpToken.setUsed(true);
+        otpTokenRepository.save(otpToken);
+        
+        log.info("[Forgot Password] Password reset successfully for email: {}", user.getEmail());
     }
 
     // ─────────────────────────
