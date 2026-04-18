@@ -24,6 +24,7 @@ class DeckRepository(
                         categoryId = deck.categoryId,
                         name = deck.name,
                         description = deck.description,
+                        isPublic = deck.isPublic,
                         createdAt = deck.createdAt,
                         updatedAt = deck.updatedAt
                     )
@@ -54,6 +55,7 @@ class DeckRepository(
                     categoryId = domainDeck.categoryId,
                     name = domainDeck.name,
                     description = domainDeck.description,
+                    isPublic = domainDeck.isPublic,
                     createdAt = domainDeck.createdAt,
                     updatedAt = domainDeck.updatedAt
                 )
@@ -92,6 +94,7 @@ class DeckRepository(
                     categoryId = domainDeck.categoryId,
                     name = domainDeck.name,
                     description = domainDeck.description,
+                    isPublic = domainDeck.isPublic,
                     createdAt = domainDeck.createdAt,
                     updatedAt = domainDeck.updatedAt
                 )
@@ -115,8 +118,9 @@ class DeckRepository(
                     val deckEntity = DeckEntity(
                         id = domainDeck.id,
                         categoryId = domainDeck.categoryId,
-                    name = domainDeck.name,
+                        name = domainDeck.name,
                         description = domainDeck.description,
+                        isPublic = domainDeck.isPublic,
                         createdAt = domainDeck.createdAt,
                         updatedAt = domainDeck.updatedAt
                     )
@@ -129,8 +133,9 @@ class DeckRepository(
                 val deckEntity = DeckEntity(
                     id = deck.id,
                     categoryId = deck.categoryId,
-                        name = deck.name,
+                    name = deck.name,
                     description = deck.description,
+                    isPublic = deck.isPublic,
                     createdAt = deck.createdAt,
                     updatedAt = deck.updatedAt
                 )
@@ -153,6 +158,7 @@ class DeckRepository(
                     categoryId = domainDeck.categoryId,
                     name = domainDeck.name,
                     description = domainDeck.description,
+                    isPublic = domainDeck.isPublic,
                     createdAt = domainDeck.createdAt,
                     updatedAt = domainDeck.updatedAt
                 )
@@ -171,8 +177,9 @@ class DeckRepository(
         val deckEntity = DeckEntity(
             id = deck.id,
             categoryId = deck.categoryId,
-                        name = deck.name,
+            name = deck.name,
             description = deck.description,
+            isPublic = deck.isPublic,
             createdAt = deck.createdAt,
             updatedAt = deck.updatedAt
         )
@@ -186,6 +193,20 @@ class DeckRepository(
             if (response.isSuccess()) {
                 deckDao.deleteDeckById(id)
                 Result.success(response.message ?: "Deleted successfully")
+            } else {
+                Result.failure(Exception(response.message ?: "Unknown error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Xóa bộ thẻ chỉ trên server (khi tắt public)
+    suspend fun deleteDeckFromServerOnly(id: String): Result<String> {
+        return try {
+            val response = deckApiService.deleteDeck(id)
+            if (response.isSuccess()) {
+                Result.success(response.message ?: "Deleted successfully on server")
             } else {
                 Result.failure(Exception(response.message ?: "Unknown error"))
             }

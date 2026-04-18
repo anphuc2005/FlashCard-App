@@ -20,6 +20,23 @@ class AddDeckContainerActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment_add_deck) as NavHostFragment
         navController = navHostFragment.navController
 
+        // Check if we need to start with Edit Deck
+        val isEditMode = intent.getBooleanExtra("IS_EDIT_MODE", false)
+        val deckId = intent.getStringExtra("DECK_ID")
+
+        val navGraph = navController.navInflater.inflate(R.navigation.nav_add_deck)
+        if (isEditMode) {
+            navGraph.setStartDestination(R.id.editDeckFragment)
+        } else {
+            navGraph.setStartDestination(R.id.addDeckFragment)
+        }
+
+        // Pass arguments
+        val startArgs = Bundle().apply {
+            if (isEditMode && deckId != null) putString("DECK_ID", deckId)
+        }
+        navController.setGraph(navGraph, startArgs)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -27,4 +44,3 @@ class AddDeckContainerActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
-

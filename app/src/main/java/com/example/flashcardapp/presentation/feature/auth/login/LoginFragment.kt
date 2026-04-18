@@ -26,6 +26,8 @@ import com.example.flashcardapp.databinding.FragmentLoginBinding
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.main.MainActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn.getClient
+import com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -42,7 +44,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        val task = getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
             account.idToken?.let { idToken ->
@@ -55,6 +57,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             val errorMessage = when (e.statusCode) {
                 7 -> "Lỗi mạng hoặc chưa cài đặt Google Play Services"
                 12501 -> "Bạn đã hủy đăng nhập"
+                1033 -> "Lỗi kết nối đến server. Vui lòng thử lại sau"
                 else -> "Đăng nhập Google thất bại (Mã: ${e.statusCode})"
             }
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
@@ -77,7 +80,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             .requestEmail()
             .build()
 
-        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+        googleSignInClient = getClient(requireActivity(), gso)
     }
 
     override fun onResume() {
@@ -158,7 +161,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                                 renderLoading(false)
                                 loadingDialog?.dismiss()
                                 loadingDialog = null
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                val msg = when {
+                                    state.message.contains("1033") -> "Lỗi kết nối đến server"
+                                    state.message.contains("401") -> "Sai tài khoản hoặc mật khẩu"
+                                    else -> state.message
+                                }
+                                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                                 viewModel.resetUiState()
                             }
                         }
@@ -178,4 +186,3 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
     }
 }
-

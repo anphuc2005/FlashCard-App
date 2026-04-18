@@ -17,6 +17,11 @@ import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase
+import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
+import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
+import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
+import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
 
 /**
  * Dependency Injection Container
@@ -71,7 +76,23 @@ class AppContainer(private val applicationContext: Context) {
         AddFlashCardUseCase(flashCardRepository)
     }
 
-    val addDeckUseCase: com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase by lazy {
-        com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase(deckRepository)
+    val addDeckUseCase: AddDeckUseCase by lazy {
+        AddDeckUseCase(deckRepository)
+    }
+
+    val exploreDecksUseCase: ExploreDecksUseCase by lazy {
+        ExploreDecksUseCase(deckRepository)
+    }
+
+    val cloneDeckUseCase: CloneDeckUseCase by lazy {
+        CloneDeckUseCase(deckRepository)
+    }
+
+    val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {
+        GetDeckByIdUseCase(deckRepository)
+    }
+
+    val updateDeckUseCase: UpdateDeckUseCase by lazy {
+        UpdateDeckUseCase(deckRepository)
     }
 }

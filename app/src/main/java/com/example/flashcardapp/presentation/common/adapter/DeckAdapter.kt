@@ -11,12 +11,13 @@ import com.example.flashcardapp.databinding.ItemDeckBinding
 import com.example.flashcardapp.domain.model.Deck
 
 class DeckAdapter(
-    private val onItemClick: (Deck) -> Unit
+    private val onItemClick: (Deck) -> Unit,
+    private val onItemEdit: (Deck) -> Unit
 ) : ListAdapter<Deck, DeckAdapter.DeckViewHolder>(DeckDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeckViewHolder {
         val binding = ItemDeckBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DeckViewHolder(binding, onItemClick)
+        return DeckViewHolder(binding, onItemClick, onItemEdit)
     }
 
     override fun onBindViewHolder(holder: DeckViewHolder, position: Int) {
@@ -25,7 +26,8 @@ class DeckAdapter(
 
     class DeckViewHolder(
         private val binding: ItemDeckBinding,
-        private val onItemClick: (Deck) -> Unit
+        private val onItemClick: (Deck) -> Unit,
+        private val onItemEdit: (Deck) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Deck) {
@@ -59,6 +61,10 @@ class DeckAdapter(
 
                 ctaLearn.setOnClickListener {
                     onItemClick(item)
+                }
+
+                editBtn.setOnClickListener {
+                    onItemEdit(item)
                 }
             }
         }

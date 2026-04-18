@@ -13,7 +13,7 @@ import com.example.flashcardapp.data.datasource.local.entity.FlashCardEntity
 
 @Database(
     entities = [DeckEntity::class, FlashCardEntity::class, ChatMessageEntity::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class FlashCardDatabase : RoomDatabase() {
@@ -32,7 +32,9 @@ abstract class FlashCardDatabase : RoomDatabase() {
                     context.applicationContext,
                     FlashCardDatabase::class.java,
                     "flashcard_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(false)
+                    .build()
                 instance = db
                 db
             }

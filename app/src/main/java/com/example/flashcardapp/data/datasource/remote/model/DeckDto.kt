@@ -32,9 +32,10 @@ fun FlashCard.toDto(): FlashCardDto {
 data class DeckDto(
     @SerializedName("id") val id: String,
     @SerializedName("categoryId") val categoryId: String,
+    @SerializedName("themeColor") val themeColor: String? = null,
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String? = null,
-    @SerializedName("public") val isPublic: Boolean = false,
+    @SerializedName(value = "isPublic", alternate = ["public"]) val isPublic: Boolean = false,
     @SerializedName("createdAt") val createdAt: String? = null,
     @SerializedName("updatedAt") val updatedAt: String? = null
 ) {
@@ -44,6 +45,7 @@ data class DeckDto(
             categoryId = categoryId,
             name = name,
             description = description,
+            themeColor = themeColor,
             isPublic = isPublic,
             iconResId = null,
             backgroundResId = null,
@@ -59,9 +61,9 @@ fun Deck.toDto(): DeckDto {
         name = name,
         description = description,
         categoryId = categoryId,
+        themeColor = themeColor,
         isPublic = isPublic,
         createdAt = createdAt,
         updatedAt = updatedAt
     )
 }
-

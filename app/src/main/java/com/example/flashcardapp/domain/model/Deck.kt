@@ -8,6 +8,7 @@ data class Deck(
     val categoryId: String = "",
     val name: String,
     val description: String? = null,
+    val themeColor: String? = null,
     @DrawableRes val iconResId: Int? = null,
     @ColorRes val backgroundResId: Int? = null,
     val isPublic: Boolean = false,

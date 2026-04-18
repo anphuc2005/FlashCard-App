@@ -14,6 +14,7 @@ class AddDeckUseCase(
             categoryId = categoryId,
             name = name,
             description = description,
+            isPublic = isPublic,
             createdAt = currentTime,
             updatedAt = currentTime
         )
