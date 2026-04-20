@@ -3,6 +3,8 @@ package com.example.flashcardapp.data.datasource.remote.api
 import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterRequest
@@ -32,5 +34,9 @@ interface AuthApiService {
 
     @POST("auth/reset-password")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<ApiResponse<ResetPasswordResponse>>
+
+    @POST("auth/google")
+    suspend fun googleLogin(@Body request: GoogleLoginRequest): Response<ApiResponse<GoogleLoginResponse>>
+
 }
 

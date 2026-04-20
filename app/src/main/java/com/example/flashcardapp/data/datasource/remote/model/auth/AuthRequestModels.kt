@@ -25,3 +25,9 @@ data class ResetPasswordRequest(
     val otpCode: String,
     val newPassword: String
 )
+
+data class GoogleLoginRequest(
+    val idToken: String
+)
+
+

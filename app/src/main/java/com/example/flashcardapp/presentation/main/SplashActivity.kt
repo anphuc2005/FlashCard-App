@@ -59,7 +59,9 @@ class SplashActivity : AppCompatActivity() {
                                 hasNavigated = true
                                 delay(NAVIGATION_DELAY_MS)
                                 // Route to AuthActivity (login flow)
-                                startActivity(Intent(this@SplashActivity, AuthActivity::class.java))
+                                val intent = Intent(this@SplashActivity, AuthActivity::class.java)
+                                intent.putExtra("OPEN_LOGIN", true)
+                                startActivity(intent)
                                 finish()
                             }
                         }
@@ -87,4 +89,3 @@ class SplashActivity : AppCompatActivity() {
         const val NAVIGATION_DELAY_MS = 180L
     }
 }
-

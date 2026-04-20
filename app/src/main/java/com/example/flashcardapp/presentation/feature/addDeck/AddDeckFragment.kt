@@ -17,14 +17,20 @@ import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentAddDeskBinding
+import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
 class AddDeckFragment : Fragment() {
     private lateinit var binding: FragmentAddDeskBinding
 
+    private var loadingDialog: LoadingDialogFragment? = null
+
     private val viewModel: AddDeckViewModel by viewModels {
+        val container = (requireActivity().application as FlashcardApp).container
         AddDeckViewModelFactory(
-            (requireActivity().application as FlashcardApp).container.addDeckUseCase
+            container.addDeckUseCase,
+            container.categoryRepository
         )
     }
 
@@ -49,6 +55,17 @@ class AddDeckFragment : Fragment() {
         binding.switchPublic.setOnCheckedChangeListener { _, _ ->
             updateSwitchTint()
         }
+
+        binding.chipGroupTopics.setOnCheckedStateChangeListener { group, checkedIds ->
+            val selectedChipId = checkedIds.firstOrNull()
+            if (selectedChipId != null) {
+                val chip = group.findViewById<Chip>(selectedChipId)
+                val categoryId = chip?.tag as? String
+                if (categoryId != null) {
+                    viewModel.selectCategory(categoryId)
+                }
+            }
+        }
         
         binding.btnNext.setOnClickListener {
             val name = binding.etName.text.toString().trim()
@@ -62,24 +79,58 @@ class AddDeckFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    when (state) {
-                        is AddDeckState.Idle -> {
-                            // Do nothing
+                launch {
+                    viewModel.uiState.collect { state ->
+                        when (state) {
+                            is AddDeckState.Idle -> {
+                                renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
+                            }
+                            is AddDeckState.Loading -> {
+                                renderLoading(true)
+                                if (loadingDialog == null || loadingDialog?.isVisible == false) {
+                                    loadingDialog = LoadingDialogFragment.newInstance("Đang thêm bộ thẻ...")
+                                    loadingDialog?.show(childFragmentManager, "LoadingDialog")
+                                }
+                            }
+                            is AddDeckState.Success -> {
+                                renderLoading(false)
+                                loadingDialog?.dismiss()
+                                loadingDialog = null
+                                val bundle = bundleOf("DECK_ID" to state.deck.id)
+                                findNavController().navigate(
+                                    R.id.action_addDeckFragment_to_addCardFragment, 
+                                    bundle
+                                )
+                                viewModel.resetState()
+                            }
+                            is AddDeckState.Error -> {
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            }
                         }
-                        is AddDeckState.Loading -> {
-                            // Optionally show loading
-                        }
-                        is AddDeckState.Success -> {
-                            val bundle = bundleOf("DECK_ID" to state.deck.id)
-                            findNavController().navigate(
-                                R.id.action_addDeckFragment_to_addCardFragment, 
-                                bundle
-                            )
-                            viewModel.resetState()
-                        }
-                        is AddDeckState.Error -> {
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                
+                launch {
+                    viewModel.categories.collect { categories ->
+                        binding.chipGroupTopics.removeAllViews()
+                        
+                        val selectedId = viewModel.selectedCategoryId.value
+                        
+                        categories.forEach { category ->
+                            val chip = layoutInflater.inflate(
+                                R.layout.item_chip_choice, 
+                                binding.chipGroupTopics, 
+                                false
+                            ) as Chip
+                            
+                            chip.id = View.generateViewId()
+                            chip.text = category.name
+                            chip.tag = category.id
+                            chip.isChecked = category.id == selectedId
+                            
+                            binding.chipGroupTopics.addView(chip)
                         }
                     }
                 }
@@ -100,5 +151,9 @@ class AddDeckFragment : Fragment() {
         binding.switchPublic.thumbTintList = studyThumb
         binding.switchPublic.trackTintList = studyTrack
     }
-}
 
+    private fun renderLoading(isLoading: Boolean) {
+        binding.btnNext.isEnabled = !isLoading
+        binding.btnNext.alpha = if (isLoading) 0.7f else 1f
+    }
+}

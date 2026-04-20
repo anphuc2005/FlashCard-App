@@ -223,6 +223,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonGoogle"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/auth_social_button_height"
                     android:layout_weight="1"

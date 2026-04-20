@@ -7,11 +7,16 @@ import java.util.UUID
 class AddDeckUseCase(
     private val deckRepository: DeckRepository
 ) {
-    suspend operator fun invoke(name: String, description: String, isPublic: Boolean): Result<Deck> {
+    suspend operator fun invoke(name: String, description: String, isPublic: Boolean, categoryId: String): Result<Deck> {
+        val currentTime = System.currentTimeMillis().toString()
         val newDeck = Deck(
             id = UUID.randomUUID().toString(),
+            categoryId = categoryId,
             name = name,
             description = description,
+            isPublic = isPublic,
+            createdAt = currentTime,
+            updatedAt = currentTime
         )
         return deckRepository.createDeck(newDeck, isPublic)
     }

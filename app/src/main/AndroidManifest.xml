@@ -38,18 +38,6 @@
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="false" />
-<!--        <activity-->
-<!--            android:name=".presentation.main.MainActivity"-->
-<!--            android:theme="@style/Theme.FlashCardApp.Splash"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
-<!--        <activity-->
-<!--            android:name=".presentation.main.SplashActivity"-->
-<!--            android:exported="false" />-->
         <activity
             android:name=".presentation.feature.addDeck.AddDeckContainerActivity"
             android:exported="false" />
@@ -59,7 +47,7 @@
         <activity
             android:name=".presentation.feature.auth.AuthActivity"
             android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
+            android:exported="true" />
 
         <receiver
             android:name=".presentation.common.dialog.accountDialog.ReminderReceiver"

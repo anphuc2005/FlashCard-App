@@ -21,26 +21,26 @@ class FlashCardViewModel(private val flashCardRepository: FlashCardRepository) :
     private val _flashCardUiState = MutableStateFlow<FlashCardUiState>(FlashCardUiState.Loading)
     val flashCardUiState: StateFlow<FlashCardUiState> = _flashCardUiState.asStateFlow()
 
-    fun getCardsByDeckId(deckId: String) {
-        viewModelScope.launch {
-            _flashCardUiState.value = FlashCardUiState.Loading
-            try {
-                val result = flashCardRepository.getCardsByDeckIdFromApi(deckId)
-                result.onSuccess { cards ->
-                    _flashCardUiState.value = if (cards.isEmpty()) {
-                        FlashCardUiState.Empty
-                    } else {
-                        FlashCardUiState.Success(cards)
-                    }
-                }
-                result.onFailure { exception ->
-                    _flashCardUiState.value = FlashCardUiState.Error(exception.message ?: "Unknown error")
-                }
-            } catch (e: Exception) {
-                _flashCardUiState.value = FlashCardUiState.Error(e.message ?: "Unknown error")
-            }
-        }
-    }
+//    fun getCardsByDeckId(deckId: String) {
+//        viewModelScope.launch {
+//            _flashCardUiState.value = FlashCardUiState.Loading
+//            try {
+//                val result = flashCardRepository.getCardsByDeckIdFromApi(deckId)
+//                result.onSuccess { cards ->
+//                    _flashCardUiState.value = if (cards.isEmpty()) {
+//                        FlashCardUiState.Empty
+//                    } else {
+//                        FlashCardUiState.Success(cards)
+//                    }
+//                }
+//                result.onFailure { exception ->
+//                    _flashCardUiState.value = FlashCardUiState.Error(exception.message ?: "Unknown error")
+//                }
+//            } catch (e: Exception) {
+//                _flashCardUiState.value = FlashCardUiState.Error(e.message ?: "Unknown error")
+//            }
+//        }
+//    }
 
     fun addCard(card: FlashCard) {
         viewModelScope.launch {

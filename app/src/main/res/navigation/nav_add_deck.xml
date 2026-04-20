@@ -21,5 +21,20 @@
         android:label="Thêm Thẻ"
         tools:layout="@layout/fragment_add_card" />
 
-</navigation>
+    <fragment
+        android:id="@+id/editDeckFragment"
+        android:name="com.example.flashcardapp.presentation.feature.editDeck.EditDeckFragment"
+        android:label="Chỉnh Sửa Bộ Thẻ"
+        tools:layout="@layout/fragment_edit_deck">
+        <action
+            android:id="@+id/action_editDeckFragment_to_editCardFragment"
+            app:destination="@id/editCardFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/editCardFragment"
+        android:name="com.example.flashcardapp.presentation.feature.editDeck.EditCardFragment"
+        android:label="Chỉnh Sửa Thẻ"
+        tools:layout="@layout/fragment_edit_card" />
+
+</navigation>

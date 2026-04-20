@@ -7,9 +7,10 @@ import androidx.room.PrimaryKey
 data class DeckEntity(
     @PrimaryKey
     val id: String,
+    val categoryId: String? = null,
     val name: String,
     val description: String? = null,
+    val isPublic: Boolean = false,
     val createdAt: String? = null,
     val updatedAt: String? = null
 )
-

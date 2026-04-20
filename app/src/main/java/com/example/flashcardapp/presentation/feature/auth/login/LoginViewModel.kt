@@ -7,6 +7,7 @@ import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigur
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flashcardapp.domain.usecase.auth.GoogleLoginUseCase
 import com.example.flashcardapp.domain.usecase.auth.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val googleLoginUseCase: GoogleLoginUseCase
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(LoginFormState())
@@ -52,6 +54,24 @@ class LoginViewModel(
                         throwable.message ?: "An unexpected error occurred"
                     )
                 }
+            }
+        }
+    }
+
+    fun googleLogin(idToken: String) {
+        _uiState.value = AuthOperationState.Loading
+        viewModelScope.launch {
+            Log.d("LoginViewModel", "Attempting Google Login")
+            val result = googleLoginUseCase(idToken)
+            result.onSuccess {
+                Log.d("LoginViewModel", "Google Login successful")
+                _uiState.value = AuthOperationState.Success("Google Login successful")
+            }
+            result.onFailure { throwable ->
+                Log.e("LoginViewModel", "Google Login failed: ${throwable.message}", throwable)
+                _uiState.value = AuthOperationState.Error(
+                    throwable.message ?: "Google login failed"
+                )
             }
         }
     }

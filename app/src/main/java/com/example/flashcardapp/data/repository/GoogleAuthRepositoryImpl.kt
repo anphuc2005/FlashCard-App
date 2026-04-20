@@ -12,6 +12,8 @@ import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordR
 import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginRequest
+import com.example.flashcardapp.data.datasource.remote.model.auth.GoogleLoginResponse
 import com.example.flashcardapp.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -24,9 +26,20 @@ class GoogleAuthRepositoryImpl(
 ) : AuthRepository {
 
     override suspend fun login(request: LoginRequest): Result<LoginResponse> = withContext(ioDispatcher) {
-        // Here we would call a specific Google Auth endpoint through authApiService.
-        // For now, it's a placeholder until the API is implemented.
         Result.failure(NotImplementedError("Google login is not yet implemented via API"))
+    }
+
+    override suspend fun googleLogin(request: GoogleLoginRequest): Result<GoogleLoginResponse> = withContext(ioDispatcher) {
+        try {
+            val response = authApiService.googleLogin(request)
+            if (response.isSuccessful && response.body()?.isSuccess() == true) {
+                Result.success(response.body()!!.data!!)
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Google login failed"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun register(request: RegisterRequest): Result<RegisterResponse> {

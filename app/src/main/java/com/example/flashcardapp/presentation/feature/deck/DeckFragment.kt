@@ -15,6 +15,7 @@ import com.example.flashcardapp.presentation.common.adapter.DeckAdapter
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
 import androidx.fragment.app.viewModels
+import com.example.flashcardapp.R
 import kotlinx.coroutines.launch
 
 class DeckFragment : Fragment() {
@@ -60,6 +61,13 @@ class DeckFragment : Fragment() {
                 }
                 startActivity(intent)
                 Toast.makeText(requireContext(), "Opening ${deck.name}", Toast.LENGTH_SHORT).show()
+            },
+            onItemEdit = { deck ->
+                val intent = Intent(requireContext(), AddDeckContainerActivity::class.java).apply {
+                    putExtra("DECK_ID", deck.id)
+                    putExtra("IS_EDIT_MODE", true)
+                }
+                startActivity(intent)
             }
         )
 
@@ -71,7 +79,9 @@ class DeckFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.btnAddDesk.setOnClickListener {
-            val intent = Intent(requireContext(), AddDeckContainerActivity::class.java)
+            val intent = Intent(requireContext(), AddDeckContainerActivity::class.java).apply {
+                putExtra("IS_EDIT_MODE", false)
+            }
             startActivity(intent)
         }
 
@@ -116,4 +126,3 @@ class DeckFragment : Fragment() {
         Toast.makeText(requireContext(), "No decks available", Toast.LENGTH_SHORT).show()
     }
 }
-

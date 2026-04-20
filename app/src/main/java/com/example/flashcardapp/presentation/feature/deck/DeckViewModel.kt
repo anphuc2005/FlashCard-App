@@ -22,6 +22,12 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
     private val _deckUiState = MutableStateFlow<DeckUiState>(DeckUiState.Loading)
     val deckUiState: StateFlow<DeckUiState> = _deckUiState.asStateFlow()
 
+    private val _exploreState = MutableStateFlow<Result<List<Deck>>?>(null)
+    val exploreState: StateFlow<Result<List<Deck>>?> = _exploreState.asStateFlow()
+
+    private val _cloneState = MutableStateFlow<Result<Deck>?>(null)
+    val cloneState: StateFlow<Result<Deck>?> = _cloneState.asStateFlow()
+
     init {
         // If repository is null, use mock data for testing
         if (deckRepository == null) {
@@ -81,7 +87,16 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
 
     fun createDeck(name: String, description: String) {
         viewModelScope.launch {
-            // Implementation for creating new deck
+            if (deckRepository != null) {
+                val newDeck = Deck(
+                    id = java.util.UUID.randomUUID().toString(),
+                    name = name,
+                    description = description,
+                    createdAt = System.currentTimeMillis().toString(),
+                    updatedAt = System.currentTimeMillis().toString()
+                )
+                deckRepository.createDeck(newDeck, isPublic = true)
+            }
         }
     }
 
@@ -102,5 +117,26 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
             }
         }
     }
-}
 
+    fun exploreDecks() {
+        viewModelScope.launch {
+            if (deckRepository == null) return@launch
+            try {
+                _exploreState.value = deckRepository.exploreDecks()
+            } catch (e: Exception) {
+                _exploreState.value = Result.failure(e)
+            }
+        }
+    }
+
+    fun cloneDeck(deckId: String) {
+        viewModelScope.launch {
+            if (deckRepository == null) return@launch
+            try {
+                _cloneState.value = deckRepository.cloneDeck(deckId)
+            } catch (e: Exception) {
+                _cloneState.value = Result.failure(e)
+            }
+        }
+    }
+}

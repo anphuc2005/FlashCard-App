@@ -7,14 +7,21 @@ import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreIm
 import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
 import com.example.flashcardapp.data.repository.DeckRepository
 import com.example.flashcardapp.data.repository.FlashCardRepository
+import com.example.flashcardapp.data.repository.CategoryRepository
 import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
 import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
 import com.example.flashcardapp.domain.usecase.auth.ForgotPasswordUseCase
+import com.example.flashcardapp.domain.usecase.auth.GoogleLoginUseCase
 import com.example.flashcardapp.domain.usecase.auth.LoginUseCase
 import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase
+import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
+import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
+import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
+import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
 
 /**
  * Dependency Injection Container
@@ -23,8 +30,10 @@ import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
 class AppContainer(private val applicationContext: Context) {
 
     // 1. Core / Managers
-    val sessionManager: AppSessionManager by lazy {
-        AppSessionManager(applicationContext)
+    val sessionManager = AppSessionManager(applicationContext)
+
+    init {
+        RetrofitClient.tokenProvider = { sessionManager.accessToken }
     }
 
     // 2. Data Stores
@@ -42,6 +51,10 @@ class AppContainer(private val applicationContext: Context) {
         DeckRepository(RetrofitClient.deckApiService, database.deckDao())
     }
 
+    val categoryRepository: CategoryRepository by lazy {
+        CategoryRepository(RetrofitClient.categoriesApiService)
+    }
+
     val flashCardRepository: FlashCardRepository by lazy {
         val database = FlashCardDatabase.getInstance(applicationContext)
         FlashCardRepository(RetrofitClient.deckApiService, database.flashCardDao())
@@ -51,6 +64,7 @@ class AppContainer(private val applicationContext: Context) {
     val authUseCases: AuthUseCases by lazy {
         AuthUseCases(
             login = LoginUseCase(authRepository),
+            googleLogin = GoogleLoginUseCase(authRepository),
             register = RegisterUseCase(authRepository),
             forgotPassword = ForgotPasswordUseCase(authRepository),
             verifyOtp = VerifyOtpUseCase(authRepository),
@@ -62,7 +76,23 @@ class AppContainer(private val applicationContext: Context) {
         AddFlashCardUseCase(flashCardRepository)
     }
 
-    val addDeckUseCase: com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase by lazy {
-        com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase(deckRepository)
+    val addDeckUseCase: AddDeckUseCase by lazy {
+        AddDeckUseCase(deckRepository)
+    }
+
+    val exploreDecksUseCase: ExploreDecksUseCase by lazy {
+        ExploreDecksUseCase(deckRepository)
+    }
+
+    val cloneDeckUseCase: CloneDeckUseCase by lazy {
+        CloneDeckUseCase(deckRepository)
+    }
+
+    val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {
+        GetDeckByIdUseCase(deckRepository)
+    }
+
+    val updateDeckUseCase: UpdateDeckUseCase by lazy {
+        UpdateDeckUseCase(deckRepository)
     }
 }
