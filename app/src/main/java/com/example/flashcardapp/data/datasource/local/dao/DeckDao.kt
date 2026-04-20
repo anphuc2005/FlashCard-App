@@ -30,10 +30,9 @@ interface DeckDao {
     @Query("SELECT * FROM deck_table")
     fun getAllDecks(): Flow<List<DeckEntity>>
 
-    @Query("DELETE FROM deck_table WHERE id = :id")
-    suspend fun deleteDeckById(id: String)
+    @Query("SELECT d.*, (SELECT COUNT(id) FROM flashcard_table f WHERE f.deckId = d.id) AS cardCount FROM deck_table d")
+    fun getAllDecksWithCardCount(): Flow<List<com.example.flashcardapp.data.datasource.local.entity.DeckWithCardCount>>
 
     @Query("DELETE FROM deck_table")
     suspend fun deleteAllDecks()
 }
-

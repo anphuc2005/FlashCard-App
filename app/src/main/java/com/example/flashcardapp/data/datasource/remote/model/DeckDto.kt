@@ -3,32 +3,6 @@ package com.example.flashcardapp.data.datasource.remote.model
 import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.domain.model.FlashCard
 import com.google.gson.annotations.SerializedName
-
-data class FlashCardDto(
-    @SerializedName("id") val id: String,
-    @SerializedName("question") val question: String,
-    @SerializedName("answer") val answer: String,
-    @SerializedName("deckId") val deckId: String
-) {
-    fun toDomain(): FlashCard {
-        return FlashCard(
-            id = id,
-            question = question,
-            answer = answer,
-            deckId = deckId
-        )
-    }
-}
-
-fun FlashCard.toDto(): FlashCardDto {
-    return FlashCardDto(
-        id = id,
-        question = question,
-        answer = answer,
-        deckId = deckId
-    )
-}
-
 data class DeckDto(
     @SerializedName("id") val id: String,
     @SerializedName("categoryId") val categoryId: String,
@@ -36,6 +10,7 @@ data class DeckDto(
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String? = null,
     @SerializedName(value = "isPublic", alternate = ["public"]) val isPublic: Boolean = false,
+    @SerializedName("cardCount") val cardCount: Int? = 0,
     @SerializedName("createdAt") val createdAt: String? = null,
     @SerializedName("updatedAt") val updatedAt: String? = null
 ) {
@@ -50,7 +25,8 @@ data class DeckDto(
             iconResId = null,
             backgroundResId = null,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            customCardCount = cardCount
         )
     }
 }

@@ -17,6 +17,8 @@ import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.DeleteFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.UpdateFlashCardUseCase
 import com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase
 import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
 import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
@@ -57,7 +59,7 @@ class AppContainer(private val applicationContext: Context) {
 
     val flashCardRepository: FlashCardRepository by lazy {
         val database = FlashCardDatabase.getInstance(applicationContext)
-        FlashCardRepository(RetrofitClient.deckApiService, database.flashCardDao())
+        FlashCardRepository(RetrofitClient.cardApiService, database.flashCardDao())
     }
 
     // 4. Use Cases
@@ -74,6 +76,14 @@ class AppContainer(private val applicationContext: Context) {
 
     val addFlashCardUseCase: AddFlashCardUseCase by lazy {
         AddFlashCardUseCase(flashCardRepository)
+    }
+
+    val updateFlashCardUseCase: UpdateFlashCardUseCase by lazy {
+        UpdateFlashCardUseCase(flashCardRepository)
+    }
+
+    val deleteFlashCardUseCase: DeleteFlashCardUseCase by lazy {
+        DeleteFlashCardUseCase(flashCardRepository)
     }
 
     val addDeckUseCase: AddDeckUseCase by lazy {
@@ -94,5 +104,9 @@ class AppContainer(private val applicationContext: Context) {
 
     val updateDeckUseCase: UpdateDeckUseCase by lazy {
         UpdateDeckUseCase(deckRepository)
+    }
+
+    val getCardsByDeckIdUseCase: com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase by lazy {
+        com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(flashCardRepository)
     }
 }

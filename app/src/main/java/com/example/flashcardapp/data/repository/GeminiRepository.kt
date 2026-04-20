@@ -42,42 +42,53 @@ class GeminiRepository(
         chatMessageDao.deleteAllMessages()
     }
 
-    override suspend fun sendMessage(userMessage: String, chatHistory: List<ChatMessage>): Result<String> =
-        withContext(Dispatchers.IO) {
-            try {
-                if (!TopicValidator.isFlashCardRelated(userMessage)) {
-                    return@withContext Result.success(TopicValidator.getOutOfTopicMessage())
-                }
-
-                val payload = GeminiRequest(
-                    contents = listOf(
-                        GeminiContent(parts = listOf(GeminiPart(text = userMessage)))
-                    )
-                )
-                val response = apiService.generateContent(apiKey = apiKey, request = payload)
-                val aiText = response.candidates
-                    ?.firstOrNull()
-                    ?.content?.parts
-                    ?.firstOrNull()
-                    ?.text
-                    ?: throw Exception("Empty response from AI")
-
-                Result.success(aiText)
-            } catch (e: HttpException) {
-                val errorMessage = when (e.code()) {
-                    403 -> "Lỗi 403: API Key không hợp lệ hoặc không có quyền truy cập. Kiểm tra Gemini API Key trong local.properties"
-                    401 -> "Lỗi 401: Unauthorized - API Key không hợp lệ"
-                    429 -> "Lỗi 429: Quá nhiều request - Chờ một lúc rồi thử lại"
-                    500 -> "Lỗi 500: Lỗi server của Gemini"
-                    else -> "Lỗi ${e.code()}: ${e.message}"
-                }
-                Log.e(TAG, errorMessage, e)
-                Result.failure(Exception(errorMessage))
-            } catch (e: Exception) {
-                Log.e(TAG, "Lỗi gửi tin nhắn: ${e.message}", e)
-                Result.failure(e)
+    override suspend fun sendMessage(
+        userMessage: String,
+        chatHistory: List<ChatMessage>,
+        contextMessage: String?
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            if (!TopicValidator.isFlashCardRelated(userMessage)) {
+                return@withContext Result.success(TopicValidator.getOutOfTopicMessage())
             }
+
+            val payload = GeminiRequest(
+                contents = listOf(
+                    GeminiContent(parts = listOf(GeminiPart(text = userMessage)))
+                )
+            )
+            val response = apiService.generateContent(apiKey = apiKey, request = payload)
+            val aiText = response.candidates
+                ?.firstOrNull()
+                ?.content?.parts
+                ?.firstOrNull()
+                ?.text
+                ?: throw Exception("Empty response from AI")
+
+            val chatHistoryBuilder = StringBuilder()
+            if (contextMessage != null) {
+                chatHistoryBuilder.append("system: $contextMessage\n")
+            }
+            chatHistory.forEach { chatMessage ->
+                chatHistoryBuilder.append("${chatMessage.sender}: ${chatMessage.message}\n")
+            }
+
+            Result.success(aiText)
+        } catch (e: HttpException) {
+            val errorMessage = when (e.code()) {
+                403 -> "Lỗi 403: API Key không hợp lệ hoặc không có quyền truy cập. Kiểm tra Gemini API Key trong local.properties"
+                401 -> "Lỗi 401: Unauthorized - API Key không hợp lệ"
+                429 -> "Lỗi 429: Quá nhiều request - Chờ một lúc rồi thử lại"
+                500 -> "Lỗi 500: Lỗi server của Gemini"
+                else -> "Lỗi ${e.code()}: ${e.message}"
+            }
+            Log.e(TAG, errorMessage, e)
+            Result.failure(Exception(errorMessage))
+        } catch (e: Exception) {
+            Log.e(TAG, "Lỗi gửi tin nhắn: ${e.message}", e)
+            Result.failure(e)
         }
+    }
 
     private fun ChatMessageEntity.toDomain(): ChatMessage = ChatMessage(
         id = id,
@@ -94,4 +105,3 @@ class GeminiRepository(
         status = "SUCCESS"
     )
 }
-

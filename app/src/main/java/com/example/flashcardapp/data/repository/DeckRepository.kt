@@ -44,6 +44,11 @@ class DeckRepository(
         return deckDao.getAllDecks()
     }
 
+    // Lấy bộ thẻ kèm số lượng thẻ từ local database
+    fun getAllDecksWithCardCountFromDb(): Flow<List<com.example.flashcardapp.data.datasource.local.entity.DeckWithCardCount>> {
+        return deckDao.getAllDecksWithCardCount()
+    }
+
     // Lấy bộ thẻ theo ID từ API
     suspend fun getDeckByIdFromApi(id: String): Result<Deck> {
         return try {

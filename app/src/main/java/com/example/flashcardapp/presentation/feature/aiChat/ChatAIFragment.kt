@@ -5,19 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.flashcardapp.di.ChatModule
-import com.example.flashcardapp.domain.usecase.chat.ChatUseCases
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.databinding.FragmentChatAIBinding
+import com.example.flashcardapp.di.ChatModule
 import com.example.flashcardapp.presentation.common.adapter.ChatMessageAdapter
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.collections.get
 
 class ChatAIFragment : Fragment() {
 
@@ -47,9 +45,10 @@ class ChatAIFragment : Fragment() {
 
     private fun setupViewModel() {
         val useCases = ChatModule.provideChatUseCases(requireContext())
+        val exploreDecksUseCase = (requireActivity().application as FlashcardApp).container.exploreDecksUseCase
         viewModel = ViewModelProvider(
             this,
-            ChatAIViewModelFactory(useCases)
+            ChatAIViewModelFactory(useCases, exploreDecksUseCase)
         )[ChatAIViewModel::class.java]
     }
 

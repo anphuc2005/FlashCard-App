@@ -45,7 +45,8 @@ class GroqRepository(
 
     override suspend fun sendMessage(
         userMessage: String,
-        chatHistory: List<ChatMessage>
+        chatHistory: List<ChatMessage>,
+        contextMessage: String?
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             if (!TopicValidator.isFlashCardRelated(userMessage)) {
@@ -53,6 +54,14 @@ class GroqRepository(
             }
 
             val messages = mutableListOf<GroqMessage>()
+            if (contextMessage != null) {
+                messages.add(
+                    GroqMessage(
+                        role = "system",
+                        content = contextMessage
+                    )
+                )
+            }
             chatHistory.forEach { chatMessage ->
                 messages.add(
                     GroqMessage(
@@ -117,4 +126,3 @@ class GroqRepository(
         status = "SUCCESS"
     )
 }
-

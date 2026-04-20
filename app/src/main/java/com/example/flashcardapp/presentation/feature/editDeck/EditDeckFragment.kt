@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentEditDeckBinding
+import com.example.flashcardapp.presentation.common.adapter.EditDeckCardAdapter
 import kotlinx.coroutines.launch
 
 class EditDeckFragment : Fragment() {
@@ -26,10 +27,16 @@ class EditDeckFragment : Fragment() {
 
     private val viewModel: EditDeckViewModel by viewModels {
         val container = (requireActivity().application as FlashcardApp).container
-        EditDeckViewModelFactory(container.getDeckByIdUseCase, container.updateDeckUseCase)
+        EditDeckViewModelFactory(
+            container.getDeckByIdUseCase,
+            container.updateDeckUseCase,
+            container.getCardsByDeckIdUseCase,
+            container.deleteFlashCardUseCase
+        )
     }
 
     private var deckId: String? = null
+    private lateinit var editDeckCardAdapter: EditDeckCardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +66,31 @@ class EditDeckFragment : Fragment() {
     }
 
     private fun setupViews() {
+        editDeckCardAdapter = EditDeckCardAdapter(
+            onEditClick = { card ->// Navigate to edit card, passing card details if needed
+                val bundle = Bundle().apply {
+                    putString("CARD_ID", card.id)
+                    putString("QUESTION", card.question)
+                    putString("ANSWER", card.answer)
+                    putString("DECK_ID", card.deckId)
+                }
+                findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle) 
+            },
+            onDeleteClick = { card ->
+                android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Xoá thẻ")
+                    .setMessage("Bạn có chắc chắn muốn xoá thẻ này không?")
+                    .setPositiveButton("Xoá") { _, _ ->
+                        viewModel.deleteCard(card)
+                        Toast.makeText(requireContext(), "Đã xoá thẻ", Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("Huỷ", null)
+                    .show()
+            }
+        )
+
         binding.rvCards.layoutManager = LinearLayoutManager(requireContext())
-        // binding.rvCards.adapter = editDeckCardAdapter
+        binding.rvCards.adapter = editDeckCardAdapter
         binding.tvTitle.text = "Sửa bộ thẻ"
     }
 
@@ -96,27 +126,38 @@ class EditDeckFragment : Fragment() {
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.deckState.collect { state ->
-                    when (state) {
-                        is EditDeckState.Loading -> {
-                            // Hiện loading (tuỳ chọn)
+                launch {
+                    viewModel.deckState.collect { state ->
+                        when (state) {
+                            is EditDeckState.Loading -> {
+                                // Hiện loading (tuỳ chọn)
+                            }
+                            is EditDeckState.Success -> {
+                                binding.etDeckName.setText(state.deck.name)
+                                binding.etDeckDescription.setText(state.deck.description)
+                                binding.switchPublic.isChecked = state.deck.isPublic
+                                println("Deck is public: ${state.deck.isPublic} ${state.deck.name}")
+                                updateSwitchTint(state.deck.isPublic)
+                                binding.tvCardCountLabel.text = "Số lượng thẻ (${state.deck.cardCount})"
+                            }
+                            is EditDeckState.UpdateSuccess -> {
+                                Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
+                                requireActivity().finish()
+                            }
+                            is EditDeckState.Error -> {
+                                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {}
                         }
-                        is EditDeckState.Success -> {
-                            binding.etDeckName.setText(state.deck.name)
-                            binding.etDeckDescription.setText(state.deck.description)
-                            binding.switchPublic.isChecked = state.deck.isPublic
-                            println("Deck is public: ${state.deck.isPublic} ${state.deck.name}")
-                            updateSwitchTint(state.deck.isPublic)
-                            binding.tvCardCountLabel.text = "Số lượng thẻ (${state.deck.cards.size})"
+                    }
+                }
+                launch {
+                    viewModel.cardsState.collect { cards ->
+                        editDeckCardAdapter.submitList(cards)
+                        // Update UI label if desired (so it depends on cards API response)
+                        if (cards.isNotEmpty()) {
+                            binding.tvCardCountLabel.text = "Số lượng thẻ (${cards.size})"
                         }
-                        is EditDeckState.UpdateSuccess -> {
-                            Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
-                            requireActivity().finish()
-                        }
-                        is EditDeckState.Error -> {
-                            Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
-                        }
-                        else -> {}
                     }
                 }
             }

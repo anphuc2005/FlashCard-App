@@ -33,7 +33,9 @@ interface FlashCardDao {
     @Query("SELECT * FROM flashcard_table")
     fun getAllCards(): Flow<List<FlashCardEntity>>
 
+    @Query("SELECT * FROM flashcard_table WHERE isSynced = 0")
+    suspend fun getUnsyncedCards(): List<FlashCardEntity>
+
     @Query("DELETE FROM flashcard_table WHERE deckId = :deckId")
     suspend fun deleteCardsByDeckId(deckId: String)
 }
-
