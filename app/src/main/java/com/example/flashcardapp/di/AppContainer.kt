@@ -24,6 +24,8 @@ import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
 import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
 import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
 import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
+import com.example.flashcardapp.domain.usecase.category.GetAllCategoriesUseCase
+import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCase
 
 /**
  * Dependency Injection Container
@@ -96,6 +98,14 @@ class AppContainer(private val applicationContext: Context) {
 
     val cloneDeckUseCase: CloneDeckUseCase by lazy {
         CloneDeckUseCase(deckRepository)
+    }
+
+    val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase by lazy {
+        GetExploreDecksFromApiUseCase(deckRepository)
+    }
+
+    val getAllCategoriesUseCase: GetAllCategoriesUseCase by lazy {
+        GetAllCategoriesUseCase(categoryRepository)
     }
 
     val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {

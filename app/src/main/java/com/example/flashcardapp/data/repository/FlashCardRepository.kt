@@ -5,7 +5,9 @@ import com.example.flashcardapp.data.datasource.local.entity.FlashCardEntity
 import com.example.flashcardapp.data.datasource.remote.api.CardApiService
 import com.example.flashcardapp.data.datasource.remote.model.toDto
 import com.example.flashcardapp.domain.model.FlashCard
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class FlashCardRepository(
     private val cardApiService: CardApiService,
@@ -17,7 +19,7 @@ class FlashCardRepository(
     }
 
     // Lấy thẻ từ API theo Deck ID
-    suspend fun getCardsByDeckIdFromApi(deckId: String): List<FlashCard> {
+    suspend fun getCardsByDeckIdFromApi(deckId: String): List<FlashCard>  {
         val response = cardApiService.getCardOfDeck(deckId)
         if (response.status == 200 && response.data != null) {
             val listCards = response.data.map { it.toDomain() }
@@ -39,19 +41,16 @@ class FlashCardRepository(
                 e.printStackTrace()
             }
             
-            return listCards
+            return withContext(Dispatchers.IO) {
+                listCards
+            }
         } else {
             throw Exception("Failed to fetch cards: ${response.message}")
         }
     }
 
-    // Lấy tất cả thẻ từ local database
-    fun getAllCardsFromDb(): Flow<List<FlashCardEntity>> {
-        return flashCardDao.getAllCards()
-    }
-
     // Thêm thẻ vào local database
-    suspend fun insertCard(card: FlashCard) {
+    suspend fun insertCard(card: FlashCard) = withContext(Dispatchers.IO) {
         val cardEntity = FlashCardEntity(
             id = card.id,
             question = card.question,
@@ -94,7 +93,7 @@ class FlashCardRepository(
     }
 
     // Cập nhật thẻ
-    suspend fun updateCard(card: FlashCard) {
+    suspend fun updateCard(card: FlashCard) = withContext(Dispatchers.IO) {
         try {
             // Update to remote first
             val response = cardApiService.updateCard(card.id, card.toDto())

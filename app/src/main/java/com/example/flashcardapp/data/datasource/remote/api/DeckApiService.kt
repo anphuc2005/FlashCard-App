@@ -23,7 +23,7 @@ interface DeckApiService {
     @POST("decks")
     suspend fun createDeck(@Body deck: DeckDto): ApiResponse<DeckDto>
 
-    @POST("decks/{deckId}/clone")
+    @POST("decks/{id}/clone")
     suspend fun cloneDeck(@Path("id") deckId: String): ApiResponse<DeckDto>
 
     @PUT("decks/{id}")
