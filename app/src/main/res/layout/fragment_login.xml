@@ -117,8 +117,7 @@
                 app:boxStrokeColor="@color/auth_input_stroke_selector"
                 app:boxStrokeWidth="@dimen/auth_input_stroke_width"
                 app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width"
-                app:endIconDrawable="@drawable/ic_auth_eye_hidden"
-                app:endIconMode="custom"
+                app:endIconMode="password_toggle"
                 app:endIconTint="@color/auth_input_hint">
 
                 <com.google.android.material.textfield.TextInputEditText

@@ -6,7 +6,7 @@ import com.example.flashcardapp.domain.model.FlashCard
 class AddFlashCardUseCase(
     private val repository: FlashCardRepository
 ) {
-    suspend operator fun invoke(question: String, answer: String, deckId: String): Result<Unit> {
+    suspend operator fun invoke(question: String, answer: String, deckId: String, imageUrl: String? = null): Result<Unit> {
         if (question.isBlank() || answer.isBlank()) {
             return Result.failure(IllegalArgumentException("Câu hỏi và câu trả lời không được để trống"))
         }
@@ -15,6 +15,7 @@ class AddFlashCardUseCase(
             id = java.util.UUID.randomUUID().toString(),
             question = question,
             answer = answer,
+            imageUrl = imageUrl,
             deckId = deckId
         )
         

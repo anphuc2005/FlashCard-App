@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.flashcardapp.FlashcardApp
 import kotlinx.coroutines.launch
+import java.io.File
 
 class AddCardFragment : Fragment() {
     private lateinit var binding: FragmentAddCardBinding
@@ -58,8 +59,10 @@ class AddCardFragment : Fragment() {
         }
 
     private val viewModel: AddCardViewModel by viewModels {
+        val appContainer = (requireActivity().application as FlashcardApp).container
         AddCardViewModelFactory(
-            (requireActivity().application as FlashcardApp).container.addFlashCardUseCase
+            appContainer.addFlashCardUseCase,
+            appContainer.uploadImageUseCase
         )
     }
 
@@ -124,42 +127,73 @@ class AddCardFragment : Fragment() {
         // Lệnh này dùng để check state finish hay continue phía sau
         view?.setTag(com.example.flashcardapp.R.id.nav_host_fragment_add_deck, shouldFinish)
         
-        viewModel.submitCard(question, answer, deckId)
+        var imageFile: File? = null
+        selectedImageUri?.let { uri ->
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            imageFile = File(requireContext().cacheDir, "temp_img_${System.currentTimeMillis()}.jpg")
+            imageFile?.outputStream()?.use { out -> inputStream?.copyTo(out) }
+        }
+
+        viewModel.submitCard(question, answer, deckId, imageFile)
     }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    when (state) {
-                        is AddCardState.Idle -> {
-                            // Do nothing
-                        }
-                        is AddCardState.Loading -> {
-                            // Show loading (có thể làm hiển thị ProgressDialog)
-                        }
-                        is AddCardState.Success -> {
-                            Toast.makeText(requireContext(), "Lưu thẻ thành công!", Toast.LENGTH_SHORT).show()
-                            binding.etFront.text?.clear()
-                            binding.etBack.text?.clear()
-                            
-                            binding.layoutImageEmpty.visibility = View.VISIBLE
-                            binding.ivSelectedImage.visibility = View.GONE
-                            binding.ivSelectedImage.setImageURI(null)
-                            selectedImageUri = null
-                            
-                            binding.layoutAudioEmpty.visibility = View.VISIBLE
-                            binding.layoutAudioSelected.visibility = View.GONE
-                            selectedAudioUri = null
-                            
-                            val shouldFinish = view?.getTag(com.example.flashcardapp.R.id.nav_host_fragment_add_deck) as? Boolean ?: false
-                            if (shouldFinish) {
-                                requireActivity().finish()
+                // Lắng nghe state của add card
+                launch {
+                    viewModel.uiState.collect { state ->
+                        when (state) {
+                            is AddCardState.Idle -> {
+                                // Do nothing
                             }
-                            viewModel.resetState()
+                            is AddCardState.Loading -> {
+                                // Show loading
+                            }
+                            is AddCardState.Success -> {
+                                Toast.makeText(requireContext(), "Lưu thẻ thành công!", Toast.LENGTH_SHORT).show()
+                                binding.etFront.text?.clear()
+                                binding.etBack.text?.clear()
+                                
+                                binding.layoutImageEmpty.visibility = View.VISIBLE
+                                binding.ivSelectedImage.visibility = View.GONE
+                                binding.ivSelectedImage.setImageURI(null)
+                                selectedImageUri = null
+                                
+                                binding.layoutAudioEmpty.visibility = View.VISIBLE
+                                binding.layoutAudioSelected.visibility = View.GONE
+                                selectedAudioUri = null
+                                
+                                val shouldFinish = view?.getTag(com.example.flashcardapp.R.id.nav_host_fragment_add_deck) as? Boolean ?: false
+                                if (shouldFinish) {
+                                    requireActivity().finish()
+                                }
+                                viewModel.resetState()
+                            }
+                            is AddCardState.Error -> {
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            }
                         }
-                        is AddCardState.Error -> {
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                // Lắng nghe state của upload image
+                launch {
+                    viewModel.uploadState.collect { state ->
+                        when (state) {
+                            is UploadState.Idle -> {}
+                            is UploadState.Loading -> {
+                                Toast.makeText(requireContext(), "Đang tải ảnh lên...", Toast.LENGTH_SHORT).show()
+                            }
+                            is UploadState.Success -> {
+                                Toast.makeText(requireContext(), "Tải ảnh xong", Toast.LENGTH_SHORT).show()
+                                // TODO: state.url là link cloud, b có thể lưu url này vào để truyền cùng submitCard.
+                                viewModel.resetUploadState()
+                            }
+                            is UploadState.Error -> {
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                viewModel.resetUploadState()
+                            }
                         }
                     }
                 }
@@ -167,4 +201,3 @@ class AddCardFragment : Fragment() {
         }
     }
 }
-

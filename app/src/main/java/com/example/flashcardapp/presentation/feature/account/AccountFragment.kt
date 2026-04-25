@@ -9,10 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.databinding.FragmentAccountBinding
 import com.example.flashcardapp.databinding.ItemSettingRowBinding
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
@@ -25,7 +29,7 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.Reminde
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog.ThemeOption
 import com.example.flashcardapp.presentation.feature.auth.AuthActivity
-import com.example.flashcardapp.FlashcardApp
+import kotlinx.coroutines.launch
 
 class AccountFragment : Fragment() {
 
@@ -76,6 +80,12 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRows()
         setupActions()
+        loadProfile()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadProfile()
     }
 
     override fun onDestroyView() {
@@ -137,6 +147,9 @@ class AccountFragment : Fragment() {
         }
         binding.rowExport.root.setOnClickListener { showExportDialog() }
         binding.rowRate.root.setOnClickListener { showRatingDialog() }
+        binding.btnSettings.setOnClickListener {
+            findNavController().navigate(R.id.action_accountFragment_to_editProfileFragment)
+        }
 
         binding.btnLogout.setOnClickListener { showLogoutDialog() }
     }
@@ -277,5 +290,37 @@ class AccountFragment : Fragment() {
             }
         }
         dialog.show(childFragmentManager, "LogoutConfirmDialog")
+    }
+
+    private fun loadProfile() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val profileResult = (requireActivity().application as FlashcardApp)
+                .container
+                .getMyProfileUseCase()
+
+            profileResult.onSuccess { profile ->
+                binding.name.text = profile.displayName
+                binding.memberSince.text = formatMemberSince(profile.createdAt)
+
+                if (profile.avatarUrl.isNullOrBlank()) {
+                    binding.avatar.setImageResource(R.drawable.user)
+                } else {
+                    Glide.with(this@AccountFragment)
+                        .load(profile.avatarUrl)
+                        .placeholder(R.drawable.user)
+                        .error(R.drawable.user)
+                        .into(binding.avatar)
+                }
+            }
+        }
+    }
+
+    private fun formatMemberSince(createdAt: String?): String {
+        if (createdAt.isNullOrBlank()) return "Thành viên"
+
+        return runCatching {
+            val date = java.time.Instant.parse(createdAt).atZone(java.time.ZoneId.systemDefault())
+            "Thành viên từ tháng ${date.monthValue}, ${date.year}"
+        }.getOrDefault("Thành viên")
     }
 }

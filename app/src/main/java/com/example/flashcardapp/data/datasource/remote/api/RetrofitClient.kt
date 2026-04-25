@@ -47,5 +47,7 @@ object RetrofitClient {
     val deckApiService: DeckApiService = retrofit.create(DeckApiService::class.java)
     val cardApiService: CardApiService = retrofit.create(CardApiService::class.java)
     val categoriesApiService: CategoriesApiService = retrofit.create(CategoriesApiService::class.java)
+    val profileApiService: ProfileApiService = retrofit.create(ProfileApiService::class.java)
+    val uploadApiService: UploadApiService = retrofit.create(UploadApiService::class.java)
     val groqApiService: GroqApiService = groqRetrofit.create(GroqApiService::class.java)
 }
