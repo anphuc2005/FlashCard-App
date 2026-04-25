@@ -1,7 +1,7 @@
 package com.example.flashcardapp.data.datasource.remote.api
 
 import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
-import com.example.flashcardapp.domain.model.FlashCard
+import com.example.flashcardapp.data.datasource.remote.model.FlashCardDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -11,18 +11,16 @@ import retrofit2.http.Path
 
 interface CardApiService {
 
-    @GET("cards/{id}")
-    suspend fun getCardById(@Path("id") id: String): ApiResponse<FlashCard>
+    @GET("cards/deck/{deckId}")
+    suspend fun getCardOfDeck(@Path("deckId") deckId: String): ApiResponse<List<FlashCardDto>>
 
-    @POST("cards")
-    suspend fun createCard(@Body card: FlashCard): ApiResponse<FlashCard>
+    @POST("cards/bulk")
+    suspend fun addCard(@Body card: List<FlashCardDto>): ApiResponse<FlashCardDto>
 
     @PUT("cards/{id}")
-    suspend fun updateCard(@Path("id") id: String, @Body card: FlashCard): ApiResponse<FlashCard>
+    suspend fun updateCard(@Path("id") id: String, @Body card: FlashCardDto): ApiResponse<FlashCardDto>
 
     @DELETE("cards/{id}")
     suspend fun deleteCard(@Path("id") id: String): ApiResponse<String>
 
-    @GET("decks/{deckId}/cards")
-    suspend fun getCardsByDeckId(@Path("deckId") deckId: String): ApiResponse<List<FlashCard>>
 }

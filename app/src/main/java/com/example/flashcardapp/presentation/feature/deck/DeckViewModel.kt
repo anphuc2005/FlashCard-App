@@ -51,14 +51,16 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
         viewModelScope.launch {
             if (deckRepository == null) return@launch
             
-            deckRepository.getAllDecksFromDb().collect { entities ->
-                val decks = entities.map { entity ->
+            deckRepository.getAllDecksWithCardCountFromDb().collect { aggregations ->
+                val decks = aggregations.map { agg ->
+                    val entity = agg.deck
                     Deck(
                         id = entity.id,
                         name = entity.name,
                         description = entity.description,
                         createdAt = entity.createdAt,
-                        updatedAt = entity.updatedAt
+                        updatedAt = entity.updatedAt,
+                        customCardCount = agg.cardCount
                     )
                 }
                 

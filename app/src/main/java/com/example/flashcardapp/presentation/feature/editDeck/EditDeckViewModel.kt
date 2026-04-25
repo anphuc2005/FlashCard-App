@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
 import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.DeleteFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase
+import com.example.flashcardapp.domain.model.FlashCard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,11 +23,16 @@ sealed class EditDeckState {
 
 class EditDeckViewModel(
     private val getDeckByIdUseCase: GetDeckByIdUseCase,
-    private val updateDeckUseCase: UpdateDeckUseCase
+    private val updateDeckUseCase: UpdateDeckUseCase,
+    private val getCardsByDeckIdUseCase: GetCardsByDeckIdUseCase,
+    private val deleteFlashCardUseCase: DeleteFlashCardUseCase
 ) : ViewModel() {
 
     private val _deckState = MutableStateFlow<EditDeckState>(EditDeckState.Idle)
     val deckState: StateFlow<EditDeckState> = _deckState.asStateFlow()
+
+    private val _cardsState = MutableStateFlow<List<FlashCard>>(emptyList())
+    val cardsState: StateFlow<List<FlashCard>> = _cardsState.asStateFlow()
 
     private var currentDeck: Deck? = null
 
@@ -35,10 +43,41 @@ class EditDeckViewModel(
                 .onSuccess { deck ->
                     currentDeck = deck
                     _deckState.value = EditDeckState.Success(deck)
+
+                    // Fetch cards associated with this deck
+                    fetchCardsForDeck(id)
                 }
                 .onFailure { error ->
                     _deckState.value = EditDeckState.Error(error.message ?: "Lỗi tải bộ thẻ")
                 }
+        }
+    }
+
+    private fun fetchCardsForDeck(deckId: String) {
+        viewModelScope.launch {
+            getCardsByDeckIdUseCase(deckId).onSuccess { cards ->
+                _cardsState.value = cards
+            }.onFailure {
+                // Optionally handle failure fetching cards (e.g. show toast or empty list)
+            }
+        }
+    }
+
+    fun deleteCard(card: FlashCard) {
+        viewModelScope.launch {
+            _deckState.value = EditDeckState.Loading
+            deleteFlashCardUseCase(
+                id = card.id,
+                question = card.question,
+                answer = card.answer,
+                deckId = card.deckId
+            ).onSuccess {
+                // Refresh cards after delete
+                currentDeck?.id?.let { deckId -> fetchCardsForDeck(deckId) }
+                _deckState.value = EditDeckState.Success(currentDeck!!) // Back to normal state
+            }.onFailure { error ->
+                _deckState.value = EditDeckState.Error(error.message ?: "Lỗi xoá thẻ")
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.domain.model.ChatMessage
 import com.example.flashcardapp.domain.usecase.chat.ChatUseCases
+import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
 import com.example.flashcardapp.utils.MarkdownConverter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,8 @@ enum class MessageStatus {
 }
 
 class ChatAIViewModel(
-    private val useCases: ChatUseCases
+    private val useCases: ChatUseCases,
+    private val exploreDecksUseCase: ExploreDecksUseCase
 ) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
@@ -76,9 +78,23 @@ class ChatAIViewModel(
 
             useCases.saveMessage(sendingMessage)
 
+            // Get decks context for AI
+            var contextMessage: String? = null
+            val decksResult = exploreDecksUseCase.invoke()
+            if (decksResult.isSuccess) {
+                val decks = decksResult.getOrNull() ?: emptyList()
+                if (decks.isNotEmpty()) {
+                    val decksString = decks.joinToString(" | ") { 
+                        "ID: ${it.id}, Tên bộ: ${it.name}, Mô tả: ${it.description ?: "Không có"}" 
+                    }
+                    contextMessage = "Bạn là trợ lý học tập Flashcard thông minh. Dưới đây là danh sách các bộ thẻ hiện có trên hệ thống: [$decksString]. Khi người dùng hỏi cần học gì, hãy dựa vào nhu cầu của họ và giới thiệu (các) bộ thẻ phù hợp nhất kèm thông tin mô tả."
+                }
+            }
+
             val result = useCases.sendMessage(
                 userMessage = userText,
-                history = _messages.value
+                history = _messages.value,
+                contextMessage = contextMessage
             )
 
             result.onSuccess { aiResponse ->
@@ -168,11 +184,11 @@ class ChatAIViewModel(
 
 
 class ChatAIViewModelFactory(
-    private val useCases: ChatUseCases
+    private val useCases: ChatUseCases,
+    private val exploreDecksUseCase: ExploreDecksUseCase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ChatAIViewModel(useCases) as T
+        return ChatAIViewModel(useCases, exploreDecksUseCase) as T
     }
 }
-

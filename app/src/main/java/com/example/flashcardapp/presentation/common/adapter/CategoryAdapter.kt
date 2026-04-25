@@ -1,0 +1,110 @@
+package com.example.flashcardapp.presentation.common.adapter
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.example.flashcardapp.R
+import com.example.flashcardapp.databinding.ItemShortcutBinding
+import com.example.flashcardapp.domain.model.Category
+import kotlin.math.abs
+
+class CategoryAdapter(
+    private val onItemClick: (Category) -> Unit
+) : ListAdapter<Category, CategoryAdapter.CategoryViewHolder>(CategoryDiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
+        val binding = ItemShortcutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        
+        // Thiết lập layout param bằng code để có marginRight và chiều rộng wrap_content cho danh sách ngang
+        val density = parent.context.resources.displayMetrics.density
+        val marginEndPx = (16 * density).toInt()
+        val params = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            marginEnd = marginEndPx
+        }
+        binding.root.layoutParams = params
+
+        return CategoryViewHolder(binding, onItemClick)
+    }
+
+    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+
+    class CategoryViewHolder(
+        private val binding: ItemShortcutBinding,
+        private val onItemClick: (Category) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: Category) {
+            binding.apply {
+                tvTitle.text = item.name
+
+                val (iconRes, bgColorRes, tintColorRes) = getCategoryVisuals(item.name)
+
+                imgIcon.setImageResource(iconRes)
+                imgIcon.setColorFilter(
+                    ContextCompat.getColor(binding.root.context, tintColorRes),
+                    android.graphics.PorterDuff.Mode.SRC_IN
+                )
+                cardIcon.setCardBackgroundColor(
+                    ContextCompat.getColor(binding.root.context, bgColorRes)
+                )
+
+                root.setOnClickListener {
+                    onItemClick(item)
+                }
+            }
+        }
+
+        private fun getCategoryVisuals(name: String): Triple<Int, Int, Int> {
+            val nameLower = name.lowercase().trim()
+            if (nameLower.contains("ngôn ngữ") || nameLower.contains("language") || nameLower.contains("tiếng")) {
+                return Triple(R.drawable.ic_language, R.color.md_icon_blue_background, R.color.md_icon_blue)
+            }
+            if (nameLower.contains("khoa học") || nameLower.contains("science") || nameLower.contains("toán") || nameLower.contains("math")) {
+                return Triple(R.drawable.ic_science, R.color.md_icon_green_background, R.color.md_icon_green)
+            }
+            if (nameLower.contains("công nghệ") || nameLower.contains("it") || nameLower.contains("lập trình") || nameLower.contains("tech")) {
+                return Triple(R.drawable.ic_json, R.color.md_icon_purple_background, R.color.md_icon_purple)
+            }
+            if (nameLower.contains("lịch sử") || nameLower.contains("history")) {
+                return Triple(R.drawable.ic_history, R.color.md_icon_yellow_background, R.color.md_icon_yellow)
+            }
+            if (nameLower.contains("kinh tế") || nameLower.contains("art") || nameLower.contains("âm nhạc") || nameLower.contains("music")) {
+                return Triple(R.drawable.ic_economic, R.color.md_icon_orange_background, R.color.md_icon_orange)
+            }
+            if (nameLower.contains("từ vựng") || nameLower.contains("vocabulary")) {
+                return Triple(R.drawable.ic_cards, R.color.md_icon_red_background, R.color.md_icon_red)
+            }
+
+            val colors = listOf(
+                Pair(R.color.md_icon_blue_background, R.color.md_icon_blue),
+                Pair(R.color.md_icon_green_background, R.color.md_icon_green),
+                Pair(R.color.md_icon_purple_background, R.color.md_icon_purple),
+                Pair(R.color.md_icon_yellow_background, R.color.md_icon_yellow),
+                Pair(R.color.md_icon_orange_background, R.color.md_icon_orange),
+                Pair(R.color.md_icon_red_background, R.color.md_icon_red),
+                Pair(R.color.md_icon_gray_background, R.color.md_icon_gray)
+            )
+            val hash = abs(name.hashCode())
+            val colorPair = colors[hash % colors.size]
+            return Triple(R.drawable.ic_discover, colorPair.first, colorPair.second)
+        }
+    }
+
+    private class CategoryDiffCallback : DiffUtil.ItemCallback<Category>() {
+        override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
+            return oldItem == newItem
+        }
+    }
+}

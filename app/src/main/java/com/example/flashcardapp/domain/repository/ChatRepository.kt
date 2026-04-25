@@ -8,6 +8,5 @@ interface ChatRepository {
     suspend fun saveMessage(message: ChatMessage)
     suspend fun deleteMessageById(id: String)
     suspend fun clearMessages()
-    suspend fun sendMessage(userMessage: String, history: List<ChatMessage>): Result<String>
+    suspend fun sendMessage(userMessage: String, history: List<ChatMessage>, contextMessage: String? = null): Result<String>
 }
-

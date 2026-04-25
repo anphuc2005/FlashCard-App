@@ -17,11 +17,15 @@ import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.DeleteFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.UpdateFlashCardUseCase
 import com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase
 import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
 import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
 import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
 import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
+import com.example.flashcardapp.domain.usecase.category.GetAllCategoriesUseCase
+import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCase
 
 /**
  * Dependency Injection Container
@@ -57,7 +61,7 @@ class AppContainer(private val applicationContext: Context) {
 
     val flashCardRepository: FlashCardRepository by lazy {
         val database = FlashCardDatabase.getInstance(applicationContext)
-        FlashCardRepository(RetrofitClient.deckApiService, database.flashCardDao())
+        FlashCardRepository(RetrofitClient.cardApiService, database.flashCardDao())
     }
 
     // 4. Use Cases
@@ -76,6 +80,14 @@ class AppContainer(private val applicationContext: Context) {
         AddFlashCardUseCase(flashCardRepository)
     }
 
+    val updateFlashCardUseCase: UpdateFlashCardUseCase by lazy {
+        UpdateFlashCardUseCase(flashCardRepository)
+    }
+
+    val deleteFlashCardUseCase: DeleteFlashCardUseCase by lazy {
+        DeleteFlashCardUseCase(flashCardRepository)
+    }
+
     val addDeckUseCase: AddDeckUseCase by lazy {
         AddDeckUseCase(deckRepository)
     }
@@ -88,11 +100,23 @@ class AppContainer(private val applicationContext: Context) {
         CloneDeckUseCase(deckRepository)
     }
 
+    val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase by lazy {
+        GetExploreDecksFromApiUseCase(deckRepository)
+    }
+
+    val getAllCategoriesUseCase: GetAllCategoriesUseCase by lazy {
+        GetAllCategoriesUseCase(categoryRepository)
+    }
+
     val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {
         GetDeckByIdUseCase(deckRepository)
     }
 
     val updateDeckUseCase: UpdateDeckUseCase by lazy {
         UpdateDeckUseCase(deckRepository)
+    }
+
+    val getCardsByDeckIdUseCase: com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase by lazy {
+        com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(flashCardRepository)
     }
 }

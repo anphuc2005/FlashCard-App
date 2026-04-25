@@ -20,6 +20,6 @@ data class FlashCardEntity(
     val id: String,
     val question: String,
     val answer: String,
-    val deckId: String
+    val deckId: String,
+    val isSynced: Boolean = true // Thêm trường này để đánh dấu đã đồng bộ với server hay chưa
 )
-
