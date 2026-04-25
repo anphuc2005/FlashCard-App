@@ -1,4 +1,4 @@
-package com.example.flashcardapp.core.utils.chart
+﻿package com.example.flashcardapp.core.utils.chart
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,7 +7,6 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
-import androidx.core.content.ContextCompat
 import com.example.flashcardapp.R
 import kotlin.math.max
 
@@ -23,30 +22,41 @@ class WeeklyBarChartView @JvmOverloads constructor(
     private var highlightIndex: Int = -1
 
     private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.blue_primary) // e.g. #2E6BFF
-        style = Paint.Style.FILL
-    }
-    private val barBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.bar_track)    // e.g. #E5ECF6
+        color = getAttrColor(R.attr.iconBlue)
         style = Paint.Style.FILL
     }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.gray_600)     // e.g. #9AA6B6
+        color = getAttrColor(R.attr.subTitleColor)
         textSize = sp(12f)
         textAlign = Paint.Align.CENTER
+    }
+    private val activeLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = getAttrColor(R.attr.iconBlue)
+        textSize = sp(12f)
+        textAlign = Paint.Align.CENTER
+        isFakeBoldText = true
+    }
+    private val activeLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = getAttrColor(R.attr.iconBlue)
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = dp(3f)
     }
 
     private val barRect = RectF()
 
     private val barWidthDp = 14f
     private val barRadiusDp = 6f
-    private val barSpacingDp = 22f
-    private val chartTopPaddingDp = 12f
-    private val chartBottomPaddingDp = 32f  // space for labels
+    private val minBarHeightDp = 10f
+    private val minBarSpacingDp = 14f
+    private val maxBarSpacingDp = 30f
+    private val horizontalPaddingDp = 18f
+    private val chartTopPaddingDp = 10f
+    private val chartBottomPaddingDp = 38f
 
     fun setData(newEntries: List<DayEntry>, highlight: Int = -1) {
         entries = newEntries
-        highlightIndex = highlight
+        highlightIndex = if (highlight in newEntries.indices) highlight else -1
         requestLayout()
         invalidate()
     }
@@ -54,8 +64,11 @@ class WeeklyBarChartView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredHeight = dp(140f).toInt()
         val resolvedHeight = resolveSize(desiredHeight, heightMeasureSpec)
-        val minWidth =
-            (entries.size * (dp(barWidthDp) + dp(barSpacingDp)) + dp(barSpacingDp)).toInt()
+        val minWidth = (
+            (entries.size * dp(barWidthDp)) +
+                ((entries.size - 1).coerceAtLeast(0) * dp(minBarSpacingDp)) +
+                (2 * dp(horizontalPaddingDp))
+            ).toInt()
         val resolvedWidth = resolveSize(minWidth, widthMeasureSpec)
         setMeasuredDimension(resolvedWidth, resolvedHeight)
     }
@@ -67,36 +80,66 @@ class WeeklyBarChartView @JvmOverloads constructor(
         val maxVal = max(entries.maxOf { it.value }, 1f)
         val barWidth = dp(barWidthDp)
         val barRadius = dp(barRadiusDp)
-        val spacing = dp(barSpacingDp)
+        val minBarHeight = dp(minBarHeightDp)
+        val minSpacing = dp(minBarSpacingDp)
+        val maxSpacing = dp(maxBarSpacingDp)
+        val horizontalPadding = dp(horizontalPaddingDp)
         val topPad = dp(chartTopPaddingDp)
         val bottomPad = dp(chartBottomPaddingDp)
         val chartHeight = height - topPad - bottomPad
 
-        var cx = spacing + barWidth / 2f
+        val count = entries.size
+        val availableWidth = max(0f, width - (horizontalPadding * 2f))
+        val spacing = if (count > 1) {
+            ((availableWidth - (count * barWidth)) / (count - 1))
+                .coerceIn(minSpacing, maxSpacing)
+        } else {
+            0f
+        }
+        val contentWidth = (count * barWidth) + ((count - 1).coerceAtLeast(0) * spacing)
+        val startX = ((width - contentWidth) / 2f) + (barWidth / 2f)
+
+        var cx = startX
         entries.forEachIndexed { index, entry ->
-            val h = (entry.value / maxVal) * chartHeight
-            val barTop = topPad + (chartHeight - h)
+            val rawHeight = (entry.value / maxVal) * chartHeight
+            val displayHeight = if (entry.value > 0f) max(rawHeight, minBarHeight) else 0f
+            val barTop = topPad + (chartHeight - displayHeight)
             val barBottom = topPad + chartHeight
 
-            // track/background
-            barRect.set(cx - barWidth / 2, topPad + chartHeight - dp(4f), cx + barWidth / 2, barBottom)
-            canvas.drawRoundRect(barRect, barRadius, barRadius, barBgPaint)
+            if (displayHeight > 0f) {
+                barRect.set(cx - barWidth / 2, barTop, cx + barWidth / 2, barBottom)
+                val oldAlpha = barPaint.alpha
+                if (index != highlightIndex) barPaint.alpha = 110
+                canvas.drawRoundRect(barRect, barRadius, barRadius, barPaint)
+                barPaint.alpha = oldAlpha
+            }
 
-            // bar
-            barRect.set(cx - barWidth / 2, barTop, cx + barWidth / 2, barBottom)
-            val paint = if (index == highlightIndex) barPaint else barBgPaint.apply { alpha = 200 }
-            canvas.drawRoundRect(barRect, barRadius, barRadius, paint)
-            paint.alpha = 255 // reset
+            if (index == highlightIndex) {
+                val lineWidth = dp(30f)
+                val lineY = height - bottomPad + dp(6f)
+                canvas.drawLine(cx - lineWidth / 2f, lineY, cx + lineWidth / 2f, lineY, activeLinePaint)
+            }
 
-            // label
-            val labelY = height - dp(12f)
-            canvas.drawText(entry.label, cx, labelY, labelPaint)
+            val labelY = height - dp(10f)
+            val paint = if (index == highlightIndex) activeLabelPaint else labelPaint
+            canvas.drawText(entry.label, cx, labelY, paint)
 
             cx += barWidth + spacing
         }
     }
 
-    private fun dp(v: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, resources.displayMetrics)
-    private fun sp(v: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, v, resources.displayMetrics)
-}
+    private fun dp(value: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics)
+    }
 
+    private fun sp(value: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics)
+    }
+
+    private fun getAttrColor(attrRes: Int): Int {
+        val typedArray = context.theme.obtainStyledAttributes(intArrayOf(attrRes))
+        val color = typedArray.getColor(0, 0xFF1F7AE0.toInt())
+        typedArray.recycle()
+        return color
+    }
+}
