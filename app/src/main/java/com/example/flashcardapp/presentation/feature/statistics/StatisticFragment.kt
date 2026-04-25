@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.R
 import com.example.flashcardapp.core.utils.chart.WeeklyBarChartView
 import com.example.flashcardapp.databinding.FragmentStatisticBinding
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.example.flashcardapp.presentation.feature.statistics.adapter.DeckStatisticsAdapter
 import com.example.flashcardapp.presentation.feature.statistics.adapter.StatisticAchievementAdapter
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
@@ -68,7 +69,7 @@ class StatisticFragment : Fragment() {
         }
         binding.btnAchievementDetail.setOnClickListener {
             if (allAchievements.isEmpty()) {
-                Toast.makeText(requireContext(), getString(R.string.stat_no_achievement_data), Toast.LENGTH_SHORT).show()
+                showAppWarning(getString(R.string.stat_no_achievement_data))
             } else {
                 createAchievementDetailDialog(allAchievements)
                     .show(childFragmentManager, ACHIEVEMENT_DETAIL_DIALOG_TAG)
@@ -157,7 +158,7 @@ class StatisticFragment : Fragment() {
         achievementAdapter.submitList(emptyList())
         deckStatisticsAdapter.submitList(emptyList())
         val safeMessage = if (message.isBlank()) getString(R.string.stat_error_load) else message
-        Toast.makeText(requireContext(), safeMessage, Toast.LENGTH_SHORT).show()
+        showAppError(safeMessage)
     }
 
     override fun onDestroyView() {

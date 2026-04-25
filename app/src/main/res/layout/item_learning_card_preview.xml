@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/learning_space_sm"
+    android:backgroundTint="?attr/componentBackground"
+    app:cardCornerRadius="@dimen/learning_card_radius"
+    app:cardElevation="@dimen/learning_card_elevation"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/learning_card_padding">
+
+        <TextView
+            android:id="@+id/textCardTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_tag_blue"
+            android:paddingHorizontal="@dimen/learning_preview_tag_padding_horizontal"
+            android:paddingVertical="@dimen/learning_preview_tag_padding_vertical"
+            android:textAllCaps="true"
+            android:textColor="?attr/iconBlue"
+            android:textSize="@dimen/learning_tag_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/learning_space_md"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/learning_body_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/learning_space_xs"
+            android:textColor="?attr/subTitleColor"
+            android:textSize="@dimen/learning_caption_text_size" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

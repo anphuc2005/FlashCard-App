@@ -62,7 +62,7 @@ class StatisticViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 isInitialized = true,
-                errorMessage = throwable.message ?: "Co loi xay ra"
+                errorMessage = throwable.message ?: "Có lỗi xảy ra"
             )
         }
     }
@@ -70,7 +70,7 @@ class StatisticViewModel : ViewModel() {
     private fun mockOverview(): StatisticsOverview {
         return StatisticsOverview(
             userId = "guest",
-            userName = "Ban",
+            userName = "Bạn",
             xpToday = 180,
             streakDays = 7,
             totalDecks = 6,
@@ -133,14 +133,14 @@ class StatisticViewModel : ViewModel() {
         timeStatistics: TimeStatistics
     ): List<StatisticAchievementItem> {
         val achievements = listOf(
-            StatisticAchievement("learned", "Nguoi chinh phuc", StatisticAchievement.Category.LEARNED, overview.learnedCards, 120, "the", overview.learnedCards >= 120),
-            StatisticAchievement("streak", "Chuoi vang", StatisticAchievement.Category.STREAK, overview.streakDays, 10, "ngay", overview.streakDays >= 10),
-            StatisticAchievement("deck", "Nha suu tam", StatisticAchievement.Category.DECK, overview.totalDecks, 10, "bo", overview.totalDecks >= 10),
-            StatisticAchievement("review", "On tap ben bi", StatisticAchievement.Category.REVIEW, overview.reviewCount, 300, "luot", overview.reviewCount >= 300),
-            StatisticAchievement("accuracy", "Xa thu chinh xac", StatisticAchievement.Category.ACCURACY, overview.accuracy.toInt(), 85, "%", overview.accuracy >= 85.0),
-            StatisticAchievement("xp", "Nang luong cao", StatisticAchievement.Category.XP, overview.xpToday, 250, "XP", overview.xpToday >= 250),
-            StatisticAchievement("time", "Hoc sau", StatisticAchievement.Category.STUDY_TIME, timeStatistics.totalStudyMinutes, 600, "phut", timeStatistics.totalStudyMinutes >= 600),
-            StatisticAchievement("reviewed_cards", "Tang toc", StatisticAchievement.Category.REVIEWED_CARDS, timeStatistics.totalReviewedCards, 160, "the", timeStatistics.totalReviewedCards >= 160)
+            StatisticAchievement("learned", "Người chinh phục", StatisticAchievement.Category.LEARNED, overview.learnedCards, 120, "thẻ", overview.learnedCards >= 120),
+            StatisticAchievement("streak", "Chuỗi vàng", StatisticAchievement.Category.STREAK, overview.streakDays, 10, "ngày", overview.streakDays >= 10),
+            StatisticAchievement("deck", "Nhà sưu tầm", StatisticAchievement.Category.DECK, overview.totalDecks, 10, "bộ", overview.totalDecks >= 10),
+            StatisticAchievement("review", "Ôn tập bền bỉ", StatisticAchievement.Category.REVIEW, overview.reviewCount, 300, "lượt", overview.reviewCount >= 300),
+            StatisticAchievement("accuracy", "Xạ thủ chính xác", StatisticAchievement.Category.ACCURACY, overview.accuracy.toInt(), 85, "%", overview.accuracy >= 85.0),
+            StatisticAchievement("xp", "Năng lượng cao", StatisticAchievement.Category.XP, overview.xpToday, 250, "XP", overview.xpToday >= 250),
+            StatisticAchievement("time", "Học sâu", StatisticAchievement.Category.STUDY_TIME, timeStatistics.totalStudyMinutes, 600, "phút", timeStatistics.totalStudyMinutes >= 600),
+            StatisticAchievement("reviewed_cards", "Tăng tốc", StatisticAchievement.Category.REVIEWED_CARDS, timeStatistics.totalReviewedCards, 160, "thẻ", timeStatistics.totalReviewedCards >= 160)
         )
 
         return achievements.map { achievement ->
@@ -150,7 +150,7 @@ class StatisticViewModel : ViewModel() {
                 title = achievement.title,
                 description = "${formatter.formatNumber(cappedProgress)}/${formatter.formatNumber(achievement.target)} $progressLabel",
                 introduction = introductionForCategory(achievement.category),
-                condition = "Dat ${formatter.formatNumber(achievement.target)} $progressLabel",
+                condition = "Đạt ${formatter.formatNumber(achievement.target)} $progressLabel",
                 iconResId = iconForCategory(achievement.category),
                 isUnlocked = achievement.isUnlocked
             )
@@ -159,14 +159,14 @@ class StatisticViewModel : ViewModel() {
 
     private fun introductionForCategory(category: StatisticAchievement.Category): String {
         return when (category) {
-            StatisticAchievement.Category.LEARNED -> "Moc tich luy so the da hoc cua ban."
-            StatisticAchievement.Category.STREAK -> "Moc duy tri chuoi ngay hoc lien tuc."
-            StatisticAchievement.Category.DECK -> "Moc mo rong so luong bo the ban da tao."
-            StatisticAchievement.Category.REVIEW -> "Moc tong so lan on tap ban da thuc hien."
-            StatisticAchievement.Category.ACCURACY -> "Moc do chinh xac trong qua trinh hoc."
-            StatisticAchievement.Category.XP -> "Moc nang luong hoc tap trong hom nay."
-            StatisticAchievement.Category.STUDY_TIME -> "Moc thoi luong hoc tap trong khoang thoi gian dang chon."
-            StatisticAchievement.Category.REVIEWED_CARDS -> "Moc so the ban da hoc trong khoang thoi gian dang chon."
+            StatisticAchievement.Category.LEARNED -> "Mốc tích lũy số thẻ đã học của bạn."
+            StatisticAchievement.Category.STREAK -> "Mốc duy trì chuỗi ngày học liên tục."
+            StatisticAchievement.Category.DECK -> "Mốc mở rộng số lượng bộ thẻ bạn đã tạo."
+            StatisticAchievement.Category.REVIEW -> "Mốc tổng số lần ôn tập bạn đã thực hiện."
+            StatisticAchievement.Category.ACCURACY -> "Mốc độ chính xác trong quá trình học."
+            StatisticAchievement.Category.XP -> "Mốc năng lượng học tập trong hôm nay."
+            StatisticAchievement.Category.STUDY_TIME -> "Mốc thời lượng học tập trong khoảng thời gian đang chọn."
+            StatisticAchievement.Category.REVIEWED_CARDS -> "Mốc số thẻ bạn đã học trong khoảng thời gian đang chọn."
         }
     }
 

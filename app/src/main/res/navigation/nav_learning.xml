@@ -31,12 +31,20 @@
         <action
             android:id="@+id/action_frontCardFragment_to_backCardFragment"
             app:destination="@id/backCardFragment" />
+        <action
+            android:id="@+id/action_frontCardFragment_to_studyResultFragment"
+            app:destination="@id/studyResultFragment" />
     </fragment>
     <fragment
         android:id="@+id/backCardFragment"
         android:name="com.example.flashcardapp.presentation.feature.learning.BackCardFragment"
         android:label="fragment_back_card"
         tools:layout="@layout/fragment_back_card" >
+        <action
+            android:id="@+id/action_backCardFragment_to_frontCardFragment"
+            app:destination="@id/frontCardFragment"
+            app:popUpTo="@id/frontCardFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_backCardFragment_to_studyResultFragment"
             app:destination="@id/studyResultFragment" />

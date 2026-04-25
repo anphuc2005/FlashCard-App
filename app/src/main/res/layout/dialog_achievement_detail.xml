@@ -25,7 +25,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tất cả thành tích"
+                android:text="@string/stat_achievement_all_title"
                 android:textColor="?attr/textColor"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -35,7 +35,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="@android:color/transparent"
-                android:contentDescription="Đóng"
+                android:contentDescription="@string/stat_dialog_close"
                 android:padding="8dp"
                 android:src="@drawable/ic_close"
                 app:tint="?attr/subTitleColor" />
@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Đã mở khóa 0/0 thành tích"
+            android:text="@string/stat_achievement_summary_placeholder"
             android:textColor="?attr/subTitleColor"
             android:textSize="13sp" />
 
