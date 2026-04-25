@@ -13,7 +13,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.util.Log
-import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +24,7 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentLoginBinding
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.main.MainActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn.getClient
 import com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent
@@ -50,7 +50,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             account.idToken?.let { idToken ->
                 viewModel.googleLogin(idToken)
             } ?: run {
-                Toast.makeText(requireContext(), "Không lấy được mã xác thực Google", Toast.LENGTH_SHORT).show()
+                showAppError("Không lấy được mã xác thực Google")
             }
         } catch (e: ApiException) {
             Log.e("LoginFragment", "Google sign in failed", e)
@@ -60,7 +60,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 1033 -> "Lỗi kết nối đến server. Vui lòng thử lại sau"
                 else -> "Đăng nhập Google thất bại (Mã: ${e.statusCode})"
             }
-            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            showAppError(errorMessage)
         }
     }
 
@@ -69,9 +69,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         _binding = FragmentLoginBinding.bind(view)
 
         setupViewModel()
+        setupPasswordToggle()
         setupGoogleSignIn()
         setupListeners()
         observeViewModel()
+    }
+
+    private fun setupPasswordToggle() {
+        PasswordToggleConfigurator.setup(binding.layoutPassword, binding.inputPassword)
     }
 
     private fun setupGoogleSignIn() {
@@ -166,7 +171,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                                     state.message.contains("401") -> "Sai tài khoản hoặc mật khẩu"
                                     else -> state.message
                                 }
-                                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                                showAppError(msg)
                                 viewModel.resetUiState()
                             }
                         }

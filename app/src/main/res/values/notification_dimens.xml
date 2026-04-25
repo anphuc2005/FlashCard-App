@@ -1,0 +1,16 @@
+<resources>
+    <dimen name="app_notification_margin_top">24dp</dimen>
+    <dimen name="app_notification_margin_horizontal">16dp</dimen>
+    <dimen name="app_notification_radius">28dp</dimen>
+    <dimen name="app_notification_elevation">6dp</dimen>
+    <dimen name="app_notification_stroke">1dp</dimen>
+    <dimen name="app_notification_padding_horizontal">18dp</dimen>
+    <dimen name="app_notification_padding_vertical">16dp</dimen>
+    <dimen name="app_notification_icon_container_size">44dp</dimen>
+    <dimen name="app_notification_icon_size">22dp</dimen>
+    <dimen name="app_notification_content_spacing">14dp</dimen>
+    <dimen name="app_notification_message_spacing">2dp</dimen>
+    <dimen name="app_notification_title_size">14sp</dimen>
+    <dimen name="app_notification_message_size">12sp</dimen>
+    <dimen name="app_notification_min_width">320dp</dimen>
+</resources>

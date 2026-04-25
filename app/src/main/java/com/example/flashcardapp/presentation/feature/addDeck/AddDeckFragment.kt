@@ -2,7 +2,6 @@ package com.example.flashcardapp.presentation.feature.addDeck
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +17,7 @@ import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentAddDeskBinding
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
@@ -106,7 +106,7 @@ class AddDeckFragment : Fragment() {
                                 viewModel.resetState()
                             }
                             is AddDeckState.Error -> {
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                showAppError(state.message)
                             }
                         }
                     }

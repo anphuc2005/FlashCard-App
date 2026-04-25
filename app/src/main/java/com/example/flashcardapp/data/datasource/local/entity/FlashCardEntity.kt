@@ -2,10 +2,12 @@ package com.example.flashcardapp.data.datasource.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "flashcard_table",
+    indices = [Index(value = ["deckId"])],
     foreignKeys = [
         ForeignKey(
             entity = DeckEntity::class,

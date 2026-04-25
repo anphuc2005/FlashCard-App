@@ -44,7 +44,7 @@
                 android:id="@+id/achievementTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chuyên cần"
+                android:text="@string/stat_achievement_placeholder_title"
                 android:textColor="?attr/textColor"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="0/7 ngày liên tiếp"
+                android:text="@string/stat_achievement_placeholder_desc"
                 android:textColor="?attr/subTitleColor"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -63,7 +63,7 @@
             android:id="@+id/achievementStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chưa mở khóa"
+            android:text="@string/stat_achievement_locked"
             android:textColor="?attr/subTitleColor"
             android:textSize="12sp"
             android:textStyle="bold" />

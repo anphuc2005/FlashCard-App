@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/learning_good_bg"
+    app:cardCornerRadius="@dimen/learning_card_radius_medium"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/learning_good_stroke"
+    app:strokeWidth="@dimen/learning_stroke_width">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/learning_top_bar_margin">
+
+        <ImageView
+            android:id="@+id/ratingIcon"
+            android:layout_width="@dimen/learning_feedback_icon_size"
+            android:layout_height="@dimen/learning_feedback_icon_size" />
+
+        <TextView
+            android:id="@+id/ratingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/learning_space_xs"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/learning_good_text"
+            android:textSize="@dimen/learning_body_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/ratingDelay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/learning_good_text"
+            android:textSize="@dimen/learning_tag_text_size" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

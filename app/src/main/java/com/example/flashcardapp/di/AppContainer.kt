@@ -7,6 +7,7 @@ import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreIm
 import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
 import com.example.flashcardapp.data.repository.DeckRepository
 import com.example.flashcardapp.data.repository.FlashCardRepository
+import com.example.flashcardapp.data.repository.StudyRepository
 import com.example.flashcardapp.data.repository.CategoryRepository
 import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
 import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
@@ -26,6 +27,11 @@ import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
 import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
 import com.example.flashcardapp.domain.usecase.category.GetAllCategoriesUseCase
 import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCase
+import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
+import com.example.flashcardapp.domain.usecase.study.SaveStudyReviewUseCase
+import com.example.flashcardapp.domain.usecase.study.StudyUseCases
+import com.example.flashcardapp.domain.usecase.study.SyncStudyReviewsUseCase
 
 /**
  * Dependency Injection Container
@@ -62,6 +68,11 @@ class AppContainer(private val applicationContext: Context) {
     val flashCardRepository: FlashCardRepository by lazy {
         val database = FlashCardDatabase.getInstance(applicationContext)
         FlashCardRepository(RetrofitClient.cardApiService, database.flashCardDao())
+    }
+
+    val studyRepository: StudyRepository by lazy {
+        val database = FlashCardDatabase.getInstance(applicationContext)
+        StudyRepository(RetrofitClient.studyApiService, database.studyReviewDao(), applicationContext)
     }
 
     // 4. Use Cases
@@ -118,5 +129,14 @@ class AppContainer(private val applicationContext: Context) {
 
     val getCardsByDeckIdUseCase: com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase by lazy {
         com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(flashCardRepository)
+    }
+
+    val studyUseCases: StudyUseCases by lazy {
+        StudyUseCases(
+            getSessionCards = GetStudySessionCardsUseCase(studyRepository),
+            getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
+            saveReview = SaveStudyReviewUseCase(studyRepository),
+            syncReviews = SyncStudyReviewsUseCase(studyRepository)
+        )
     }
 }

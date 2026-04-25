@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.flashcardapp.databinding.FragmentAddCardBinding
 
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -19,6 +18,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppSuccess
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import kotlinx.coroutines.launch
 
 class AddCardFragment : Fragment() {
@@ -29,13 +31,13 @@ class AddCardFragment : Fragment() {
     private val requestImagePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) openImagePicker.launch("image/*")
-            else Toast.makeText(requireContext(), "Cần cấp quyền để thêm ảnh", Toast.LENGTH_SHORT).show()
+            else showAppWarning("Cần cấp quyền để thêm ảnh")
         }
 
     private val requestAudioPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) openAudioPicker.launch("audio/*")
-            else Toast.makeText(requireContext(), "Cần cấp quyền để thêm âm thanh", Toast.LENGTH_SHORT).show()
+            else showAppWarning("Cần cấp quyền để thêm âm thanh")
         }
 
     private val openImagePicker =
@@ -139,7 +141,7 @@ class AddCardFragment : Fragment() {
                             // Show loading (có thể làm hiển thị ProgressDialog)
                         }
                         is AddCardState.Success -> {
-                            Toast.makeText(requireContext(), "Lưu thẻ thành công!", Toast.LENGTH_SHORT).show()
+                            showAppSuccess("Đã lưu thẻ thành công!")
                             binding.etFront.text?.clear()
                             binding.etBack.text?.clear()
                             
@@ -159,7 +161,7 @@ class AddCardFragment : Fragment() {
                             viewModel.resetState()
                         }
                         is AddCardState.Error -> {
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            showAppError(state.message)
                         }
                     }
                 }

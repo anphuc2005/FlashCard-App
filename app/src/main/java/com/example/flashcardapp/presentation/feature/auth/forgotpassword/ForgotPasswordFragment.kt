@@ -7,7 +7,6 @@ import com.example.flashcardapp.presentation.feature.auth.otp.OtpVerificationFra
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +19,7 @@ import com.example.flashcardapp.databinding.FragmentForgotPasswordBinding
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.dialog.authDialog.CheckEmailDialogFragment
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -107,7 +107,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                                 renderLoading(false)
                                 loadingDialog?.dismiss()
                                 loadingDialog = null
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                showAppError(state.message)
                                 viewModel.resetUiState()
                             }
                         }

@@ -1,28 +1,33 @@
 package com.example.flashcardapp.presentation.feature.auth
 
-import android.view.View
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
-import android.widget.ImageView
 import com.example.flashcardapp.R
 import com.google.android.material.textfield.TextInputLayout
 
 object PasswordToggleConfigurator {
 
     fun setup(textInputLayout: TextInputLayout, editText: EditText) {
-        val toggleButton = textInputLayout.setEndIconOnClickListener { 
+        textInputLayout.setEndIconDrawable(R.drawable.ic_auth_eye_hidden)
+        editText.transformationMethod = PasswordTransformationMethod.getInstance()
+
+        textInputLayout.setEndIconOnClickListener {
             togglePasswordVisibility(editText, textInputLayout)
         }
     }
 
     private fun togglePasswordVisibility(editText: EditText, textInputLayout: TextInputLayout) {
-        if (editText.inputType == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
-            // Hide password
-            editText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        val isVisible = editText.transformationMethod is HideReturnsTransformationMethod
+
+        if (isVisible) {
+            editText.transformationMethod = PasswordTransformationMethod.getInstance()
+            textInputLayout.setEndIconDrawable(R.drawable.ic_auth_eye_hidden)
         } else {
-            // Show password
-            editText.inputType = android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            editText.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            textInputLayout.setEndIconDrawable(R.drawable.ic_auth_eye_visible)
         }
-        editText.setSelection(editText.text.length)
+
+        editText.setSelection(editText.text?.length ?: 0)
     }
 }
-

@@ -1,159 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".presentation.feature.learning.FrontCardFragment"
-    android:background="?attr/colorOnBackground">
+    android:background="@color/learning_background"
+    tools:context=".presentation.feature.learning.FrontCardFragment">
 
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/learning_top_bar_height"
+        android:layout_marginStart="@dimen/learning_screen_padding_large"
+        android:layout_marginTop="@dimen/learning_screen_padding_large"
+        android:layout_marginEnd="@dimen/learning_screen_padding_large"
         android:gravity="center_vertical"
-        android:paddingStart="12dp"
-        android:paddingEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/btnClose"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_close"/>
+            android:layout_width="@dimen/learning_icon_button_size"
+            android:layout_height="@dimen/learning_icon_button_size"
+            android:background="@drawable/bg_learning_close_circle"
+            android:padding="@dimen/learning_top_bar_margin"
+            android:src="@drawable/ic_close"
+            app:tint="@color/learning_text_secondary" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginVertical="10dp">
+            android:layout_marginStart="@dimen/learning_space_lg"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvProgressLabel"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="@string/app_front_card_learnProgress"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:textColor="?attr/subTitleColor"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tvProgressValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="13/20"
-                android:textStyle="bold"
-                android:textSize="13sp"
-                android:textColor="#2E6BFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                <TextView
+                    android:id="@+id/tvProgressLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/app_front_card_learnProgress"
+                    android:textAllCaps="true"
+                    android:textColor="@color/learning_text_muted"
+                    android:textSize="@dimen/learning_label_text_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/learning_space_md"
+                    android:textColor="@color/learning_primary"
+                    android:textSize="@dimen/learning_body_text_size"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="01:00"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tvProgressValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/learning_primary"
+                    android:textSize="@dimen/learning_body_text_size"
+                    android:textStyle="bold"
+                    tools:text="13/20" />
+            </LinearLayout>
 
             <com.example.flashcardapp.core.utils.chart.ProgressBar
-                android:layout_width="0dp"
-                android:layout_height="10dp"
-                android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@id/tvProgressLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_progress_height"
+                android:layout_marginTop="@dimen/learning_space_sm" />
+        </LinearLayout>
     </LinearLayout>
 
-
-    <!-- Flashcard -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardFront"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="28dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="2dp"
-        app:strokeWidth="0dp"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toTopOf="@+id/flipArea"
+        android:layout_marginStart="@dimen/learning_screen_padding_large"
+        android:layout_marginTop="@dimen/learning_space_lg"
+        android:layout_marginEnd="@dimen/learning_screen_padding_large"
+        android:layout_marginBottom="@dimen/learning_space_lg"
+        android:backgroundTint="@color/learning_surface"
+        app:cardCornerRadius="@dimen/learning_card_radius_figma"
+        app:cardElevation="@dimen/learning_card_elevation_medium"
+        app:layout_constraintBottom_toTopOf="@id/flipArea"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:strokeColor="@color/learning_soft_border"
+        app:strokeWidth="@dimen/learning_stroke_width">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:gravity="center"
-            android:padding="26dp"
-            android:background="?attr/componentBackground">
+            android:orientation="vertical"
+            android:padding="@dimen/learning_card_padding_large">
 
-            <ImageView
-                android:id="@+id/iconType"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@android:color/transparent"
-                android:padding="16dp"
-                android:src="@drawable/ic_book"
-                />
+            <FrameLayout
+                android:layout_width="@dimen/learning_front_card_icon_size"
+                android:layout_height="@dimen/learning_front_card_icon_size"
+                android:background="@drawable/bg_learning_icon_soft">
+
+                <ImageView
+                    android:id="@+id/iconType"
+                    android:layout_width="@dimen/learning_front_card_icon_inner_size"
+                    android:layout_height="@dimen/learning_front_card_icon_inner_size"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_book"
+                    app:tint="@color/learning_primary" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/questionText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="What is the capital\nof France?"
+                android:layout_marginTop="@dimen/learning_space_xxxl"
+                android:ellipsize="end"
                 android:gravity="center"
-                android:textSize="22sp"
+                android:maxLines="3"
+                android:textColor="@color/learning_text_primary"
+                android:textSize="@dimen/learning_card_question_text_size"
                 android:textStyle="bold"
-                android:textColor="?attr/textColor"/>
+                tools:text="What is the capital of France?" />
 
             <TextView
                 android:id="@+id/questionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="QUESTION"
+                android:layout_marginTop="@dimen/learning_space_xl"
+                android:text="@string/learning_question_label"
                 android:textAllCaps="true"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="?attr/subTitleColor"/>
+                android:textColor="@color/learning_text_soft"
+                android:textSize="@dimen/learning_body_text_size"
+                android:textStyle="bold" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Flip hint -->
     <LinearLayout
         android:id="@+id/flipArea"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/learning_space_lg"
         android:gravity="center_horizontal"
-        app:layout_constraintTop_toBottomOf="@id/cardFront"
-        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/hintButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardFront">
 
         <TextView
             android:id="@+id/tapToFlip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_front_card_flipCard"
-            android:textSize="14sp"
-            android:textColor="#5A6475"/>
+            android:textColor="@color/learning_text_muted"
+            android:textSize="@dimen/learning_answer_text_size"
+            android:textStyle="bold" />
 
-        <com.google.android.material.button.MaterialButton
+        <ImageButton
             android:id="@+id/btnFlip"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="10dp"
-            app:icon="@drawable/ic_flip"
-            app:iconGravity="textStart"
-            app:cornerRadius="24dp"/>
+            android:layout_width="@dimen/learning_icon_button_large_size"
+            android:layout_height="@dimen/learning_icon_button_large_size"
+            android:layout_marginTop="@dimen/learning_space_md"
+            android:background="@drawable/bg_learning_flip_button"
+            android:padding="@dimen/learning_card_padding"
+            android:src="@drawable/ic_flip"
+            app:tint="@color/learning_primary" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/hintButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/learning_screen_padding_large"
+        android:background="@drawable/bg_learning_hint_pill"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/learning_screen_padding_large"
+        android:paddingVertical="@dimen/learning_top_bar_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
+        <ImageView
+            android:layout_width="@dimen/learning_feedback_icon_size"
+            android:layout_height="@dimen/learning_feedback_icon_size"
+            android:src="@drawable/ic_hint"
+            app:tint="@color/learning_text_secondary" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/learning_space_sm"
+            android:text="@string/learning_hint_question"
+            android:textColor="@color/learning_text_secondary"
+            android:textSize="@dimen/learning_body_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

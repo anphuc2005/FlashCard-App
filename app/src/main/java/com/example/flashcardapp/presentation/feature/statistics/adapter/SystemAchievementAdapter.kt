@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ItemAchievementDetailBinding
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
 import com.google.android.material.color.MaterialColors
@@ -33,12 +34,14 @@ class SystemAchievementAdapter :
             binding.achievementIcon.setImageResource(item.iconResId)
             binding.achievementTitle.text = item.title
             binding.achievementDesc.text = item.description
-            binding.achievementStatus.text = if (item.isUnlocked) "Đã mở khóa" else "Chưa mở khóa"
+            binding.achievementStatus.text = binding.root.context.getString(
+                if (item.isUnlocked) R.string.stat_achievement_unlocked else R.string.stat_achievement_locked
+            )
 
             val statusColor = if (item.isUnlocked) {
-                MaterialColors.getColor(binding.root, com.example.flashcardapp.R.attr.iconGreen)
+                MaterialColors.getColor(binding.root, R.attr.iconGreen)
             } else {
-                MaterialColors.getColor(binding.root, com.example.flashcardapp.R.attr.subTitleColor)
+                MaterialColors.getColor(binding.root, R.attr.subTitleColor)
             }
             binding.achievementStatus.setTextColor(statusColor)
             binding.root.alpha = if (item.isUnlocked) 1f else 0.75f

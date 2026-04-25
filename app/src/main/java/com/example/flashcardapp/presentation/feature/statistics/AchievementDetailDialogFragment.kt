@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.DialogAchievementDetailBinding
 import com.example.flashcardapp.presentation.feature.statistics.adapter.SystemAchievementAdapter
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
@@ -44,7 +45,11 @@ class AchievementDetailDialogFragment : DialogFragment() {
         val achievements = getAchievementsFromArgs()
         val unlockedCount = achievements.count { it.isUnlocked }
 
-        binding.tvAchievementSummary.text = "Đã mở khóa $unlockedCount/${achievements.size} thành tích"
+        binding.tvAchievementSummary.text = getString(
+            R.string.stat_achievement_summary,
+            unlockedCount,
+            achievements.size
+        )
         binding.rvAllAchievements.apply {
             adapter = achievementAdapter
             layoutManager = LinearLayoutManager(requireContext())

@@ -7,7 +7,6 @@ import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigur
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +17,8 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentOtpVerificationBinding
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -103,7 +104,7 @@ class OtpVerificationFragment : Fragment(R.layout.fragment_otp_verification) {
         val otp = collectedOtp()
         Log.d("OtpVerificationFragment", "Submitting OTP email=${emailArg ?: "<null>"} otp=$otp")
         if (otp.length < 6) {
-            Toast.makeText(requireContext(), "Please enter OTP", Toast.LENGTH_SHORT).show()
+            showAppWarning("Vui lòng nhập đầy đủ mã OTP")
             return
         }
         viewModel.verify(otp)
@@ -154,7 +155,7 @@ class OtpVerificationFragment : Fragment(R.layout.fragment_otp_verification) {
                             renderLoading(false)
                             loadingDialog?.dismiss()
                             loadingDialog = null
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            showAppError(state.message)
                             Log.e("OtpVerificationFragment", "Error: ${state.message}")
                             viewModel.resetState()
                         }
