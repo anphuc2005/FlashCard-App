@@ -82,85 +82,93 @@ class AppContainer(private val applicationContext: Context) {
 
     val profileRepository: ProfileRepository by lazy {
         ProfileRepository(RetrofitClient.profileApiService)
-
-    val studyRepository: StudyRepository by lazy {
-        val database = FlashCardDatabase.getInstance(applicationContext)
-        StudyRepository(RetrofitClient.studyApiService, database.studyReviewDao(), applicationContext)
     }
 
-    // 4. Use Cases
-    val authUseCases: AuthUseCases by lazy {
-        AuthUseCases(
-            login = LoginUseCase(authRepository),
-            googleLogin = GoogleLoginUseCase(authRepository),
-            register = RegisterUseCase(authRepository),
-            forgotPassword = ForgotPasswordUseCase(authRepository),
-            verifyOtp = VerifyOtpUseCase(authRepository),
-            resetPassword = ResetPasswordUseCase(authRepository)
-        )
-    }
+        val studyRepository: StudyRepository by lazy {
+            val database = FlashCardDatabase.getInstance(applicationContext)
+            StudyRepository(
+                RetrofitClient.studyApiService,
+                database.studyReviewDao(),
+                applicationContext
+            )
+        }
 
-    val addFlashCardUseCase: AddFlashCardUseCase by lazy {
-        AddFlashCardUseCase(flashCardRepository)
-    }
+        // 4. Use Cases
+        val authUseCases: AuthUseCases by lazy {
+            AuthUseCases(
+                login = LoginUseCase(authRepository),
+                googleLogin = GoogleLoginUseCase(authRepository),
+                register = RegisterUseCase(authRepository),
+                forgotPassword = ForgotPasswordUseCase(authRepository),
+                verifyOtp = VerifyOtpUseCase(authRepository),
+                resetPassword = ResetPasswordUseCase(authRepository)
+            )
+        }
 
-    val updateFlashCardUseCase: UpdateFlashCardUseCase by lazy {
-        UpdateFlashCardUseCase(flashCardRepository)
-    }
+        val addFlashCardUseCase: AddFlashCardUseCase by lazy {
+            AddFlashCardUseCase(flashCardRepository)
+        }
 
-    val deleteFlashCardUseCase: DeleteFlashCardUseCase by lazy {
-        DeleteFlashCardUseCase(flashCardRepository)
-    }
+        val updateFlashCardUseCase: UpdateFlashCardUseCase by lazy {
+            UpdateFlashCardUseCase(flashCardRepository)
+        }
 
-    val addDeckUseCase: AddDeckUseCase by lazy {
-        AddDeckUseCase(deckRepository)
-    }
+        val deleteFlashCardUseCase: DeleteFlashCardUseCase by lazy {
+            DeleteFlashCardUseCase(flashCardRepository)
+        }
 
-    val exploreDecksUseCase: ExploreDecksUseCase by lazy {
-        ExploreDecksUseCase(deckRepository)
-    }
+        val addDeckUseCase: AddDeckUseCase by lazy {
+            AddDeckUseCase(deckRepository)
+        }
 
-    val cloneDeckUseCase: CloneDeckUseCase by lazy {
-        CloneDeckUseCase(deckRepository)
-    }
+        val exploreDecksUseCase: ExploreDecksUseCase by lazy {
+            ExploreDecksUseCase(deckRepository)
+        }
 
-    val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase by lazy {
-        GetExploreDecksFromApiUseCase(deckRepository)
-    }
+        val cloneDeckUseCase: CloneDeckUseCase by lazy {
+            CloneDeckUseCase(deckRepository)
+        }
 
-    val getAllCategoriesUseCase: GetAllCategoriesUseCase by lazy {
-        GetAllCategoriesUseCase(categoryRepository)
-    }
+        val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase by lazy {
+            GetExploreDecksFromApiUseCase(deckRepository)
+        }
 
-    val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {
-        GetDeckByIdUseCase(deckRepository)
-    }
+        val getAllCategoriesUseCase: GetAllCategoriesUseCase by lazy {
+            GetAllCategoriesUseCase(categoryRepository)
+        }
 
-    val updateDeckUseCase: UpdateDeckUseCase by lazy {
-        UpdateDeckUseCase(deckRepository)
-    }
+        val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {
+            GetDeckByIdUseCase(deckRepository)
+        }
 
-    val getCardsByDeckIdUseCase: com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase by lazy {
-        com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(flashCardRepository)
-    }
+        val updateDeckUseCase: UpdateDeckUseCase by lazy {
+            UpdateDeckUseCase(deckRepository)
+        }
 
-    val uploadImageUseCase: UploadImageUseCase by lazy {
-        UploadImageUseCase(uploadRepository)
-    }
+        val getCardsByDeckIdUseCase: com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase by lazy {
+            com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(
+                flashCardRepository
+            )
+        }
 
-    val getMyProfileUseCase: GetMyProfileUseCase by lazy {
-        GetMyProfileUseCase(profileRepository)
-    }
+        val uploadImageUseCase: UploadImageUseCase by lazy {
+            UploadImageUseCase(uploadRepository)
+        }
 
-    val updateMyProfileUseCase: UpdateMyProfileUseCase by lazy {
-        UpdateMyProfileUseCase(profileRepository)
-        
-    val studyUseCases: StudyUseCases by lazy {
-        StudyUseCases(
-            getSessionCards = GetStudySessionCardsUseCase(studyRepository),
-            getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
-            saveReview = SaveStudyReviewUseCase(studyRepository),
-            syncReviews = SyncStudyReviewsUseCase(studyRepository)
-        )
+        val getMyProfileUseCase: GetMyProfileUseCase by lazy {
+            GetMyProfileUseCase(profileRepository)
+        }
+
+        val updateMyProfileUseCase: UpdateMyProfileUseCase by lazy {
+            UpdateMyProfileUseCase(profileRepository)
+        }
+
+        val studyUseCases: StudyUseCases by lazy {
+            StudyUseCases(
+                getSessionCards = GetStudySessionCardsUseCase(studyRepository),
+                getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
+                saveReview = SaveStudyReviewUseCase(studyRepository),
+                syncReviews = SyncStudyReviewsUseCase(studyRepository)
+            )
+        }
     }
-}
