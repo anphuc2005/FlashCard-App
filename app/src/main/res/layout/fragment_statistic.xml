@@ -12,7 +12,8 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingVertical="12dp"
+        android:paddingTop="@dimen/statistics_screen_padding_vertical"
+        android:paddingBottom="@dimen/statistics_screen_padding_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="14dp">
+            android:paddingHorizontal="@dimen/statistics_content_padding_horizontal">
 
             <LinearLayout
                 android:layout_width="match_parent"

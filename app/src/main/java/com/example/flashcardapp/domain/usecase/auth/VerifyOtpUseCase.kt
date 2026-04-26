@@ -6,8 +6,8 @@ import com.example.flashcardapp.domain.repository.AuthRepository
 
 class VerifyOtpUseCase(private val repository: AuthRepository) {
     suspend operator fun invoke(email: String, otp: String): Result<VerifyOtpResponse> {
-        if (email.isBlank()) return Result.failure(IllegalArgumentException("Email is required"))
-        if (otp.length < 6) return Result.failure(IllegalArgumentException("OTP is invalid"))
+        if (email.isBlank()) return Result.failure(IllegalArgumentException("Vui lòng nhập email"))
+        if (otp.length < 6) return Result.failure(IllegalArgumentException("Mã OTP không hợp lệ"))
 
         val request = VerifyOtpRequest(email = email, otpCode = otp)
         return repository.verifyOtp(request)

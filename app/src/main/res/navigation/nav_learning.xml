@@ -20,8 +20,17 @@
         android:label="fragment_session_setting"
         tools:layout="@layout/fragment_session_setting" >
         <action
-            android:id="@+id/action_sessionSettingFragment_to_frontCardFragment"
-            app:destination="@id/frontCardFragment" />
+            android:id="@+id/action_sessionSettingFragment_to_learningCardsFragment"
+            app:destination="@id/learningCardsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/learningCardsFragment"
+        android:name="com.example.flashcardapp.presentation.feature.learning.LearningCardsFragment"
+        android:label="fragment_learning_cards"
+        tools:layout="@layout/fragment_learning_cards" >
+        <action
+            android:id="@+id/action_learningCardsFragment_to_studyResultFragment"
+            app:destination="@id/studyResultFragment" />
     </fragment>
     <fragment
         android:id="@+id/frontCardFragment"

@@ -1,6 +1,8 @@
 package com.example.flashcardapp.presentation.main
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host) as NavHostFragment
         val navController = navHostFragment.navController
         val bottomNav = binding.bottomNav
+        bottomNav.itemActiveIndicatorColor = ColorStateList.valueOf(Color.TRANSPARENT)
         bottomNav.setupWithNavController(navController)
 
         binding.fabChat.setOnClickListener {

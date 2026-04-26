@@ -27,7 +27,7 @@ class OtpVerificationViewModel(
 
     fun verify(otp: String) {
         if (otp.length < 6) {
-            _uiState.value = AuthOperationState.Error("OTP không hợp lệ")
+            _uiState.value = AuthOperationState.Error("Mã OTP không hợp lệ")
             return
         }
         _uiState.value = AuthOperationState.Loading

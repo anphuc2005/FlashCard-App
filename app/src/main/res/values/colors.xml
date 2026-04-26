@@ -56,7 +56,7 @@
     <color name="md_onboarding_indicator_inactive">#CBD5E1</color>
 
     <!-- Button Bottom Nav -->
-    <color name="md_button_bottom_nav_active">#2563EB</color>
+    <color name="md_button_bottom_nav_active">#2E6BFF</color>
     <color name="md_button_bottom_nav_inactive">#64748B</color>
 
     <!-- Main Background -->
@@ -149,7 +149,10 @@
     <color name="app_notification_success">#2CC9A1</color>
     <color name="app_notification_error">#F43F6D</color>
     <color name="app_notification_warning">#FB9A2A</color>
+    <color name="discover_course_stroke_soft">#66A3AEC2</color>
     <color name="app_notification_border">#E8EEF6</color>
     <color name="app_notification_title">#1F2937</color>
     <color name="app_notification_message">#7A8AA0</color>
+    <color name="loading_dialog_stroke">#DDE7F3</color>
+    <color name="loading_dialog_text">#23324A</color>
 </resources>

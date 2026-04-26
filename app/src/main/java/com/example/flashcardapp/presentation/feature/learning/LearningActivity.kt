@@ -1,6 +1,7 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -11,6 +12,7 @@ import com.example.flashcardapp.databinding.ActivityLearningBinding
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
 
 const val EXTRA_DECK_ID = "DECK_ID"
+private const val TAG = "LearningActivity"
 
 class LearningActivity : AppCompatActivity() {
 
@@ -36,10 +38,12 @@ class LearningActivity : AppCompatActivity() {
     private fun setupLearningGraph() {
         val deckId = intent.getStringExtra(EXTRA_DECK_ID)
         if (deckId.isNullOrBlank()) {
+            Log.w(TAG, "setupLearningGraph aborted: missing deckId in intent")
             showAppWarning(getString(R.string.learning_missing_deck))
             finish()
             return
         }
+        Log.d(TAG, "setupLearningGraph: deckId=$deckId")
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_learning_host) as NavHostFragment

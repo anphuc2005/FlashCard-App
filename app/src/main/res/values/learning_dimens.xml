@@ -33,7 +33,7 @@
     <dimen name="learning_space_xxxl">24dp</dimen>
     <dimen name="learning_order_card_height">58dp</dimen>
     <dimen name="learning_stat_card_height">90dp</dimen>
-    <dimen name="learning_feedback_card_height">72dp</dimen>
+    <dimen name="learning_feedback_card_height">60dp</dimen>
     <dimen name="learning_cta_height">56dp</dimen>
     <dimen name="learning_cta_height_large">58dp</dimen>
     <dimen name="learning_progress_height">8dp</dimen>
@@ -47,6 +47,7 @@
     <dimen name="learning_type_icon_size">60dp</dimen>
     <dimen name="learning_type_icon_padding">16dp</dimen>
     <dimen name="learning_feedback_icon_size">18dp</dimen>
+    <dimen name="learning_rating_icon_size">16dp</dimen>
     <dimen name="learning_preview_tag_padding_horizontal">8dp</dimen>
     <dimen name="learning_preview_tag_padding_vertical">4dp</dimen>
     <dimen name="learning_title_text_size">22sp</dimen>

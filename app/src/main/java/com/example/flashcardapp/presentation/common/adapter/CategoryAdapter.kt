@@ -1,5 +1,6 @@
 package com.example.flashcardapp.presentation.common.adapter
 
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -17,18 +18,16 @@ class CategoryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemShortcutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        
-        // Thiết lập layout param bằng code để có marginRight và chiều rộng wrap_content cho danh sách ngang
         val density = parent.context.resources.displayMetrics.density
-        val marginEndPx = (16 * density).toInt()
+        val marginHorizontalPx = (4 * density).toInt()
         val params = RecyclerView.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ).apply {
-            marginEnd = marginEndPx
+            marginStart = marginHorizontalPx
+            marginEnd = marginHorizontalPx
         }
         binding.root.layoutParams = params
-
         return CategoryViewHolder(binding, onItemClick)
     }
 
@@ -42,24 +41,17 @@ class CategoryAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Category) {
-            binding.apply {
-                tvTitle.text = item.name
-
-                val (iconRes, bgColorRes, tintColorRes) = getCategoryVisuals(item.name)
-
-                imgIcon.setImageResource(iconRes)
-                imgIcon.setColorFilter(
-                    ContextCompat.getColor(binding.root.context, tintColorRes),
-                    android.graphics.PorterDuff.Mode.SRC_IN
-                )
-                cardIcon.setCardBackgroundColor(
-                    ContextCompat.getColor(binding.root.context, bgColorRes)
-                )
-
-                root.setOnClickListener {
-                    onItemClick(item)
-                }
-            }
+            binding.tvTitle.text = item.name
+            val (iconRes, bgColorRes, tintColorRes) = getCategoryVisuals(item.name)
+            binding.imgIcon.setImageResource(iconRes)
+            binding.imgIcon.setColorFilter(
+                ContextCompat.getColor(binding.root.context, tintColorRes),
+                PorterDuff.Mode.SRC_IN
+            )
+            binding.cardIcon.setCardBackgroundColor(
+                ContextCompat.getColor(binding.root.context, bgColorRes)
+            )
+            binding.root.setOnClickListener { onItemClick(item) }
         }
 
         private fun getCategoryVisuals(name: String): Triple<Int, Int, Int> {

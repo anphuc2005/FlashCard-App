@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/learning_background"
+    tools:context=".presentation.feature.learning.LearningCardsFragment">
+
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/learning_screen_padding_large"
+        android:layout_marginTop="@dimen/learning_screen_padding_large"
+        android:layout_marginEnd="@dimen/learning_screen_padding_large"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/learning_icon_button_size"
+            android:layout_height="@dimen/learning_icon_button_size"
+            android:background="@drawable/bg_learning_close_circle"
+            android:padding="@dimen/learning_top_bar_margin"
+            android:src="@drawable/ic_close"
+            app:tint="@color/learning_text_secondary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/learning_space_lg"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/learning_session_progress"
+                    android:textColor="@color/learning_text_secondary"
+                    android:textSize="@dimen/learning_body_text_size" />
+
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/learning_space_md"
+                    android:textColor="@color/learning_primary"
+                    android:textSize="@dimen/learning_body_text_size"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="01:00"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tvProgressValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/learning_primary"
+                    android:textSize="@dimen/learning_body_text_size"
+                    android:textStyle="bold"
+                    tools:text="15/20" />
+            </LinearLayout>
+
+            <com.example.flashcardapp.core.utils.chart.ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_progress_height"
+                android:layout_marginTop="@dimen/learning_space_sm" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerCards"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/learning_space_md"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/learning_screen_padding_large"
+        android:paddingEnd="@dimen/learning_screen_padding_large"
+        app:layout_constraintBottom_toTopOf="@id/bottomActionContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
+
+    <FrameLayout
+        android:id="@+id/bottomActionContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/hintButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="@dimen/learning_screen_padding_large"
+            android:background="@drawable/bg_learning_hint_pill"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/learning_screen_padding_large"
+            android:paddingVertical="@dimen/learning_top_bar_margin"
+            android:text="@string/learning_hint_question"
+            android:textColor="@color/learning_text_secondary"
+            android:textSize="@dimen/learning_body_text_size"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/ratingSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/learning_surface"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/learning_screen_padding_horizontal"
+            android:paddingTop="@dimen/learning_space_xs"
+            android:paddingBottom="@dimen/learning_space_md"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/feedbackTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/learning_feedback_title"
+                android:textAllCaps="true"
+                android:textColor="@color/learning_text_muted"
+                android:textSize="@dimen/learning_label_text_size"
+                android:textStyle="bold" />
+
+            <GridLayout
+                android:id="@+id/feedbackGrid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_sm"
+                android:alignmentMode="alignBounds"
+                android:columnCount="2"
+                android:rowCount="2"
+                android:useDefaultMargins="false">
+
+                <include
+                    android:id="@+id/cardAgain"
+                    layout="@layout/item_learning_rating_card"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/learning_feedback_card_height"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="@dimen/learning_space_xs"
+                    android:layout_marginBottom="@dimen/learning_space_xs"
+                    android:layout_rowWeight="1" />
+
+                <include
+                    android:id="@+id/cardHard"
+                    layout="@layout/item_learning_rating_card"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/learning_feedback_card_height"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/learning_space_xs"
+                    android:layout_marginBottom="@dimen/learning_space_xs"
+                    android:layout_rowWeight="1" />
+
+                <include
+                    android:id="@+id/cardGood"
+                    layout="@layout/item_learning_rating_card"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/learning_feedback_card_height"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="@dimen/learning_space_xs"
+                    android:layout_marginTop="@dimen/learning_space_xs"
+                    android:layout_rowWeight="1" />
+
+                <include
+                    android:id="@+id/cardEasy"
+                    layout="@layout/item_learning_rating_card"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/learning_feedback_card_height"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/learning_space_xs"
+                    android:layout_marginTop="@dimen/learning_space_xs"
+                    android:layout_rowWeight="1" />
+            </GridLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

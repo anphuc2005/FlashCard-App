@@ -1,66 +1,86 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
+import androidx.viewpager2.widget.ViewPager2
 import com.example.flashcardapp.R
-import com.example.flashcardapp.databinding.FragmentBackCardBinding
+import com.example.flashcardapp.databinding.FragmentLearningCardsBinding
 import com.example.flashcardapp.databinding.ItemLearningRatingCardBinding
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import com.example.flashcardapp.presentation.feature.learning.adapter.LearningSessionPagerAdapter
 import kotlinx.coroutines.launch
 
 private const val SECONDS_PER_MINUTE = 60L
-private const val FLIP_ANIMATION_DURATION = 110L
+private const val FLIP_HALF_DURATION = 110L
 private const val FLIP_CAMERA_DISTANCE = 9000f
-private const val TAG = "BackCardFragment"
 
-class BackCardFragment : Fragment() {
+class LearningCardsFragment : Fragment() {
 
-    private var _binding: FragmentBackCardBinding? = null
+    private var _binding: FragmentLearningCardsBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: FlashCardViewModel by activityViewModels()
+    private lateinit var pagerAdapter: LearningSessionPagerAdapter
     private var isFlipAnimating = false
+
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            viewModel.setCurrentIndex(position)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentBackCardBinding.inflate(inflater, container, false)
+        _binding = FragmentLearningCardsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupPager()
+        setupRatingCards()
         setupClickListeners()
-        animateEntryFromFront()
         observeViewModel()
     }
 
     override fun onDestroyView() {
-        Glide.with(this).clear(binding.cardImage)
+        binding.viewPagerCards.unregisterOnPageChangeCallback(pageChangeCallback)
         _binding = null
         super.onDestroyView()
     }
 
+    private fun setupPager() {
+        pagerAdapter = LearningSessionPagerAdapter(::onCardTapped)
+        binding.viewPagerCards.apply {
+            adapter = pagerAdapter
+            offscreenPageLimit = 1
+            registerOnPageChangeCallback(pageChangeCallback)
+        }
+    }
+
     private fun setupClickListeners() {
         binding.btnClose.setOnClickListener { showExitLearningDialog() }
-        binding.cardAnswer.setOnClickListener { flipBackToQuestion() }
-        binding.cardAgain.root.setOnClickListener { rateCard(LearningRating.AGAIN) }
-        binding.cardHard.root.setOnClickListener { rateCard(LearningRating.HARD) }
-        binding.cardGood.root.setOnClickListener { rateCard(LearningRating.GOOD) }
-        binding.cardEasy.root.setOnClickListener { rateCard(LearningRating.EASY) }
+        binding.cardAgain.root.setOnClickListener { rateCurrentCard(LearningRating.AGAIN) }
+        binding.cardHard.root.setOnClickListener { rateCurrentCard(LearningRating.HARD) }
+        binding.cardGood.root.setOnClickListener { rateCurrentCard(LearningRating.GOOD) }
+        binding.cardEasy.root.setOnClickListener { rateCurrentCard(LearningRating.EASY) }
+    }
+
+    private fun setupRatingCards() {
         binding.cardAgain.ratingIcon.setImageResource(R.drawable.ic_again)
         binding.cardHard.ratingIcon.setImageResource(R.drawable.ic_difficult)
         binding.cardGood.ratingIcon.setImageResource(R.drawable.ic_good)
@@ -111,63 +131,98 @@ class BackCardFragment : Fragment() {
     }
 
     private fun renderState(state: LearningUiState) {
-        val card = state.currentCard
-        Log.d(
-            TAG,
-            "renderState: deckId=${state.deckId}, currentIndex=${state.currentIndex}, total=${state.totalSessionCards}, cardId=${card?.id}, completed=${state.isCompleted}, timeRemaining=${state.timeRemainingSeconds}"
-        )
-        binding.tvProgress.text = if (state.totalSessionCards == 0) {
+        val cards = state.sessionCards
+        if (pagerAdapter.currentList != cards) {
+            pagerAdapter.submitList(cards)
+        }
+
+        val pageCount = cards.size
+        val safeIndex = state.currentIndex.coerceIn(0, (pageCount - 1).coerceAtLeast(0))
+        binding.tvProgressValue.text = if (pageCount == 0) {
             getString(R.string.learning_progress_empty)
         } else {
             state.progressLabel
         }
         binding.progressBar.setProgress(state.progressPercent)
-        binding.cardTitle.text = card?.question ?: getString(R.string.learning_no_cards)
-        binding.cardDesc.text = card?.answer ?: getString(R.string.learning_no_answer)
         renderTimer(state.timeRemainingSeconds)
-        loadCardImage(card?.imageUrl)
+        val isBackFace = pagerAdapter.isPositionFlipped(safeIndex)
+        updateBottomAction(isBackFace = isBackFace, enabled = !state.isCompleted)
+
+        if (pageCount == 0) return
+        if (binding.viewPagerCards.currentItem != safeIndex) {
+            binding.viewPagerCards.setCurrentItem(safeIndex, false)
+        }
     }
 
-    private fun rateCard(rating: LearningRating) {
-        if (isFlipAnimating) return
-        val currentState = viewModel.uiState.value
-        if (currentState.isCompleted) {
-            Log.w(TAG, "rateCard ignored: session already completed")
-            return
+    private fun handleCompletion(state: LearningUiState) {
+        if (!state.isCompleted) return
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.learningCardsFragment) {
+            navController.navigate(R.id.action_learningCardsFragment_to_studyResultFragment)
         }
-        Log.d(
-            TAG,
-            "rateCard clicked: deckId=${currentState.deckId}, cardId=${currentState.currentCard?.id}, rating=$rating, index=${currentState.currentIndex}"
-        )
+    }
+
+    private fun onCardTapped(position: Int) {
+        if (isFlipAnimating || position != binding.viewPagerCards.currentItem) return
+        val holder = findCurrentCardView() ?: return
+        animateFlip(holder, position)
+    }
+
+    private fun findCurrentCardView(): View? {
+        val recyclerView = binding.viewPagerCards.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView
+            ?: return null
+        val holder = recyclerView.findViewHolderForAdapterPosition(binding.viewPagerCards.currentItem)
+            ?: return null
+        return holder.itemView.findViewById(R.id.cardSurface)
+    }
+
+    private fun animateFlip(cardView: View, position: Int) {
+        isFlipAnimating = true
+        cardView.cameraDistance = resources.displayMetrics.density * FLIP_CAMERA_DISTANCE
+        cardView.animate()
+            .rotationY(90f)
+            .setDuration(FLIP_HALF_DURATION)
+            .withEndAction {
+                pagerAdapter.toggleFlipState(position)
+                cardView.rotationY = -90f
+                cardView.animate()
+                    .rotationY(0f)
+                    .setDuration(FLIP_HALF_DURATION)
+                    .withEndAction {
+                        isFlipAnimating = false
+                        val isBackFace = pagerAdapter.isPositionFlipped(position)
+                        updateBottomAction(isBackFace = isBackFace, enabled = true)
+                    }
+                    .start()
+            }
+            .start()
+    }
+
+    private fun rateCurrentCard(rating: LearningRating) {
+        val position = binding.viewPagerCards.currentItem
+        if (!pagerAdapter.isPositionFlipped(position)) return
+        if (isFlipAnimating) return
         val completed = viewModel.rateCurrentCard(rating)
-        val actionId = if (completed) {
-            R.id.action_backCardFragment_to_studyResultFragment
-        } else {
-            R.id.action_backCardFragment_to_frontCardFragment
-        }
-        Log.d(TAG, "rateCard navigate: completed=$completed, actionId=$actionId")
-        if (completed) {
-            findNavController().navigate(actionId)
-            return
-        }
-        animateCardFlipOut(binding.cardAnswer, targetRotation = -90f) {
-            val navController = findNavController()
-            if (navController.currentDestination?.id == R.id.backCardFragment) {
-                navController.navigate(actionId)
-            }
+        pagerAdapter.resetFlipState(position)
+        if (!completed) {
+            val nextPosition = viewModel.uiState.value.currentIndex
+            binding.viewPagerCards.setCurrentItem(nextPosition, true)
         }
     }
 
-    private fun flipBackToQuestion() {
-        if (isFlipAnimating) return
-        val currentState = viewModel.uiState.value
-        if (currentState.isCompleted) return
-        animateCardFlipOut(binding.cardAnswer, targetRotation = -90f) {
-            val navController = findNavController()
-            if (navController.currentDestination?.id == R.id.backCardFragment) {
-                navController.navigate(R.id.action_backCardFragment_to_frontCardFragment)
-            }
-        }
+    private fun updateBottomAction(isBackFace: Boolean, enabled: Boolean) {
+        binding.hintButton.isVisible = !isBackFace
+        binding.ratingSection.isInvisible = !isBackFace
+        val canRate = isBackFace && enabled
+        val alpha = if (canRate) 1f else 0.5f
+        binding.cardAgain.root.isEnabled = canRate
+        binding.cardHard.root.isEnabled = canRate
+        binding.cardGood.root.isEnabled = canRate
+        binding.cardEasy.root.isEnabled = canRate
+        binding.cardAgain.root.alpha = alpha
+        binding.cardHard.root.alpha = alpha
+        binding.cardGood.root.alpha = alpha
+        binding.cardEasy.root.alpha = alpha
     }
 
     private fun applyRatingStyle(
@@ -183,32 +238,6 @@ class BackCardFragment : Fragment() {
         binding.ratingText.setTextColor(resolvedTextColor)
         binding.ratingDelay.setTextColor(resolvedTextColor)
         binding.ratingIcon.setColorFilter(resolvedTextColor)
-    }
-
-    private fun loadCardImage(imageUrl: String?) {
-        binding.cardImage.visibility = View.VISIBLE
-        if (imageUrl.isNullOrBlank()) {
-            Log.d(TAG, "loadCardImage fallback placeholder used")
-            binding.cardImage.setImageResource(R.drawable.test)
-            return
-        }
-
-        Log.d(TAG, "loadCardImage remote url=$imageUrl")
-        Glide.with(this)
-            .load(imageUrl)
-            .placeholder(R.drawable.test)
-            .error(R.drawable.test)
-            .centerCrop()
-            .into(binding.cardImage)
-    }
-
-    private fun handleCompletion(state: LearningUiState) {
-        if (!state.isCompleted || !state.isTimeExpired) return
-        Log.w(TAG, "handleCompletion: session completed by timeout, deckId=${state.deckId}")
-        val navController = findNavController()
-        if (navController.currentDestination?.id == R.id.backCardFragment) {
-            navController.navigate(R.id.action_backCardFragment_to_studyResultFragment)
-        }
     }
 
     private fun renderTimer(timeRemainingSeconds: Long?) {
@@ -241,35 +270,5 @@ class BackCardFragment : Fragment() {
             }
         }
         dialog.show(childFragmentManager, "learning_exit_confirm")
-    }
-
-    private fun animateEntryFromFront() {
-        val navController = findNavController()
-        if (navController.previousBackStackEntry?.destination?.id != R.id.frontCardFragment) return
-        val card = binding.cardAnswer
-        card.post {
-            card.cameraDistance = resources.displayMetrics.density * FLIP_CAMERA_DISTANCE
-            card.rotationY = 90f
-            card.animate()
-                .rotationY(0f)
-                .setDuration(FLIP_ANIMATION_DURATION)
-                .start()
-        }
-    }
-
-    private fun animateCardFlipOut(card: View, targetRotation: Float, onEnd: () -> Unit) {
-        isFlipAnimating = true
-        card.post {
-            card.cameraDistance = resources.displayMetrics.density * FLIP_CAMERA_DISTANCE
-            card.animate()
-                .rotationY(targetRotation)
-                .setDuration(FLIP_ANIMATION_DURATION)
-                .withEndAction {
-                    card.rotationY = 0f
-                    isFlipAnimating = false
-                    onEnd()
-                }
-                .start()
-        }
     }
 }

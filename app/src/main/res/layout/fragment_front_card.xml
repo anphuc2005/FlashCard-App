@@ -94,7 +94,7 @@
         android:layout_marginBottom="@dimen/learning_space_lg"
         android:backgroundTint="@color/learning_surface"
         app:cardCornerRadius="@dimen/learning_card_radius_figma"
-        app:cardElevation="@dimen/learning_card_elevation_medium"
+        app:cardElevation="@dimen/learning_zero"
         app:layout_constraintBottom_toTopOf="@id/flipArea"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -17,7 +17,7 @@ import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentEditDeckBinding
 import com.example.flashcardapp.presentation.common.adapter.EditDeckCardAdapter
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.DeleteConfirmDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
@@ -79,14 +79,16 @@ class EditDeckFragment : Fragment() {
                 findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle)
             },
             onDeleteClick = { card ->
-                val dialog = DeleteConfirmDialog.newInstance(
+                val dialog = AppConfirmDialog.newInstance(
                     title = getString(R.string.delete_confirm_title),
                     message = getString(R.string.delete_confirm_message_card),
-                    actionText = getString(R.string.delete_confirm_action),
-                    cancelText = getString(R.string.delete_confirm_cancel)
+                    confirmText = getString(R.string.delete_confirm_action),
+                    cancelText = getString(R.string.delete_confirm_cancel),
+                    iconRes = R.drawable.ic_delete,
+                    destructive = true
                 )
-                dialog.listener = object : DeleteConfirmDialog.Listener {
-                    override fun onConfirmDelete() {
+                dialog.listener = object : AppConfirmDialog.Listener {
+                    override fun onConfirm() {
                         viewModel.deleteCard(card)
                         showAppSuccess(getString(R.string.delete_success_card))
                     }
@@ -97,7 +99,7 @@ class EditDeckFragment : Fragment() {
 
         binding.rvCards.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCards.adapter = editDeckCardAdapter
-        binding.tvTitle.text = "Sá»­a bá»™ tháº»"
+        binding.tvTitle.text = "Sửa bộ thẻ"
     }
 
     private fun setupListeners() {
@@ -119,7 +121,7 @@ class EditDeckFragment : Fragment() {
             val isPublic = binding.switchPublic.isChecked
 
             if (deckName.isEmpty()) {
-                showAppWarning("TÃªn bá»™ tháº» khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng")
+                showAppWarning("Tên bộ thẻ không được để trống")
                 return@setOnClickListener
             }
 
@@ -142,10 +144,10 @@ class EditDeckFragment : Fragment() {
                                 binding.switchPublic.isChecked = state.deck.isPublic
                                 println("Deck is public: ${state.deck.isPublic} ${state.deck.name}")
                                 updateSwitchTint(state.deck.isPublic)
-                                binding.tvCardCountLabel.text = "Sá»‘ lÆ°á»£ng tháº» (${state.deck.cardCount})"
+                                binding.tvCardCountLabel.text = "Số lượng thẻ (${state.deck.cardCount})"
                             }
                             is EditDeckState.UpdateSuccess -> {
-                                showAppSuccess("ÄÃ£ cáº­p nháº­t thÃ nh cÃ´ng!")
+                                showAppSuccess("Đã cập nhật thành công!")
                                 requireActivity().finish()
                             }
                             is EditDeckState.Error -> {
@@ -159,7 +161,7 @@ class EditDeckFragment : Fragment() {
                     viewModel.cardsState.collect { cards ->
                         editDeckCardAdapter.submitList(cards)
                         if (cards.isNotEmpty()) {
-                            binding.tvCardCountLabel.text = "Sá»‘ lÆ°á»£ng tháº» (${cards.size})"
+                            binding.tvCardCountLabel.text = "Số lượng thẻ (${cards.size})"
                         }
                     }
                 }

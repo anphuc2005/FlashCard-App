@@ -16,23 +16,22 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="@dimen/main_content_margin_horizontal"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/main_fab_margin_end"
+        android:layout_marginBottom="@dimen/main_fab_margin_bottom"
         android:src="@drawable/ic_chat"
-        app:layout_anchor="@id/bottomNav"
-        app:layout_anchorGravity="top|end"
         app:tint="@android:color/white"
         app:backgroundTint="?attr/buttonColor"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
+        android:translationZ="@dimen/main_fab_elevation"
+        app:elevation="@dimen/main_fab_elevation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"

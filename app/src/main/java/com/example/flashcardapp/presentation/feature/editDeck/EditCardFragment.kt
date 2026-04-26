@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentEditCardBinding
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.DeleteConfirmDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import kotlinx.coroutines.launch
@@ -46,7 +46,7 @@ class EditCardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.headerTitle.text = "Sá»­a tháº»"
+        binding.headerTitle.text = "Sửa thẻ"
 
         arguments?.let {
             cardId = it.getString("CARD_ID") ?: ""
@@ -74,20 +74,22 @@ class EditCardFragment : Fragment() {
         }
 
         binding.btnAddAnother.setOnClickListener {
-            val dialog = DeleteConfirmDialog.newInstance(
+            val dialog = AppConfirmDialog.newInstance(
                 title = getString(R.string.delete_confirm_title),
                 message = getString(R.string.delete_confirm_message_card),
-                actionText = getString(R.string.delete_confirm_action),
-                cancelText = getString(R.string.delete_confirm_cancel)
+                confirmText = getString(R.string.delete_confirm_action),
+                cancelText = getString(R.string.delete_confirm_cancel),
+                iconRes = R.drawable.ic_delete,
+                destructive = true
             )
-            dialog.listener = object : DeleteConfirmDialog.Listener {
-                override fun onConfirmDelete() {
+            dialog.listener = object : AppConfirmDialog.Listener {
+                override fun onConfirm() {
                     viewModel.deleteCard(cardId, initialQuestion, initialAnswer, deckId)
                 }
             }
             dialog.show(childFragmentManager, "delete_card_confirm")
         }
-        binding.btnAddAnother.text = "XoÃ¡ tháº»"
+        binding.btnAddAnother.text = "Xóa thẻ"
     }
 
     private fun observeData() {
@@ -98,7 +100,7 @@ class EditCardFragment : Fragment() {
                         is EditCardState.Idle -> Unit
                         is EditCardState.Loading -> Unit
                         is EditCardState.Success -> {
-                            showAppSuccess("ÄÃ£ cáº­p nháº­t tháº» thÃ nh cÃ´ng")
+                            showAppSuccess("Đã cập nhật thẻ thành công")
                             viewModel.resetState()
                             findNavController().popBackStack()
                         }

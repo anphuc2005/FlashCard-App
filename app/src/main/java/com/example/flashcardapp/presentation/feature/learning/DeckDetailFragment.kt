@@ -1,6 +1,7 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 
 private const val TAB_NEW = 1
 private const val TAB_REVIEW = 2
+private const val TAG = "DeckDetailFragment"
 
 class DeckDetailFragment : Fragment() {
 
@@ -63,6 +65,7 @@ class DeckDetailFragment : Fragment() {
     private fun setupClickListeners() {
         binding.btnBack.setOnClickListener { requireActivity().finish() }
         binding.ctaButton.setOnClickListener {
+            Log.d(TAG, "Start button clicked for deckId=${viewModel.uiState.value.deckId}")
             findNavController().navigate(R.id.action_deckDetailFragment_to_sessionSettingFragment)
         }
         binding.tabLayout.addOnTabSelectedListener(
@@ -76,6 +79,7 @@ class DeckDetailFragment : Fragment() {
                 viewModel.uiState.collect { state ->
                     renderState(state)
                     state.errorMessage?.let { message ->
+                        Log.e(TAG, "UI error received: deckId=${state.deckId}, message=$message")
                         showAppError(message)
                         viewModel.clearError()
                     }
@@ -88,15 +92,21 @@ class DeckDetailFragment : Fragment() {
         val deckId = arguments?.getString(EXTRA_DECK_ID)
             ?: requireActivity().intent.getStringExtra(EXTRA_DECK_ID)
         if (deckId.isNullOrBlank()) {
+            Log.w(TAG, "loadDeck aborted: missing deckId in args and intent")
             showAppWarning(getString(R.string.learning_missing_deck))
             requireActivity().finish()
             return
         }
+        Log.d(TAG, "loadDeck requested from UI: deckId=$deckId")
         viewModel.loadDeck(deckId)
     }
 
     private fun renderState(state: LearningUiState) {
         val deck = state.deck
+        Log.d(
+            TAG,
+            "renderState: deckId=${state.deckId}, loading=${state.isLoading}, cards=${state.cards.size}, preview=${state.previewCards.size}, learned=${state.deckSummary.learnedCards}"
+        )
         binding.deckTitle.text = deck?.name ?: getString(R.string.learning_deck_loading)
         binding.deckDesc.text = deck?.description ?: getString(R.string.learning_deck_no_description)
         binding.statTotalCard.statLabel.text = getString(R.string.learning_stat_total)
@@ -118,6 +128,7 @@ class DeckDetailFragment : Fragment() {
                 TAB_REVIEW -> LearningCardFilter.REVIEW
                 else -> LearningCardFilter.ALL
             }
+            Log.d(TAG, "Tab selected: position=${tab?.position}, filter=$filter")
             onFilterSelected(filter)
         }
 

@@ -120,7 +120,7 @@
     <string name="ai_avatar">AI Avatar</string>
     <string name="retry">Thử lại</string>
     <string name="delete">Xóa</string>
-    <string name="error_message">Lỗi: %s</string>
+    <string name="error_message">Error: %s</string>
     <string name="reminder_notification_title">Đến giờ học rồi</string>
     <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
     <string name="default_web_client_id">268254732177-0tfv2j6eauspfpt36uio6dkpp235ashc.apps.googleusercontent.com</string>
@@ -158,7 +158,11 @@
     <string name="learning_start">Bắt đầu học</string>
     <string name="learning_session_title">Cài đặt phiên học</string>
     <string name="learning_session_title_english">Learning Session</string>
-    <string name="learning_session_progress">Session Progress</string>
+    <string name="learning_session_progress">Tiến độ học tập</string>
+    <string name="learning_exit_dialog_title">Thoát buổi học?</string>
+    <string name="learning_exit_dialog_message">Bạn có chắc chắn muốn thoát? Tiến độ học hiện tại sẽ không được lưu.</string>
+    <string name="learning_exit_dialog_continue">Tiếp tục học</string>
+    <string name="learning_exit_dialog_exit">Thoát</string>
     <string name="learning_session_limit_value">%1$d/%2$d thẻ</string>
     <string name="learning_order_title">Thứ tự</string>
     <string name="learning_order_random">Ngẫu nhiên</string>
@@ -179,10 +183,10 @@
     <string name="learning_session_empty">Hôm nay không có gì để học 🎉</string>
     <string name="learning_due_completed">Chúc mừng! Bạn đã hoàn thành tất cả các thẻ cần ôn tập cho hôm nay.</string>
     <string name="learning_no_answer">Chưa có câu trả lời</string>
-    <string name="learning_question_label">QUESTION</string>
+    <string name="learning_question_label">Câu hỏi</string>
     <string name="learning_hint_question">Gợi ý cho bạn?</string>
-    <string name="learning_answer_label">ANSWER</string>
-    <string name="learning_feedback_title">HOW WAS IT?</string>
+    <string name="learning_answer_label">Trả lời</string>
+    <string name="learning_feedback_title">Bạn thấy thế nào?</string>
     <string name="learning_rating_again">Lại</string>
     <string name="learning_rating_hard">Khó</string>
     <string name="learning_rating_good">Tốt</string>
@@ -199,9 +203,9 @@
     <string name="learning_result_score_format">%1$d/%2$d</string>
     <string name="learning_result_time_format">%1$02d:%2$02d</string>
     <string name="app_notification_success_title">Thành công</string>
-    <string name="app_notification_error_title">Lỗi hệ thống</string>
+    <string name="app_notification_error_title">System Error</string>
     <string name="app_notification_warning_title">Thất bại</string>
-    <string name="app_notification_success_default">Thao tác đã được thực hiện thành công.</string>
+    <string name="app_notification_success_default">The action was completed successfully.</string>
     <string name="app_notification_error_default">Đã có lỗi xảy ra. Vui lòng thử lại sau.</string>
     <string name="app_notification_warning_default">Vui lòng kiểm tra lại thông tin và thử lại.</string>
     <string name="app_notification_server_unreachable">Không thể kết nối máy chủ.</string>
@@ -224,5 +228,21 @@
     <string name="stat_dialog_close">Đóng</string>
     <string name="stat_achievement_placeholder_title">Chuyên cần</string>
     <string name="stat_achievement_placeholder_desc">0/7 ngày liên tiếp</string>
+    <string name="discover_title">Khám phá</string>
+    <string name="discover_search_hint">Tìm kiếm bài học, chủ đề...</string>
+    <string name="discover_popular_categories">Chủ đề phổ biến</string>
+    <string name="discover_all">Tất cả</string>
+    <string name="discover_featured_lessons">Bài học nổi bật</string>
+    <string name="discover_see_more">Xem thêm</string>
+    <string name="loading_default_message">Đang xử lý...</string>
+    <string name="deck_search_hint">Tìm kiếm bộ thẻ...</string>
+    <string name="discover_save_deck_title">Lưu bộ thẻ?</string>
+    <string name="discover_save_deck_message">Bạn có muốn lưu bộ thẻ "%1$s" vào thư viện của mình không?</string>
+    <string name="discover_save_deck_action">Lưu</string>
+    <string name="discover_save_deck_cancel">Hủy</string>
+    <string name="logout_confirm_title">Đăng xuất?</string>
+    <string name="logout_confirm_message">Bạn có chắc chắn muốn đăng xuất?</string>
+    <string name="logout_confirm_action">Đăng xuất</string>
+    <string name="logout_confirm_cancel">Hủy</string>
 </resources>
 

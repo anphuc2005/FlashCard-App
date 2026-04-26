@@ -1,9 +1,11 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -12,10 +14,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentSessionSettingBinding
-import com.example.flashcardapp.presentation.common.notification.showAppError
 import kotlinx.coroutines.launch
 
 private const val MIN_CARD_LIMIT = 1
+private const val TAG = "SessionSettingFragment"
 
 class SessionSettingFragment : Fragment() {
 
@@ -62,9 +64,15 @@ class SessionSettingFragment : Fragment() {
             viewModel.setCardLimit(value.toInt())
         }
         binding.btnStart.setOnClickListener {
+            val state = viewModel.uiState.value
+            Log.d(
+                TAG,
+                "Start session clicked: deckId=${state.deckId}, mode=${state.settings.mode}, order=${state.settings.order}, filter=${state.settings.filter}, cardLimit=${state.settings.cardLimit}, timeLimit=${state.settings.timeLimitMinutes}"
+            )
             viewModel.startSession { isReady ->
+                Log.d(TAG, "startSession callback: isReady=$isReady, currentDestination=${findNavController().currentDestination?.id}")
                 if (isReady && isAdded) {
-                    findNavController().navigate(R.id.action_sessionSettingFragment_to_frontCardFragment)
+                    findNavController().navigate(R.id.action_sessionSettingFragment_to_learningCardsFragment)
                 }
             }
         }
@@ -76,7 +84,8 @@ class SessionSettingFragment : Fragment() {
                 viewModel.uiState.collect { state ->
                     renderState(state)
                     state.errorMessage?.let { message ->
-                        showAppError(message)
+                        Log.e(TAG, "UI error received: deckId=${state.deckId}, message=$message")
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                         viewModel.clearError()
                     }
                 }
@@ -85,6 +94,10 @@ class SessionSettingFragment : Fragment() {
     }
 
     private fun renderState(state: LearningUiState) {
+        Log.d(
+            TAG,
+            "renderState: deckId=${state.deckId}, totalCards=${state.cards.size}, cardLimit=${state.settings.cardLimit}, mode=${state.settings.mode}, filter=${state.settings.filter}, loading=${state.isLoading}"
+        )
         val maxCards = state.cards.size.coerceAtLeast(MIN_CARD_LIMIT)
         binding.customSlider.minValue = MIN_CARD_LIMIT.toFloat()
         binding.customSlider.maxValue = maxCards.toFloat()
@@ -110,10 +123,12 @@ class SessionSettingFragment : Fragment() {
     }
 
     private fun selectOrder(order: LearningCardOrder) {
+        Log.d(TAG, "selectOrder: order=$order")
         viewModel.setOrder(order)
     }
 
     private fun selectTimeAttackMode() {
+        Log.d(TAG, "selectTimeAttackMode")
         viewModel.setStudyMode(LearningStudyMode.TIME_ATTACK)
     }
 

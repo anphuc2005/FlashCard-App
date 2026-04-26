@@ -14,12 +14,12 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/learning_top_bar_margin">
+        android:paddingHorizontal="@dimen/learning_space_sm">
 
         <ImageView
             android:id="@+id/ratingIcon"
-            android:layout_width="@dimen/learning_feedback_icon_size"
-            android:layout_height="@dimen/learning_feedback_icon_size" />
+            android:layout_width="@dimen/learning_rating_icon_size"
+            android:layout_height="@dimen/learning_rating_icon_size" />
 
         <TextView
             android:id="@+id/ratingText"
@@ -29,7 +29,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/learning_good_text"
-            android:textSize="@dimen/learning_body_text_size"
+            android:textSize="@dimen/learning_caption_text_size"
             android:textStyle="bold" />
 
         <TextView

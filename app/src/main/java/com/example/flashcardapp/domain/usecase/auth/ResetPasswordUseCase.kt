@@ -10,9 +10,9 @@ class ResetPasswordUseCase(private val repository: AuthRepository) {
         otp: String,
         newPassword: String
     ): Result<ResetPasswordResponse> {
-        if (email.isBlank()) return Result.failure(IllegalArgumentException("Email is required"))
-        if (otp.length < 6) return Result.failure(IllegalArgumentException("OTP is invalid"))
-        if (newPassword.length < 6) return Result.failure(IllegalArgumentException("Password must be at least 6 characters"))
+        if (email.isBlank()) return Result.failure(IllegalArgumentException("Vui lòng nhập email"))
+        if (otp.length < 6) return Result.failure(IllegalArgumentException("Mã OTP không hợp lệ"))
+        if (newPassword.length < 6) return Result.failure(IllegalArgumentException("Mật khẩu phải có ít nhất 6 ký tự"))
 
         val request = ResetPasswordRequest(
             email = email,

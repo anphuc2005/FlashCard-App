@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentAccountBinding
 import com.example.flashcardapp.databinding.ItemSettingRowBinding
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog.ExportFormat
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.LogoutConfirmDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.RatingDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderDialog
@@ -263,9 +263,16 @@ class AccountFragment : Fragment() {
     }
 
     private fun showLogoutDialog() {
-        val dialog = LogoutConfirmDialog()
-        dialog.listener = object : LogoutConfirmDialog.Listener {
-            override fun onConfirmLogout() {
+        val dialog = AppConfirmDialog.newInstance(
+            title = getString(R.string.logout_confirm_title),
+            message = getString(R.string.logout_confirm_message),
+            confirmText = getString(R.string.logout_confirm_action),
+            cancelText = getString(R.string.logout_confirm_cancel),
+            iconRes = R.drawable.ic_logout,
+            destructive = true
+        )
+        dialog.listener = object : AppConfirmDialog.Listener {
+            override fun onConfirm() {
                 val sessionManager = (requireActivity().application as FlashcardApp).container.sessionManager
                 sessionManager.clearLoginSession()
 
@@ -276,6 +283,6 @@ class AccountFragment : Fragment() {
                 startActivity(intent)
             }
         }
-        dialog.show(childFragmentManager, "LogoutConfirmDialog")
+        dialog.show(childFragmentManager, "logout_confirm")
     }
 }

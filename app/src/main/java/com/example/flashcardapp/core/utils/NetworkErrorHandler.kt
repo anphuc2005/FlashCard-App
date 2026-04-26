@@ -9,16 +9,17 @@ object NetworkErrorHandler {
         return when (throwable) {
             is HttpException -> {
                 when (throwable.code()) {
-                    400 -> "Bad Request - Kiểm tra dữ liệu gửi"
-                    401 -> "Unauthorized - Vui lòng đăng nhập"
-                    403 -> "Forbidden - Bạn không có quyền truy cập"
-                    404 -> "Not Found - Không tìm thấy dữ liệu"
-                    500 -> "Internal Server Error - Lỗi server"
-                    else -> "HTTP Error ${throwable.code()}"
+                    400 -> "Dữ liệu gửi lên chưa hợp lệ."
+                    401 -> "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại."
+                    403 -> "Bạn không có quyền thực hiện thao tác này."
+                    404 -> "Không tìm thấy dữ liệu cần thiết."
+                    500 -> "Hệ thống đang bận. Vui lòng thử lại sau."
+                    else -> "Yêu cầu mạng thất bại (mã ${throwable.code()})."
                 }
             }
-            is IOException -> "Network Error - Kiểm tra kết nối internet"
-            else -> throwable.message ?: "Unknown Error"
+            is IOException -> "Không thể kết nối internet. Vui lòng kiểm tra mạng."
+            else -> UserMessageMapper.extractReadableMessage(throwable.message)
+                ?: "Đã có lỗi xảy ra. Vui lòng thử lại."
         }
     }
 }

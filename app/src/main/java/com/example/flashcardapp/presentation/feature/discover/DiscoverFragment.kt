@@ -1,6 +1,5 @@
 package com.example.flashcardapp.presentation.feature.discover
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,9 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentDiscoverBinding
 import com.example.flashcardapp.presentation.common.adapter.CategoryAdapter
 import com.example.flashcardapp.presentation.common.adapter.CourseAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
@@ -81,17 +82,20 @@ class DiscoverFragment : Fragment() {
                 startActivity(intent)
             },
             onSaveClick = { course ->
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Lưu bộ thẻ")
-                    .setMessage("Bạn có muốn lưu bộ thẻ '${course.name}' này vào thư viện của mình không?")
-                    .setPositiveButton("Lưu") { dialog, _ ->
+                val dialog = AppConfirmDialog.newInstance(
+                    title = getString(R.string.discover_save_deck_title),
+                    message = getString(R.string.discover_save_deck_message, course.name),
+                    confirmText = getString(R.string.discover_save_deck_action),
+                    cancelText = getString(R.string.discover_save_deck_cancel),
+                    iconRes = R.drawable.ic_download,
+                    destructive = false
+                )
+                dialog.listener = object : AppConfirmDialog.Listener {
+                    override fun onConfirm() {
                         viewModel.cloneDeck(course.id)
-                        dialog.dismiss()
                     }
-                    .setNegativeButton("Huỷ") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
+                }
+                dialog.show(childFragmentManager, "discover_save_deck_confirm")
             }
         )
         binding.rvCourses.apply {

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/learning_space_sm"
+    android:paddingBottom="@dimen/learning_space_lg">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="@color/learning_surface"
+        app:cardCornerRadius="@dimen/learning_card_radius_figma"
+        app:cardElevation="@dimen/learning_zero"
+        app:strokeColor="@color/learning_soft_border"
+        app:strokeWidth="@dimen/learning_stroke_width">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/frontFace"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/learning_card_padding_large">
+
+                <FrameLayout
+                    android:layout_width="@dimen/learning_front_card_icon_size"
+                    android:layout_height="@dimen/learning_front_card_icon_size"
+                    android:background="@drawable/bg_learning_icon_soft">
+
+                    <ImageView
+                        android:layout_width="@dimen/learning_front_card_icon_inner_size"
+                        android:layout_height="@dimen/learning_front_card_icon_inner_size"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_book"
+                        app:tint="@color/learning_primary" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/questionText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/learning_space_xxxl"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="3"
+                    android:textColor="@color/learning_text_primary"
+                    android:textSize="@dimen/learning_card_question_text_size"
+                    android:textStyle="bold"
+                    tools:text="What is the capital of France?" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/learning_space_xl"
+                    android:text="@string/learning_question_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/learning_text_soft"
+                    android:textSize="@dimen/learning_body_text_size"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/backFace"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/answerImageBottomGuide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.42" />
+
+                <ImageView
+                    android:id="@+id/cardImage"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@color/learning_chip_unselected"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/test"
+                    app:layout_constraintBottom_toTopOf="@id/answerImageBottomGuide"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_min="@dimen/learning_back_visual_min_height"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/answerContent"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="@dimen/learning_card_padding_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/answerImageBottomGuide">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_blue"
+                        android:paddingHorizontal="@dimen/learning_top_bar_margin"
+                        android:paddingVertical="@dimen/learning_space_xs"
+                        android:text="@string/learning_answer_label"
+                        android:textAllCaps="true"
+                        android:textColor="@color/learning_primary"
+                        android:textSize="@dimen/learning_label_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/backQuestionText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/learning_space_lg"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:textColor="@color/learning_text_primary"
+                        android:textSize="@dimen/learning_card_question_text_size"
+                        android:textStyle="bold"
+                        tools:text="Kiến thức cơ bản" />
+
+                    <TextView
+                        android:id="@+id/answerText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/learning_space_md"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="4"
+                        android:textColor="@color/learning_text_secondary"
+                        android:textSize="@dimen/learning_answer_text_size"
+                        tools:text="The detailed explanation or translation of the flashcard content goes here." />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

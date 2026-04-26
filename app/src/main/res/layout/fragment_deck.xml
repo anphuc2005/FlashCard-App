@@ -41,15 +41,20 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/searchContainer"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
             app:boxBackgroundColor="?attr/componentBackground"
+            app:boxBackgroundMode="outline"
             app:boxCornerRadiusTopStart="14dp"
             app:boxCornerRadiusTopEnd="14dp"
             app:boxCornerRadiusBottomStart="14dp"
             app:boxCornerRadiusBottomEnd="14dp"
+            app:boxStrokeColor="@color/auth_input_stroke_selector"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:hintEnabled="false"
             app:startIconDrawable="@drawable/ic_search"
             app:startIconTint="#A3AEC2">
 
@@ -57,7 +62,8 @@
                 android:id="@+id/searchInput"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Search decks..."
+                android:background="@null"
+                android:hint="@string/deck_search_hint"
                 android:textColor="?attr/textColor"
                 android:textColorHint="?attr/subTitleColor"
                 android:paddingVertical="12dp"

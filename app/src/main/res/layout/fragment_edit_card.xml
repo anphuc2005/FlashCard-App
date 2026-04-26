@@ -71,20 +71,24 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilFront"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="?attr/componentBackground"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etFront"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
+                    android:background="@null"
                     android:gravity="top|start"
                     android:hint="Nhập nội dung câu hỏi tại đây..."
                     android:padding="12dp"
@@ -106,20 +110,24 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilBack"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="?attr/componentBackground"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etBack"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
+                    android:background="@null"
                     android:gravity="top|start"
                     android:hint="Nhập câu trả lời hoặc định nghĩa..."
                     android:padding="12dp"

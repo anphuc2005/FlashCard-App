@@ -17,15 +17,15 @@ enum class AppNotificationType {
 }
 
 fun Fragment.showAppSuccess(message: String, title: String? = null) {
-    requireContext().showAppNotification(AppNotificationType.SUCCESS, message, title)
+    requireContext().showAppSuccess(message, title)
 }
 
 fun Fragment.showAppError(message: String?, title: String? = null) {
-    requireContext().showAppNotification(AppNotificationType.ERROR, message, title)
+    requireContext().showAppError(message, title)
 }
 
 fun Fragment.showAppWarning(message: String?, title: String? = null) {
-    requireContext().showAppNotification(AppNotificationType.WARNING, message, title)
+    requireContext().showAppWarning(message, title)
 }
 
 fun Context.showAppSuccess(message: String, title: String? = null) {
@@ -54,7 +54,11 @@ private fun Context.showAppNotification(
     Toast(applicationContext).apply {
         duration = Toast.LENGTH_SHORT
         view = binding.root
-        setGravity(Gravity.TOP or Gravity.CENTER_HORIZONTAL, 0, resources.getDimensionPixelSize(R.dimen.app_notification_margin_top))
+        setGravity(
+            Gravity.TOP or Gravity.CENTER_HORIZONTAL,
+            0,
+            resources.getDimensionPixelSize(R.dimen.app_notification_margin_top)
+        )
     }.show()
 }
 
@@ -95,12 +99,6 @@ private fun Context.sanitizeNotificationMessage(rawMessage: String?, type: AppNo
     if (message.isBlank()) return defaultMessage(type)
 
     val normalized = message.lowercase(Locale.getDefault())
-    val cleaned = message
-        .removePrefix("Error:")
-        .removePrefix("error:")
-        .removePrefix("Lỗi:")
-        .trim()
-
     return when {
         normalized.contains("401") || normalized.contains("unauthorized") ->
             getString(R.string.app_notification_invalid_credentials)
@@ -130,7 +128,6 @@ private fun Context.sanitizeNotificationMessage(rawMessage: String?, type: AppNo
             normalized.contains("trace") ||
             normalized.contains("unexpected") ->
             defaultMessage(type)
-        cleaned.isBlank() -> defaultMessage(type)
-        else -> cleaned
+        else -> message
     }
 }

@@ -20,7 +20,7 @@ import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentDeckBinding
 import com.example.flashcardapp.presentation.common.adapter.DeckAdapter
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.DeleteConfirmDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
@@ -90,19 +90,21 @@ class DeckFragment : Fragment() {
                 if (position == RecyclerView.NO_POSITION) return
 
                 val deckId = deckAdapter.currentList[position].id
-                val dialog = DeleteConfirmDialog.newInstance(
+                val dialog = AppConfirmDialog.newInstance(
                     title = getString(R.string.delete_confirm_title),
                     message = getString(R.string.delete_confirm_message_deck),
-                    actionText = getString(R.string.delete_confirm_action),
-                    cancelText = getString(R.string.delete_confirm_cancel)
+                    confirmText = getString(R.string.delete_confirm_action),
+                    cancelText = getString(R.string.delete_confirm_cancel),
+                    iconRes = R.drawable.ic_delete,
+                    destructive = true
                 )
-                dialog.listener = object : DeleteConfirmDialog.Listener {
-                    override fun onConfirmDelete() {
+                dialog.listener = object : AppConfirmDialog.Listener {
+                    override fun onConfirm() {
                         deckViewModel.deleteDeck(deckId)
                         showAppSuccess(getString(R.string.delete_success_deck))
                     }
 
-                    override fun onCancelDelete() {
+                    override fun onCancel() {
                         deckAdapter.notifyItemChanged(position)
                     }
                 }
@@ -172,7 +174,7 @@ class DeckFragment : Fragment() {
         }
 
         binding.filterButton.setOnClickListener {
-            showAppWarning("TÃ­nh nÄƒng lá»c bá»™ tháº» sáº½ sá»›m Ä‘Æ°á»£c cáº­p nháº­t.")
+            showAppWarning("Tính năng lọc bộ thẻ sẽ sớm được cập nhật.")
         }
     }
 
@@ -207,6 +209,6 @@ class DeckFragment : Fragment() {
     }
 
     private fun showEmpty() {
-        showAppWarning("ChÆ°a cÃ³ bá»™ tháº» nÃ o Ä‘á»ƒ hiá»ƒn thá»‹.")
+        showAppWarning("Chưa có bộ thẻ nào để hiển thị.")
     }
 }
