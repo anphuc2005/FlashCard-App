@@ -5,14 +5,14 @@ import com.example.flashcardapp.data.datasource.remote.model.profile.UpdateProfi
 import com.example.flashcardapp.data.datasource.remote.model.profile.UserProfileDto
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.PUT
+import retrofit2.http.PATCH
 
 interface ProfileApiService {
 
-    @GET("profile/me")
+    @GET("users/me")
     suspend fun getMyProfile(): ApiResponse<UserProfileDto>
 
-    @PUT("profile/me")
+    @PATCH("users/me")
     suspend fun updateMyProfile(
         @Body request: UpdateProfileRequest
     ): ApiResponse<UserProfileDto>

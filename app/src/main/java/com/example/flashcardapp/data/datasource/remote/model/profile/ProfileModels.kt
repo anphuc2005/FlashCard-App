@@ -11,7 +11,8 @@ data class UserProfileDto(
 )
 
 data class UpdateProfileRequest(
-    @SerializedName("displayName") val displayName: String
+    @SerializedName("displayName") val displayName: String,
+    @SerializedName("avatarUrl") val imageUrl: String? = null
 )
 
 fun UserProfileDto.toDomain(): UserProfile {

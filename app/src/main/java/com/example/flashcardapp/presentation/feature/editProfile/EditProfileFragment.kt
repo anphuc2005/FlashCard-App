@@ -21,6 +21,7 @@ import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentEditProfileBinding
 import kotlinx.coroutines.launch
+import java.io.File
 
 class EditProfileFragment : Fragment() {
 
@@ -28,10 +29,15 @@ class EditProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: EditProfileViewModel
+    private var selectedImageFile: File? = null
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri ?: return@registerForActivityResult
         binding.avatar.setImageURI(uri)
+        selectedImageFile = createTempImageFile(uri)
+        if (selectedImageFile == null) {
+            Toast.makeText(requireContext(), "Không thể đọc ảnh đã chọn", Toast.LENGTH_SHORT).show()
+        }
         viewModel.updateAvatarPreview(uri.toString())
     }
 
@@ -70,7 +76,8 @@ class EditProfileFragment : Fragment() {
             this,
             EditProfileViewModelFactory(
                 getMyProfileUseCase = container.getMyProfileUseCase,
-                updateMyProfileUseCase = container.updateMyProfileUseCase
+                updateMyProfileUseCase = container.updateMyProfileUseCase,
+                uploadImageUseCase = container.uploadImageUseCase
             )
         )[EditProfileViewModel::class.java]
     }
@@ -78,7 +85,7 @@ class EditProfileFragment : Fragment() {
     private fun setupActions() {
         binding.btnBack.setOnClickListener { findNavController().popBackStack() }
         binding.btnEditAvatar.setOnClickListener { requestGalleryPermissionAndPick() }
-        binding.btnSave.setOnClickListener { viewModel.submit() }
+        binding.btnSave.setOnClickListener { viewModel.submit(selectedImageFile) }
 
         binding.etFullName.doAfterTextChangedCompat { text ->
             viewModel.onDisplayNameChanged(text)
@@ -117,6 +124,7 @@ class EditProfileFragment : Fragment() {
                     }
 
                     if (state.isSaved) {
+                        selectedImageFile = null
                         Toast.makeText(requireContext(), "Đã lưu thay đổi", Toast.LENGTH_SHORT).show()
                         viewModel.consumeSavedEvent()
                         findNavController().popBackStack()
@@ -143,6 +151,18 @@ class EditProfileFragment : Fragment() {
         pickImageLauncher.launch("image/*")
     }
 
+    private fun createTempImageFile(uri: Uri): File? {
+        return runCatching {
+            val tempFile = File(requireContext().cacheDir, "profile_${System.currentTimeMillis()}.jpg")
+            requireContext().contentResolver.openInputStream(uri)?.use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return null
+            tempFile
+        }.getOrNull()
+    }
+
     private fun loadAvatar(avatarUrl: String?) {
         if (avatarUrl.isNullOrBlank()) {
             binding.avatar.setImageResource(R.drawable.user)
@@ -165,10 +185,18 @@ class EditProfileFragment : Fragment() {
     private fun formatMemberSince(createdAt: String?): String {
         if (createdAt.isNullOrBlank()) return "Thành viên"
 
-        return runCatching {
-            val date = java.time.Instant.parse(createdAt).atZone(java.time.ZoneId.systemDefault())
-            "Thành viên từ tháng ${date.monthValue}, ${date.year}"
-        }.getOrDefault("Thành viên")
+        val yearFromInstant = runCatching {
+            java.time.Instant.parse(createdAt).atZone(java.time.ZoneId.systemDefault()).year
+        }.getOrNull()
+
+        val yearFromText = Regex("(\\d{4})")
+            .find(createdAt)
+            ?.groupValues
+            ?.getOrNull(1)
+            ?.toIntOrNull()
+
+        val year = yearFromInstant ?: yearFromText ?: return "Thành viên"
+        return "Thành viên từ năm $year"
     }
 }
 

@@ -22,6 +22,9 @@ public class ProfileService {
     public UserProfileResponse updateMyProfile(String email, UpdateProfileRequest request) {
         User user = findByEmail(email);
         user.setDisplayName(request.getDisplayName().trim());
+        if (request.getImageUrl() != null && !request.getImageUrl().isBlank()) {
+            user.setAvatarUrl(request.getImageUrl().trim());
+        }
         User updatedUser = userRepository.save(user);
         return toUserProfile(updatedUser);
     }
