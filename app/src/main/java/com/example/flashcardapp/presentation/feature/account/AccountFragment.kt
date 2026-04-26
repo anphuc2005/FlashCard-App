@@ -5,16 +5,22 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.databinding.FragmentAccountBinding
 import com.example.flashcardapp.databinding.ItemSettingRowBinding
+import com.example.flashcardapp.domain.model.UserProfile
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog.ExportFormat
@@ -25,7 +31,8 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.Reminde
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog.ThemeOption
 import com.example.flashcardapp.presentation.feature.auth.AuthActivity
-import com.example.flashcardapp.FlashcardApp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class AccountFragment : Fragment() {
 
@@ -51,6 +58,12 @@ class AccountFragment : Fragment() {
 
     private var ratingValue = 4
     private var ratingComment = ""
+    private var profileLoadJob: Job? = null
+    private var skipNextResumeRefresh = true
+
+    private companion object {
+        const val TAG = "AccountFragment"
+    }
 
     private val galleryPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) openImagePicker()
@@ -76,9 +89,23 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRows()
         setupActions()
+        renderCachedProfile()
+        loadProfile(forceRefresh = false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (skipNextResumeRefresh) {
+            skipNextResumeRefresh = false
+            return
+        }
+        loadProfile(forceRefresh = true)
     }
 
     override fun onDestroyView() {
+        profileLoadJob?.cancel()
+        profileLoadJob = null
+        skipNextResumeRefresh = true
         _binding = null
         super.onDestroyView()
     }
@@ -137,6 +164,9 @@ class AccountFragment : Fragment() {
         }
         binding.rowExport.root.setOnClickListener { showExportDialog() }
         binding.rowRate.root.setOnClickListener { showRatingDialog() }
+        binding.btnSettings.setOnClickListener {
+            findNavController().navigate(R.id.action_accountFragment_to_editProfileFragment)
+        }
 
         binding.btnLogout.setOnClickListener { showLogoutDialog() }
     }
@@ -284,5 +314,66 @@ class AccountFragment : Fragment() {
             }
         }
         dialog.show(childFragmentManager, "logout_confirm")
+    }
+
+    private fun renderCachedProfile() {
+        val cachedProfile = (requireActivity().application as FlashcardApp)
+            .container
+            .getMyProfileUseCase
+            .getCachedProfile()
+        cachedProfile?.let { renderProfile(it) }
+    }
+
+    private fun loadProfile(forceRefresh: Boolean) {
+        profileLoadJob?.cancel()
+        profileLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            Log.i(TAG, "loadProfile() called -> requesting users/me")
+            val profileResult = (requireActivity().application as FlashcardApp)
+                .container
+                .getMyProfileUseCase(forceRefresh = forceRefresh)
+
+            profileResult.onSuccess { profile ->
+                Log.i(
+                    TAG,
+                    "Render profile from users/me -> email=${profile.email}, displayName=${profile.displayName}, avatarUrl=${profile.avatarUrl}, createdAt=${profile.createdAt}"
+                )
+                renderProfile(profile)
+            }
+            profileResult.onFailure { throwable ->
+                Log.e(TAG, "Failed to load profile from users/me", throwable)
+            }
+        }
+    }
+
+    private fun renderProfile(profile: UserProfile) {
+        binding.name.text = profile.displayName.ifBlank { "Người dùng" }
+        binding.memberSince.text = formatMemberSince(profile.createdAt)
+
+        if (profile.avatarUrl.isNullOrBlank()) {
+            binding.avatar.setImageResource(R.drawable.user)
+        } else {
+            Glide.with(this@AccountFragment)
+                .load(profile.avatarUrl)
+                .placeholder(R.drawable.user)
+                .error(R.drawable.user)
+                .into(binding.avatar)
+        }
+    }
+
+    private fun formatMemberSince(createdAt: String?): String {
+        if (createdAt.isNullOrBlank()) return "Thành viên"
+
+        val yearFromInstant = runCatching {
+            java.time.Instant.parse(createdAt).atZone(java.time.ZoneId.systemDefault()).year
+        }.getOrNull()
+
+        val yearFromText = Regex("(\\d{4})")
+            .find(createdAt)
+            ?.groupValues
+            ?.getOrNull(1)
+            ?.toIntOrNull()
+
+        val year = yearFromInstant ?: yearFromText ?: return "Thành viên"
+        return "Thành viên từ năm $year"
     }
 }

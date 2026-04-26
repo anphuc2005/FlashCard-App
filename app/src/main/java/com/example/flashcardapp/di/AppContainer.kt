@@ -10,6 +10,9 @@ import com.example.flashcardapp.data.repository.FlashCardRepository
 import com.example.flashcardapp.data.repository.StudyRepository
 import com.example.flashcardapp.data.repository.CategoryRepository
 import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
+import com.example.flashcardapp.data.repository.ProfileRepository
+import com.example.flashcardapp.data.repository.UploadRepositoryImpl
+import com.example.flashcardapp.domain.repository.UploadRepository
 import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
 import com.example.flashcardapp.domain.usecase.auth.ForgotPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.GoogleLoginUseCase
@@ -27,6 +30,9 @@ import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
 import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
 import com.example.flashcardapp.domain.usecase.category.GetAllCategoriesUseCase
 import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCase
+import com.example.flashcardapp.domain.usecase.profile.GetMyProfileUseCase
+import com.example.flashcardapp.domain.usecase.profile.UpdateMyProfileUseCase
+import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
 import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
 import com.example.flashcardapp.domain.usecase.study.SaveStudyReviewUseCase
@@ -69,6 +75,13 @@ class AppContainer(private val applicationContext: Context) {
         val database = FlashCardDatabase.getInstance(applicationContext)
         FlashCardRepository(RetrofitClient.cardApiService, database.flashCardDao())
     }
+
+    val uploadRepository: UploadRepository by lazy {
+        UploadRepositoryImpl(RetrofitClient.uploadApiService)
+    }
+
+    val profileRepository: ProfileRepository by lazy {
+        ProfileRepository(RetrofitClient.profileApiService)
 
     val studyRepository: StudyRepository by lazy {
         val database = FlashCardDatabase.getInstance(applicationContext)
@@ -131,6 +144,17 @@ class AppContainer(private val applicationContext: Context) {
         com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(flashCardRepository)
     }
 
+    val uploadImageUseCase: UploadImageUseCase by lazy {
+        UploadImageUseCase(uploadRepository)
+    }
+
+    val getMyProfileUseCase: GetMyProfileUseCase by lazy {
+        GetMyProfileUseCase(profileRepository)
+    }
+
+    val updateMyProfileUseCase: UpdateMyProfileUseCase by lazy {
+        UpdateMyProfileUseCase(profileRepository)
+        
     val studyUseCases: StudyUseCases by lazy {
         StudyUseCases(
             getSessionCards = GetStudySessionCardsUseCase(studyRepository),

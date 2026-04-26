@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.NavOptions
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.bumptech.glide.Glide
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentHomeBinding
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
@@ -28,6 +30,7 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportD
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
 import androidx.appcompat.app.AppCompatDelegate
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -50,6 +53,8 @@ class HomeFragment : Fragment() {
     private var reminderHour = 8
     private var reminderMinute = 0
     private var reminderEnabled = true
+    private var avatarLoadJob: Job? = null
+    private var skipNextResumeAvatarRefresh = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,7 +71,17 @@ class HomeFragment : Fragment() {
         setupAdapters()
         observeUiState()
         setupListeners()
+        renderCachedAvatar()
+        loadUserAvatar(forceRefresh = false)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        if (skipNextResumeAvatarRefresh) {
+            skipNextResumeAvatarRefresh = false
+            return
+        }
+        loadUserAvatar(forceRefresh = true)
     }
 
     private fun setupAdapters() {
@@ -262,8 +277,48 @@ class HomeFragment : Fragment() {
         dialog.show(childFragmentManager, "ChangeThemeDialog")
     }
 
+    private fun renderCachedAvatar() {
+        val cachedProfile = (requireActivity().application as FlashcardApp)
+            .container
+            .getMyProfileUseCase
+            .getCachedProfile()
+        renderAvatar(cachedProfile?.avatarUrl)
+    }
+
+    private fun loadUserAvatar(forceRefresh: Boolean) {
+        avatarLoadJob?.cancel()
+        avatarLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val profileResult = (requireActivity().application as FlashcardApp)
+                .container
+                .getMyProfileUseCase(forceRefresh = forceRefresh)
+
+            profileResult.onSuccess { profile ->
+                renderAvatar(profile.avatarUrl)
+            }
+
+            profileResult.onFailure {
+                renderAvatar(null)
+            }
+        }
+    }
+
+    private fun renderAvatar(avatarUrl: String?) {
+        if (avatarUrl.isNullOrBlank()) {
+            binding.imgAvatar.setImageResource(R.drawable.user)
+        } else {
+            Glide.with(this@HomeFragment)
+                .load(avatarUrl)
+                .placeholder(R.drawable.user)
+                .error(R.drawable.user)
+                .into(binding.imgAvatar)
+        }
+    }
+
 
     override fun onDestroyView() {
+        avatarLoadJob?.cancel()
+        avatarLoadJob = null
+        skipNextResumeAvatarRefresh = true
         super.onDestroyView()
         _binding = null
     }
