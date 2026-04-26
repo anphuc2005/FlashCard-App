@@ -46,12 +46,12 @@ class LoginViewModel(
                 val result = loginUseCase(email, password)
                 result.onSuccess {
                     Log.d("LoginViewModel", "Login successful. Token: ${it.accessToken.take(20)}...")
-                    _uiState.value = AuthOperationState.Success("Login successful")
+                    _uiState.value = AuthOperationState.Success("Đăng nhập thành công")
                 }
                 result.onFailure { throwable ->
                     Log.e("LoginViewModel", "Login failed: ${throwable.message}", throwable)
                     _uiState.value = AuthOperationState.Error(
-                        throwable.message ?: "An unexpected error occurred"
+                        throwable.message ?: "Đã có lỗi xảy ra. Vui lòng thử lại."
                     )
                 }
             }
@@ -65,12 +65,12 @@ class LoginViewModel(
             val result = googleLoginUseCase(idToken)
             result.onSuccess {
                 Log.d("LoginViewModel", "Google Login successful")
-                _uiState.value = AuthOperationState.Success("Google Login successful")
+                _uiState.value = AuthOperationState.Success("Đăng nhập Google thành công")
             }
             result.onFailure { throwable ->
                 Log.e("LoginViewModel", "Google Login failed: ${throwable.message}", throwable)
                 _uiState.value = AuthOperationState.Error(
-                    throwable.message ?: "Google login failed"
+                    throwable.message ?: "Đăng nhập Google thất bại"
                 )
             }
         }
@@ -85,18 +85,18 @@ class LoginViewModel(
         var isValid = true
 
         if (email.isBlank()) {
-            _formState.value = errors.copy(emailError = "Email is required")
+            _formState.value = errors.copy(emailError = "Vui lòng nhập email")
             isValid = false
         } else if (!email.contains("@")) {
-            _formState.value = errors.copy(emailError = "Invalid email format")
+            _formState.value = errors.copy(emailError = "Email không đúng định dạng")
             isValid = false
         }
 
         if (password.isBlank()) {
-            _formState.value = errors.copy(passwordError = "Password is required")
+            _formState.value = errors.copy(passwordError = "Vui lòng nhập mật khẩu")
             isValid = false
         } else if (password.length < 6) {
-            _formState.value = errors.copy(passwordError = "Password must be at least 6 characters")
+            _formState.value = errors.copy(passwordError = "Mật khẩu phải có ít nhất 6 ký tự")
             isValid = false
         }
 

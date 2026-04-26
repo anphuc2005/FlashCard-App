@@ -9,6 +9,7 @@
     android:background="@drawable/bg_dialog_round">
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:src="@drawable/ic_logout"

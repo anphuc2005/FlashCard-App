@@ -1,0 +1,97 @@
+package com.example.flashcardapp.data.repository
+
+import android.content.Context
+import com.example.flashcardapp.data.datasource.local.dao.StudyReviewDao
+import com.example.flashcardapp.data.datasource.local.entity.toEntity
+import com.example.flashcardapp.data.datasource.remote.api.StudyApiService
+import com.example.flashcardapp.data.datasource.remote.model.toDto
+import com.example.flashcardapp.domain.model.FlashCard
+import com.example.flashcardapp.domain.model.study.StudyReview
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+
+private const val STUDY_SYNC_PREFS = "study_sync_prefs"
+private const val KEY_LAST_SYNC_TIME = "lastSyncTime"
+
+class StudyRepository(
+    private val studyApiService: StudyApiService,
+    private val studyReviewDao: StudyReviewDao,
+    private val applicationContext: Context
+) {
+
+    suspend fun getSessionCards(deckId: String, mode: String): Result<List<FlashCard>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = studyApiService.getSessionCards(deckId, mode)
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(response.data.map { it.toDomain() })
+                } else {
+                    Result.failure(Exception(response.message ?: "Failed to load study session"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun saveReview(review: StudyReview): Result<StudyReview> {
+        return withContext(Dispatchers.IO) {
+            try {
+                studyReviewDao.insertReview(review.toEntity())
+                Result.success(review)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    fun observeReviewsByDeck(deckId: String): Flow<List<StudyReview>> {
+        return studyReviewDao.observeReviewsByDeck(deckId).map { reviews ->
+            reviews.map { it.toDomain() }
+        }
+    }
+
+    suspend fun getReviewedCardIds(deckId: String): Result<Set<String>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Result.success(studyReviewDao.getReviewedCardIds(deckId).toSet())
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun syncReviews(): Result<Int> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val unsyncedReviews = studyReviewDao.getUnsyncedReviews()
+                if (unsyncedReviews.isEmpty()) {
+                    return@withContext Result.success(0)
+                }
+
+                val reviews = unsyncedReviews.map { it.toDomain() }
+                val response = studyApiService.syncReviews(reviews.map { it.toDto() })
+
+                if (response.isSuccess() && response.data != null) {
+                    studyReviewDao.deleteReviews(unsyncedReviews.map { it.id })
+                    saveLastSyncTime(response.data.syncedAt)
+                    Result.success(unsyncedReviews.size)
+                } else {
+                    Result.failure(Exception(response.message ?: "Failed to sync study reviews"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    private fun saveLastSyncTime(syncedAt: String) {
+        applicationContext
+            .getSharedPreferences(STUDY_SYNC_PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_LAST_SYNC_TIME, syncedAt)
+            .apply()
+    }
+}

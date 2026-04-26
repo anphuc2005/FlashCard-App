@@ -1,5 +1,6 @@
 package com.example.flashcardapp.data.repository
 
+import com.example.flashcardapp.core.utils.UserMessageMapper
 import com.example.flashcardapp.data.datasource.local.session.AuthSessionStore
 import com.example.flashcardapp.data.datasource.remote.api.AuthApiService
 import com.example.flashcardapp.data.datasource.remote.model.auth.ForgotPasswordRequest
@@ -26,7 +27,7 @@ class GoogleAuthRepositoryImpl(
 ) : AuthRepository {
 
     override suspend fun login(request: LoginRequest): Result<LoginResponse> = withContext(ioDispatcher) {
-        Result.failure(NotImplementedError("Google login is not yet implemented via API"))
+        Result.failure(NotImplementedError("Đăng nhập Google qua API chưa được hỗ trợ ở luồng này"))
     }
 
     override suspend fun googleLogin(request: GoogleLoginRequest): Result<GoogleLoginResponse> = withContext(ioDispatcher) {
@@ -35,7 +36,12 @@ class GoogleAuthRepositoryImpl(
             if (response.isSuccessful && response.body()?.isSuccess() == true) {
                 Result.success(response.body()!!.data!!)
             } else {
-                Result.failure(Exception(response.body()?.message ?: "Google login failed"))
+                Result.failure(
+                    Exception(
+                        UserMessageMapper.extractReadableMessage(response.body()?.message)
+                            ?: "Đăng nhập Google thất bại"
+                    )
+                )
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -43,19 +49,19 @@ class GoogleAuthRepositoryImpl(
     }
 
     override suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
-        return Result.failure(UnsupportedOperationException("Google Auth does not support manual registration"))
+        return Result.failure(UnsupportedOperationException("Google Auth không hỗ trợ đăng ký thủ công"))
     }
 
     override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse> {
-        return Result.failure(UnsupportedOperationException("Google Auth does not support forgot password"))
+        return Result.failure(UnsupportedOperationException("Google Auth không hỗ trợ quên mật khẩu"))
     }
 
     override suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse> {
-        return Result.failure(UnsupportedOperationException("Google Auth does not support verifying OTP"))
+        return Result.failure(UnsupportedOperationException("Google Auth không hỗ trợ xác minh OTP"))
     }
 
     override suspend fun resetPassword(request: ResetPasswordRequest): Result<ResetPasswordResponse> {
-        return Result.failure(UnsupportedOperationException("Google Auth does not support password resetting"))
+        return Result.failure(UnsupportedOperationException("Google Auth không hỗ trợ đặt lại mật khẩu"))
     }
 
     override fun saveLoginSession(accessToken: String?) {

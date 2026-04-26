@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,7 +11,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentEditCardBinding
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import kotlinx.coroutines.launch
 
 class EditCardFragment : Fragment() {
@@ -42,11 +45,9 @@ class EditCardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        // Cập nhật header text để hiển thị "Sửa thẻ" (nếu layout có headerTitle)
+
         binding.headerTitle.text = "Sửa thẻ"
-        
-        // Lấy argument do Navigation truyền vào
+
         arguments?.let {
             cardId = it.getString("CARD_ID") ?: ""
             deckId = it.getString("DECK_ID") ?: ""
@@ -66,19 +67,29 @@ class EditCardFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        // Đổi btnSave -> để update
         binding.btnSave.setOnClickListener {
             val question = binding.etFront.text.toString()
             val answer = binding.etBack.text.toString()
             viewModel.updateCard(cardId, question, answer, deckId, null)
         }
 
-        // Có thể setup nút btnAddAnother để đổi thành nút Xóa thẻ (nếu muốn)
-        // hoặc tự thêm logic xoá
         binding.btnAddAnother.setOnClickListener {
-            viewModel.deleteCard(cardId, initialQuestion, initialAnswer, deckId)
+            val dialog = AppConfirmDialog.newInstance(
+                title = getString(R.string.delete_confirm_title),
+                message = getString(R.string.delete_confirm_message_card),
+                confirmText = getString(R.string.delete_confirm_action),
+                cancelText = getString(R.string.delete_confirm_cancel),
+                iconRes = R.drawable.ic_delete,
+                destructive = true
+            )
+            dialog.listener = object : AppConfirmDialog.Listener {
+                override fun onConfirm() {
+                    viewModel.deleteCard(cardId, initialQuestion, initialAnswer, deckId)
+                }
+            }
+            dialog.show(childFragmentManager, "delete_card_confirm")
         }
-        binding.btnAddAnother.text = "Xoá thẻ"
+        binding.btnAddAnother.text = "Xóa thẻ"
     }
 
     private fun observeData() {
@@ -86,20 +97,20 @@ class EditCardFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
-                        is EditCardState.Idle -> {}
-                        is EditCardState.Loading -> {}
+                        is EditCardState.Idle -> Unit
+                        is EditCardState.Loading -> Unit
                         is EditCardState.Success -> {
-                            Toast.makeText(requireContext(), "Cập nhật thẻ thành công", Toast.LENGTH_SHORT).show()
+                            showAppSuccess("Đã cập nhật thẻ thành công")
                             viewModel.resetState()
                             findNavController().popBackStack()
                         }
                         is EditCardState.Deleted -> {
-                            Toast.makeText(requireContext(), "Xoá thẻ thành công", Toast.LENGTH_SHORT).show()
+                            showAppSuccess(getString(R.string.delete_success_card))
                             viewModel.resetState()
                             findNavController().popBackStack()
                         }
                         is EditCardState.Error -> {
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            showAppError(state.message)
                         }
                     }
                 }

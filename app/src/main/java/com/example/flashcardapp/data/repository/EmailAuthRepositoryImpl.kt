@@ -2,6 +2,7 @@ package com.example.flashcardapp.data.repository
 
 import android.util.Log
 import com.example.flashcardapp.core.utils.NetworkErrorHandler
+import com.example.flashcardapp.core.utils.UserMessageMapper
 import com.example.flashcardapp.data.datasource.local.session.AuthSessionStore
 import com.example.flashcardapp.data.datasource.remote.api.AuthApiService
 import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
@@ -109,15 +110,16 @@ class EmailAuthRepositoryImpl(
                         }
                     }
                 } else {
-                    val errorMsg = apiResponse?.message ?: "Auth request failed"
+                    val errorMsg = UserMessageMapper.extractReadableMessage(apiResponse?.message)
+                        ?: "Yêu cầu xác thực không thành công."
                     Log.e("EmailAuthRepository", "$methodName failed: $errorMsg (status=${apiResponse?.status})")
                     Result.failure(IllegalStateException(errorMsg))
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
-                val errorMsg = errorBody?.takeIf { it.isNotBlank() }
-                    ?: response.message().takeIf { it.isNotBlank() }
-                    ?: "Auth request failed with code ${response.code()}"
+                val errorMsg = UserMessageMapper.extractReadableMessage(errorBody)
+                    ?: UserMessageMapper.extractReadableMessage(response.message())
+                    ?: "Yêu cầu xác thực thất bại (mã ${response.code()})."
                 Log.e("EmailAuthRepository", "$methodName HTTP error (${response.code()}): $errorMsg")
                 Result.failure(IllegalStateException(errorMsg))
             }

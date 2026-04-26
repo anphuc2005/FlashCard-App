@@ -1,11 +1,10 @@
 package com.example.flashcardapp.presentation.feature.editDeck
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +17,10 @@ import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentEditDeckBinding
 import com.example.flashcardapp.presentation.common.adapter.EditDeckCardAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppSuccess
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import kotlinx.coroutines.launch
 
 class EditDeckFragment : Fragment() {
@@ -40,7 +43,6 @@ class EditDeckFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Nhận ID truyền từ Navigation Graph args hoặc Intent
         deckId = arguments?.getString("DECK_ID") ?: arguments?.getString("DECK_ID_STR")
     }
 
@@ -55,7 +57,7 @@ class EditDeckFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         setupViews()
         setupListeners()
         observeData()
@@ -67,25 +69,31 @@ class EditDeckFragment : Fragment() {
 
     private fun setupViews() {
         editDeckCardAdapter = EditDeckCardAdapter(
-            onEditClick = { card ->// Navigate to edit card, passing card details if needed
+            onEditClick = { card ->
                 val bundle = Bundle().apply {
                     putString("CARD_ID", card.id)
                     putString("QUESTION", card.question)
                     putString("ANSWER", card.answer)
                     putString("DECK_ID", card.deckId)
                 }
-                findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle) 
+                findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle)
             },
             onDeleteClick = { card ->
-                android.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Xoá thẻ")
-                    .setMessage("Bạn có chắc chắn muốn xoá thẻ này không?")
-                    .setPositiveButton("Xoá") { _, _ ->
+                val dialog = AppConfirmDialog.newInstance(
+                    title = getString(R.string.delete_confirm_title),
+                    message = getString(R.string.delete_confirm_message_card),
+                    confirmText = getString(R.string.delete_confirm_action),
+                    cancelText = getString(R.string.delete_confirm_cancel),
+                    iconRes = R.drawable.ic_delete,
+                    destructive = true
+                )
+                dialog.listener = object : AppConfirmDialog.Listener {
+                    override fun onConfirm() {
                         viewModel.deleteCard(card)
-                        Toast.makeText(requireContext(), "Đã xoá thẻ", Toast.LENGTH_SHORT).show()
+                        showAppSuccess(getString(R.string.delete_success_card))
                     }
-                    .setNegativeButton("Huỷ", null)
-                    .show()
+                }
+                dialog.show(childFragmentManager, "delete_card_confirm")
             }
         )
 
@@ -111,9 +119,9 @@ class EditDeckFragment : Fragment() {
             val deckName = binding.etDeckName.text.toString().trim()
             val description = binding.etDeckDescription.text.toString().trim()
             val isPublic = binding.switchPublic.isChecked
-            
+
             if (deckName.isEmpty()) {
-                Toast.makeText(requireContext(), "Tên bộ thẻ không được để trống", Toast.LENGTH_SHORT).show()
+                showAppWarning("Tên bộ thẻ không được để trống")
                 return@setOnClickListener
             }
 
@@ -129,9 +137,7 @@ class EditDeckFragment : Fragment() {
                 launch {
                     viewModel.deckState.collect { state ->
                         when (state) {
-                            is EditDeckState.Loading -> {
-                                // Hiện loading (tuỳ chọn)
-                            }
+                            is EditDeckState.Loading -> Unit
                             is EditDeckState.Success -> {
                                 binding.etDeckName.setText(state.deck.name)
                                 binding.etDeckDescription.setText(state.deck.description)
@@ -141,20 +147,19 @@ class EditDeckFragment : Fragment() {
                                 binding.tvCardCountLabel.text = "Số lượng thẻ (${state.deck.cardCount})"
                             }
                             is EditDeckState.UpdateSuccess -> {
-                                Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
+                                showAppSuccess("Đã cập nhật thành công!")
                                 requireActivity().finish()
                             }
                             is EditDeckState.Error -> {
-                                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                showAppError(state.message)
                             }
-                            else -> {}
+                            else -> Unit
                         }
                     }
                 }
                 launch {
                     viewModel.cardsState.collect { cards ->
                         editDeckCardAdapter.submitList(cards)
-                        // Update UI label if desired (so it depends on cards API response)
                         if (cards.isNotEmpty()) {
                             binding.tvCardCountLabel.text = "Số lượng thẻ (${cards.size})"
                         }

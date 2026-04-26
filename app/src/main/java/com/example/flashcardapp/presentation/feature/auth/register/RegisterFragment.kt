@@ -13,7 +13,6 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -26,6 +25,7 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentRegisterBinding
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
+import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.main.DocumentViewerActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -44,9 +44,15 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         _binding = FragmentRegisterBinding.bind(view)
 
         setupViewModel()
+        setupPasswordToggle()
         setupTermsText()
         setupListeners()
         observeViewModel()
+    }
+
+    private fun setupPasswordToggle() {
+        PasswordToggleConfigurator.setup(binding.layoutPassword, binding.inputPassword)
+        PasswordToggleConfigurator.setup(binding.layoutConfirmPassword, binding.inputConfirmPassword)
     }
 
     override fun onResume() {
@@ -197,7 +203,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                                 renderLoading(false)
                                 loadingDialog?.dismiss()
                                 loadingDialog = null
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                showAppError(state.message)
                                 viewModel.resetUiState()
                             }
                         }

@@ -7,7 +7,7 @@ import com.example.flashcardapp.domain.repository.AuthRepository
 class ForgotPasswordUseCase(private val repository: AuthRepository) {
     suspend operator fun invoke(email: String): Result<ForgotPasswordResponse> {
         if (email.isBlank()) {
-            return Result.failure(IllegalArgumentException("Email is required"))
+            return Result.failure(IllegalArgumentException("Vui lòng nhập email"))
         }
         
         val request = ForgotPasswordRequest(email = email)

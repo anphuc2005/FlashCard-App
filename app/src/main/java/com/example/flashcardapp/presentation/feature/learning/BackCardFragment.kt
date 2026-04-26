@@ -1,44 +1,275 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentBackCardBinding
+import com.example.flashcardapp.databinding.ItemLearningRatingCardBinding
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import kotlinx.coroutines.launch
+
+private const val SECONDS_PER_MINUTE = 60L
+private const val FLIP_ANIMATION_DURATION = 110L
+private const val FLIP_CAMERA_DISTANCE = 9000f
+private const val TAG = "BackCardFragment"
 
 class BackCardFragment : Fragment() {
-    private lateinit var binding: FragmentBackCardBinding
+
+    private var _binding: FragmentBackCardBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: FlashCardViewModel by activityViewModels()
+    private var isFlipAnimating = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentBackCardBinding.inflate(inflater, container, false)
+        _binding = FragmentBackCardBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupClickListener()
+        setupClickListeners()
+        animateEntryFromFront()
+        observeViewModel()
     }
 
-    private fun setupClickListener() {
-        binding.btnClose.setOnClickListener {
-            requireActivity().finish()
+    override fun onDestroyView() {
+        Glide.with(this).clear(binding.cardImage)
+        _binding = null
+        super.onDestroyView()
+    }
+
+    private fun setupClickListeners() {
+        binding.btnClose.setOnClickListener { showExitLearningDialog() }
+        binding.cardAnswer.setOnClickListener { flipBackToQuestion() }
+        binding.cardAgain.root.setOnClickListener { rateCard(LearningRating.AGAIN) }
+        binding.cardHard.root.setOnClickListener { rateCard(LearningRating.HARD) }
+        binding.cardGood.root.setOnClickListener { rateCard(LearningRating.GOOD) }
+        binding.cardEasy.root.setOnClickListener { rateCard(LearningRating.EASY) }
+        binding.cardAgain.ratingIcon.setImageResource(R.drawable.ic_again)
+        binding.cardHard.ratingIcon.setImageResource(R.drawable.ic_difficult)
+        binding.cardGood.ratingIcon.setImageResource(R.drawable.ic_good)
+        binding.cardEasy.ratingIcon.setImageResource(R.drawable.ic_easy)
+        binding.cardAgain.ratingText.setText(R.string.learning_rating_again)
+        binding.cardHard.ratingText.setText(R.string.learning_rating_hard)
+        binding.cardGood.ratingText.setText(R.string.learning_rating_good)
+        binding.cardEasy.ratingText.setText(R.string.learning_rating_easy)
+        binding.cardAgain.ratingDelay.setText(R.string.learning_rating_again_delay)
+        binding.cardHard.ratingDelay.setText(R.string.learning_rating_hard_delay)
+        binding.cardGood.ratingDelay.setText(R.string.learning_rating_good_delay)
+        binding.cardEasy.ratingDelay.setText(R.string.learning_rating_easy_delay)
+        applyRatingStyle(
+            binding.cardAgain,
+            R.color.learning_again_bg,
+            R.color.learning_again_stroke,
+            R.color.learning_again_text
+        )
+        applyRatingStyle(
+            binding.cardHard,
+            R.color.learning_hard_bg,
+            R.color.learning_hard_stroke,
+            R.color.learning_hard_text
+        )
+        applyRatingStyle(
+            binding.cardGood,
+            R.color.learning_good_bg,
+            R.color.learning_good_stroke,
+            R.color.learning_good_text
+        )
+        applyRatingStyle(
+            binding.cardEasy,
+            R.color.learning_easy_bg,
+            R.color.learning_easy_stroke,
+            R.color.learning_easy_text
+        )
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    renderState(state)
+                    handleCompletion(state)
+                }
+            }
+        }
+    }
+
+    private fun renderState(state: LearningUiState) {
+        val card = state.currentCard
+        Log.d(
+            TAG,
+            "renderState: deckId=${state.deckId}, currentIndex=${state.currentIndex}, total=${state.totalSessionCards}, cardId=${card?.id}, completed=${state.isCompleted}, timeRemaining=${state.timeRemainingSeconds}"
+        )
+        binding.tvProgress.text = if (state.totalSessionCards == 0) {
+            getString(R.string.learning_progress_empty)
+        } else {
+            state.progressLabel
+        }
+        binding.progressBar.setProgress(state.progressPercent)
+        binding.cardTitle.text = card?.question ?: getString(R.string.learning_no_cards)
+        binding.cardDesc.text = card?.answer ?: getString(R.string.learning_no_answer)
+        renderTimer(state.timeRemainingSeconds)
+        loadCardImage(card?.imageUrl)
+    }
+
+    private fun rateCard(rating: LearningRating) {
+        if (isFlipAnimating) return
+        val currentState = viewModel.uiState.value
+        if (currentState.isCompleted) {
+            Log.w(TAG, "rateCard ignored: session already completed")
+            return
+        }
+        Log.d(
+            TAG,
+            "rateCard clicked: deckId=${currentState.deckId}, cardId=${currentState.currentCard?.id}, rating=$rating, index=${currentState.currentIndex}"
+        )
+        val completed = viewModel.rateCurrentCard(rating)
+        val actionId = if (completed) {
+            R.id.action_backCardFragment_to_studyResultFragment
+        } else {
+            R.id.action_backCardFragment_to_frontCardFragment
+        }
+        Log.d(TAG, "rateCard navigate: completed=$completed, actionId=$actionId")
+        if (completed) {
+            findNavController().navigate(actionId)
+            return
+        }
+        animateCardFlipOut(binding.cardAnswer, targetRotation = -90f) {
+            val navController = findNavController()
+            if (navController.currentDestination?.id == R.id.backCardFragment) {
+                navController.navigate(actionId)
+            }
+        }
+    }
+
+    private fun flipBackToQuestion() {
+        if (isFlipAnimating) return
+        val currentState = viewModel.uiState.value
+        if (currentState.isCompleted) return
+        animateCardFlipOut(binding.cardAnswer, targetRotation = -90f) {
+            val navController = findNavController()
+            if (navController.currentDestination?.id == R.id.backCardFragment) {
+                navController.navigate(R.id.action_backCardFragment_to_frontCardFragment)
+            }
+        }
+    }
+
+    private fun applyRatingStyle(
+        binding: ItemLearningRatingCardBinding,
+        backgroundColor: Int,
+        strokeColor: Int,
+        textColor: Int
+    ) {
+        val context = requireContext()
+        val resolvedTextColor = ContextCompat.getColor(context, textColor)
+        binding.root.setCardBackgroundColor(ContextCompat.getColor(context, backgroundColor))
+        binding.root.strokeColor = ContextCompat.getColor(context, strokeColor)
+        binding.ratingText.setTextColor(resolvedTextColor)
+        binding.ratingDelay.setTextColor(resolvedTextColor)
+        binding.ratingIcon.setColorFilter(resolvedTextColor)
+    }
+
+    private fun loadCardImage(imageUrl: String?) {
+        binding.cardImage.visibility = View.VISIBLE
+        if (imageUrl.isNullOrBlank()) {
+            Log.d(TAG, "loadCardImage fallback placeholder used")
+            binding.cardImage.setImageResource(R.drawable.test)
+            return
         }
 
-        binding.cardAgain.setOnClickListener { navigateToNextCard() }
-        binding.cardHard.setOnClickListener { navigateToNextCard() }
-        binding.cardGood.setOnClickListener { navigateToNextCard() }
-        binding.cardEasy.setOnClickListener { navigateToNextCard() }
+        Log.d(TAG, "loadCardImage remote url=$imageUrl")
+        Glide.with(this)
+            .load(imageUrl)
+            .placeholder(R.drawable.test)
+            .error(R.drawable.test)
+            .centerCrop()
+            .into(binding.cardImage)
     }
 
-    private fun navigateToNextCard() {
-        findNavController().navigate(R.id.action_backCardFragment_to_studyResultFragment)
+    private fun handleCompletion(state: LearningUiState) {
+        if (!state.isCompleted || !state.isTimeExpired) return
+        Log.w(TAG, "handleCompletion: session completed by timeout, deckId=${state.deckId}")
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.backCardFragment) {
+            navController.navigate(R.id.action_backCardFragment_to_studyResultFragment)
+        }
+    }
+
+    private fun renderTimer(timeRemainingSeconds: Long?) {
+        if (timeRemainingSeconds == null) {
+            binding.tvTimer.visibility = View.GONE
+            return
+        }
+        binding.tvTimer.visibility = View.VISIBLE
+        binding.tvTimer.text = formatTime(timeRemainingSeconds)
+    }
+
+    private fun formatTime(totalSeconds: Long): String {
+        val minutes = totalSeconds / SECONDS_PER_MINUTE
+        val seconds = totalSeconds % SECONDS_PER_MINUTE
+        return getString(R.string.learning_result_time_format, minutes, seconds)
+    }
+
+    private fun showExitLearningDialog() {
+        val dialog = AppConfirmDialog.newInstance(
+            title = getString(R.string.learning_exit_dialog_title),
+            message = getString(R.string.learning_exit_dialog_message),
+            confirmText = getString(R.string.learning_exit_dialog_exit),
+            cancelText = getString(R.string.learning_exit_dialog_continue),
+            iconRes = R.drawable.ic_close,
+            destructive = true
+        )
+        dialog.listener = object : AppConfirmDialog.Listener {
+            override fun onConfirm() {
+                requireActivity().finish()
+            }
+        }
+        dialog.show(childFragmentManager, "learning_exit_confirm")
+    }
+
+    private fun animateEntryFromFront() {
+        val navController = findNavController()
+        if (navController.previousBackStackEntry?.destination?.id != R.id.frontCardFragment) return
+        val card = binding.cardAnswer
+        card.post {
+            card.cameraDistance = resources.displayMetrics.density * FLIP_CAMERA_DISTANCE
+            card.rotationY = 90f
+            card.animate()
+                .rotationY(0f)
+                .setDuration(FLIP_ANIMATION_DURATION)
+                .start()
+        }
+    }
+
+    private fun animateCardFlipOut(card: View, targetRotation: Float, onEnd: () -> Unit) {
+        isFlipAnimating = true
+        card.post {
+            card.cameraDistance = resources.displayMetrics.density * FLIP_CAMERA_DISTANCE
+            card.animate()
+                .rotationY(targetRotation)
+                .setDuration(FLIP_ANIMATION_DURATION)
+                .withEndAction {
+                    card.rotationY = 0f
+                    isFlipAnimating = false
+                    onEnd()
+                }
+                .start()
+        }
     }
 }
-

@@ -69,20 +69,24 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilName"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#FFFFFF"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="20dp"
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusBottomStart="20dp"
                 app:boxCornerRadiusBottomEnd="20dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etName"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:background="@null"
                     android:hint="Ví dụ: Từ vựng IELTS"
                     android:textColor="?attr/textColor"
                     android:textColorHint="?attr/subTitleColor"
@@ -102,20 +106,24 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDesc"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#FFFFFF"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="20dp"
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusBottomStart="20dp"
                 app:boxCornerRadiusBottomEnd="20dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDesc"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
+                    android:background="@null"
                     android:gravity="top|start"
                     android:hint="Nhập mô tả ngắn gọn cho bộ thẻ này..."
                     android:textColor="?attr/textColor"

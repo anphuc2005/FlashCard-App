@@ -7,6 +7,7 @@ import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreIm
 import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
 import com.example.flashcardapp.data.repository.DeckRepository
 import com.example.flashcardapp.data.repository.FlashCardRepository
+import com.example.flashcardapp.data.repository.StudyRepository
 import com.example.flashcardapp.data.repository.CategoryRepository
 import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
 import com.example.flashcardapp.data.repository.ProfileRepository
@@ -32,6 +33,11 @@ import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCas
 import com.example.flashcardapp.domain.usecase.profile.GetMyProfileUseCase
 import com.example.flashcardapp.domain.usecase.profile.UpdateMyProfileUseCase
 import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
+import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
+import com.example.flashcardapp.domain.usecase.study.SaveStudyReviewUseCase
+import com.example.flashcardapp.domain.usecase.study.StudyUseCases
+import com.example.flashcardapp.domain.usecase.study.SyncStudyReviewsUseCase
 
 /**
  * Dependency Injection Container
@@ -76,6 +82,10 @@ class AppContainer(private val applicationContext: Context) {
 
     val profileRepository: ProfileRepository by lazy {
         ProfileRepository(RetrofitClient.profileApiService)
+
+    val studyRepository: StudyRepository by lazy {
+        val database = FlashCardDatabase.getInstance(applicationContext)
+        StudyRepository(RetrofitClient.studyApiService, database.studyReviewDao(), applicationContext)
     }
 
     // 4. Use Cases
@@ -144,5 +154,13 @@ class AppContainer(private val applicationContext: Context) {
 
     val updateMyProfileUseCase: UpdateMyProfileUseCase by lazy {
         UpdateMyProfileUseCase(profileRepository)
+        
+    val studyUseCases: StudyUseCases by lazy {
+        StudyUseCases(
+            getSessionCards = GetStudySessionCardsUseCase(studyRepository),
+            getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
+            saveReview = SaveStudyReviewUseCase(studyRepository),
+            syncReviews = SyncStudyReviewsUseCase(studyRepository)
+        )
     }
 }

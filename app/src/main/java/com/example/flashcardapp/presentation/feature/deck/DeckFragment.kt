@@ -1,28 +1,31 @@
 package com.example.flashcardapp.presentation.feature.deck
 
 import android.content.Intent
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentDeckBinding
 import com.example.flashcardapp.presentation.common.adapter.DeckAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppSuccess
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
-import androidx.fragment.app.viewModels
-import com.example.flashcardapp.R
 import kotlinx.coroutines.launch
 
 class DeckFragment : Fragment() {
@@ -43,18 +46,12 @@ class DeckFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Initialize RecyclerView with DeckAdapter
         setupRecyclerView()
-
-        // Observe deckUiState from ViewModel
         lifecycleScope.launch {
             deckViewModel.deckUiState.collect { uiState ->
                 handleUiState(uiState)
             }
         }
-
-        // Setup click listeners
         setupClickListeners()
     }
 
@@ -62,12 +59,10 @@ class DeckFragment : Fragment() {
         deckAdapter = DeckAdapter(
             onItemClick = { deck ->
                 deckViewModel.updateDeckLastStudied(deck)
-                
                 val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
                     putExtra("DECK_ID", deck.id)
                 }
                 startActivity(intent)
-                Toast.makeText(requireContext(), "Opening ${deck.name}", Toast.LENGTH_SHORT).show()
             },
             onItemEdit = { deck ->
                 val intent = Intent(requireContext(), AddDeckContainerActivity::class.java).apply {
@@ -92,26 +87,30 @@ class DeckFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.bindingAdapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val deckId = deckAdapter.currentList[position].id
-                    
-                    android.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Xoá bộ thẻ")
-                        .setMessage("Bạn có chắc chắn muốn xoá bộ thẻ này không?")
-                        .setPositiveButton("Xoá") { _, _ ->
-                            deckViewModel.deleteDeck(deckId)
-                            Toast.makeText(requireContext(), "Đã xoá bộ thẻ", Toast.LENGTH_SHORT).show()
-                        }
-                        .setNegativeButton("Huỷ", { dialog, _ ->
-                            deckAdapter.notifyItemChanged(position)
-                            dialog.dismiss()
-                        })
-                        .setOnCancelListener {
-                            deckAdapter.notifyItemChanged(position)
-                        }
-                        .show()
+                if (position == RecyclerView.NO_POSITION) return
+
+                val deckId = deckAdapter.currentList[position].id
+                val dialog = AppConfirmDialog.newInstance(
+                    title = getString(R.string.delete_confirm_title),
+                    message = getString(R.string.delete_confirm_message_deck),
+                    confirmText = getString(R.string.delete_confirm_action),
+                    cancelText = getString(R.string.delete_confirm_cancel),
+                    iconRes = R.drawable.ic_delete,
+                    destructive = true
+                )
+                dialog.listener = object : AppConfirmDialog.Listener {
+                    override fun onConfirm() {
+                        deckViewModel.deleteDeck(deckId)
+                        showAppSuccess(getString(R.string.delete_success_deck))
+                    }
+
+                    override fun onCancel() {
+                        deckAdapter.notifyItemChanged(position)
+                    }
                 }
+                dialog.show(childFragmentManager, "delete_deck_confirm")
             }
+
             override fun onChildDraw(
                 c: Canvas,
                 recyclerView: RecyclerView,
@@ -123,17 +122,15 @@ class DeckFragment : Fragment() {
             ) {
                 val itemView = viewHolder.itemView
                 val paint = Paint()
-                val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete) // Make sure you have an ic_delete drawable
+                val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
 
                 val density = requireContext().resources.displayMetrics.density
                 val buttonWidth = 50 * density
                 val margin = 8 * density
                 val maxSwipe = -(buttonWidth + margin * 2)
-                
-                // Giới hạn dX không cho kéo xa hơn maxSwipe
                 val clampedDx = if (dX < maxSwipe) maxSwipe else dX
 
-                if (clampedDx < 0) { // Swiping to the left
+                if (clampedDx < 0) {
                     val radius = 15 * density
 
                     paint.color = Color.parseColor("#F37E33")
@@ -150,7 +147,6 @@ class DeckFragment : Fragment() {
                         val iconTop = itemView.top + (itemView.height - it.intrinsicHeight) / 2
                         val iconLeft = (itemView.right - margin - buttonWidth + iconMargin).toInt()
 
-                        // Draw only if there's enough space
                         if (-clampedDx > buttonWidth / 3) {
                             it.setBounds(
                                 iconLeft,
@@ -178,15 +174,13 @@ class DeckFragment : Fragment() {
         }
 
         binding.filterButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Filter decks", Toast.LENGTH_SHORT).show()
+            showAppWarning("Tính năng lọc bộ thẻ sẽ sớm được cập nhật.")
         }
     }
 
     private fun handleUiState(uiState: DeckUiState) {
         when (uiState) {
-            is DeckUiState.Loading -> {
-                showLoading()
-            }
+            is DeckUiState.Loading -> showLoading()
             is DeckUiState.Success -> {
                 hideLoading()
                 deckAdapter.submitList(uiState.decks)
@@ -211,10 +205,10 @@ class DeckFragment : Fragment() {
     }
 
     private fun showError(message: String) {
-        Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_LONG).show()
+        showAppError(message)
     }
 
     private fun showEmpty() {
-        Toast.makeText(requireContext(), "No decks available", Toast.LENGTH_SHORT).show()
+        showAppWarning("Chưa có bộ thẻ nào để hiển thị.")
     }
 }

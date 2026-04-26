@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="account_content_padding_bottom">20dp</dimen>
+</resources>

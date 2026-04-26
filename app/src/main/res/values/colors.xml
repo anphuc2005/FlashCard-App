@@ -56,7 +56,7 @@
     <color name="md_onboarding_indicator_inactive">#CBD5E1</color>
 
     <!-- Button Bottom Nav -->
-    <color name="md_button_bottom_nav_active">#2563EB</color>
+    <color name="md_button_bottom_nav_active">#2E6BFF</color>
     <color name="md_button_bottom_nav_inactive">#64748B</color>
 
     <!-- Main Background -->
@@ -117,4 +117,42 @@
     <color name="switch_track_blue">#99BFF5</color>
     <color name="switch_thumb_gray">#FFFFFF</color>
     <color name="switch_track_gray">#D9DDE2</color>
+
+    <!-- Learning -->
+    <color name="learning_background">#F8FAFC</color>
+    <color name="learning_surface">#FFFFFF</color>
+    <color name="learning_border">#E2E8F0</color>
+    <color name="learning_soft_border">#F1F5F9</color>
+    <color name="learning_primary">#247BDF</color>
+    <color name="learning_primary_soft">#1A247BDF</color>
+    <color name="learning_primary_extra_soft">#0D247BDF</color>
+    <color name="learning_text_primary">#0F172A</color>
+    <color name="learning_text_secondary">#475569</color>
+    <color name="learning_text_muted">#64748B</color>
+    <color name="learning_text_soft">#94A3B8</color>
+    <color name="learning_chip_unselected">#F1F5F9</color>
+    <color name="learning_close_background">#80E2E8F0</color>
+    <color name="learning_again_bg">#1AEF4444</color>
+    <color name="learning_again_stroke">#33EF4444</color>
+    <color name="learning_again_text">#EF4444</color>
+    <color name="learning_hard_bg">#1AF59E0B</color>
+    <color name="learning_hard_stroke">#33F59E0B</color>
+    <color name="learning_hard_text">#F59E0B</color>
+    <color name="learning_good_bg">#1A2563EB</color>
+    <color name="learning_good_stroke">#332563EB</color>
+    <color name="learning_good_text">#2563EB</color>
+    <color name="learning_easy_bg">#1A22C55E</color>
+    <color name="learning_easy_stroke">#3322C55E</color>
+    <color name="learning_easy_text">#22C55E</color>
+
+    <!-- App Notification -->
+    <color name="app_notification_success">#2CC9A1</color>
+    <color name="app_notification_error">#F43F6D</color>
+    <color name="app_notification_warning">#FB9A2A</color>
+    <color name="discover_course_stroke_soft">#66A3AEC2</color>
+    <color name="app_notification_border">#E8EEF6</color>
+    <color name="app_notification_title">#1F2937</color>
+    <color name="app_notification_message">#7A8AA0</color>
+    <color name="loading_dialog_stroke">#DDE7F3</color>
+    <color name="loading_dialog_text">#23324A</color>
 </resources>

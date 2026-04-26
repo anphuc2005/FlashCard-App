@@ -53,11 +53,11 @@ class RegisterViewModel(
             viewModelScope.launch {
                 val result = registerUseCase(email, password, fullName)
                 result.onSuccess {
-                    _uiState.value = AuthOperationState.Success("Registration successful")
+                    _uiState.value = AuthOperationState.Success("Đăng ký thành công")
                 }
                 result.onFailure { throwable ->
                     _uiState.value = AuthOperationState.Error(
-                        throwable.message ?: "An unexpected error occurred"
+                        throwable.message ?: "Đã có lỗi xảy ra. Vui lòng thử lại."
                     )
                 }
             }
@@ -73,28 +73,28 @@ class RegisterViewModel(
         var isValid = true
 
         if (fullName.isBlank()) {
-            _formState.value = errors.copy(fullNameError = "Full name is required")
+            _formState.value = errors.copy(fullNameError = "Vui lòng nhập họ và tên")
             isValid = false
         }
 
         if (email.isBlank()) {
-            _formState.value = errors.copy(emailError = "Email is required")
+            _formState.value = errors.copy(emailError = "Vui lòng nhập email")
             isValid = false
         } else if (!email.contains("@")) {
-            _formState.value = errors.copy(emailError = "Invalid email format")
+            _formState.value = errors.copy(emailError = "Email không đúng định dạng")
             isValid = false
         }
 
         if (password.isBlank()) {
-            _formState.value = errors.copy(passwordError = "Password is required")
+            _formState.value = errors.copy(passwordError = "Vui lòng nhập mật khẩu")
             isValid = false
         } else if (password.length < 6) {
-            _formState.value = errors.copy(passwordError = "Password must be at least 6 characters")
+            _formState.value = errors.copy(passwordError = "Mật khẩu phải có ít nhất 6 ký tự")
             isValid = false
         }
 
         if (confirmPassword != password) {
-            _formState.value = errors.copy(confirmPasswordError = "Passwords do not match")
+            _formState.value = errors.copy(confirmPasswordError = "Mật khẩu xác nhận không khớp")
             isValid = false
         }
 

@@ -110,50 +110,58 @@
                 android:paddingHorizontal="16dp">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="TÊN BỘ THẺ"
-                    app:boxBackgroundColor="#F4F8FF"
+                    app:boxBackgroundColor="@android:color/transparent"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeWidth="0dp"
-                    app:boxStrokeWidthFocused="0dp"
-                    app:hintTextColor="?attr/subTitleColor">
+                    app:boxStrokeColor="@color/auth_input_stroke_selector"
+                    app:boxStrokeWidth="1dp"
+                    app:boxStrokeWidthFocused="2dp"
+                    app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDeckName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="Tên bộ thẻ"
                         android:padding="16dp"
                         android:textColor="?attr/textColor"
+                        android:textColorHint="?attr/subTitleColor"
                         android:textSize="16sp"
                         android:textStyle="bold" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:hint="MÔ TẢ (KHÔNG BẮT BUỘC)"
-                    app:boxBackgroundColor="#F4F8FF"
+                    app:boxBackgroundColor="@android:color/transparent"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeWidth="0dp"
-                    app:boxStrokeWidthFocused="0dp"
-                    app:hintTextColor="?attr/subTitleColor">
+                    app:boxStrokeColor="@color/auth_input_stroke_selector"
+                    app:boxStrokeWidth="1dp"
+                    app:boxStrokeWidthFocused="2dp"
+                    app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDeckDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@null"
                         android:gravity="top"
+                        android:hint="Nhập mô tả ngắn gọn cho bộ thẻ này..."
                         android:minLines="3"
                         android:padding="16dp"
                         android:textColor="?attr/textColor"
+                        android:textColorHint="?attr/subTitleColor"
                         android:textSize="14sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 

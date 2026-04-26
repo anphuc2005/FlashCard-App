@@ -36,13 +36,13 @@ class ForgotPasswordViewModel(
                 val result = forgotPasswordUseCase(email)
                 result.onSuccess {
                     _uiState.value = AuthOperationState.Success(
-                        message = "Verification code sent to your email",
+                        message = "Mã xác minh đã được gửi tới email của bạn",
                         email = email
                     )
                 }
                 result.onFailure { throwable ->
                     _uiState.value = AuthOperationState.Error(
-                        throwable.message ?: "An unexpected error occurred"
+                        throwable.message ?: "Đã có lỗi xảy ra. Vui lòng thử lại."
                     )
                 }
             }
@@ -58,10 +58,10 @@ class ForgotPasswordViewModel(
         var isValid = true
 
         if (email.isBlank()) {
-            _formState.value = errors.copy(emailError = "Email is required")
+            _formState.value = errors.copy(emailError = "Vui lòng nhập email")
             isValid = false
         } else if (!email.contains("@")) {
-            _formState.value = errors.copy(emailError = "Invalid email format")
+            _formState.value = errors.copy(emailError = "Email không đúng định dạng")
             isValid = false
         }
 
