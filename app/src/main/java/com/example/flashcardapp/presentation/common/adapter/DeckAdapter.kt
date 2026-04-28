@@ -2,13 +2,11 @@ package com.example.flashcardapp.presentation.common.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flashcardapp.databinding.ItemDeckBinding
 import com.example.flashcardapp.domain.model.Deck
-import kotlin.math.roundToInt
 
 class DeckAdapter(
     private val onItemClick: (Deck) -> Unit,
@@ -35,22 +33,9 @@ class DeckAdapter(
                 // Set deck title
                 deckTitle.text = item.name
 
-                // Set stats: cards count and studied cards from local study history
-                val studiedCards = item.studiedCount.coerceIn(0, item.cardCount)
+                // Set stats: cards count only
                 @Suppress("SetTextI18n")
-                stats.text = "${item.cardCount} thẻ · Đã học $studiedCards"
-
-                // Set progress percentage from studied cards
-                val progressPercentValue = if (item.cardCount > 0) {
-                    (studiedCards.toFloat() / item.cardCount.toFloat()) * 100f
-                } else {
-                    0f
-                }
-                @Suppress("SetTextI18n")
-                progressPercent.text = "${progressPercentValue.roundToInt()}%"
-
-                // Set progress bar progress - convert to Float
-                progressBar.setProgress(progressPercentValue)
+                stats.text = "${item.cardCount} thẻ"
 
                 // Set last studied text using real date
                 val lastStudiedText = formatTimeAgo(item.updatedAt)

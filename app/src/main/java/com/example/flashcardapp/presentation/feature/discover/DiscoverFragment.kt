@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
+import com.example.flashcardapp.core.utils.textChangesFlow
 import com.example.flashcardapp.databinding.FragmentDiscoverBinding
 import com.example.flashcardapp.presentation.common.adapter.CategoryAdapter
 import com.example.flashcardapp.presentation.common.adapter.CourseAdapter
@@ -21,7 +22,11 @@ import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDia
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DiscoverFragment : Fragment() {
@@ -56,6 +61,7 @@ class DiscoverFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerViews()
         setupListeners()
+        observeSearchInput()
         observeViewModel()
     }
 
@@ -101,6 +107,21 @@ class DiscoverFragment : Fragment() {
         binding.rvCourses.apply {
             adapter = courseAdapter
             layoutManager = LinearLayoutManager(context)
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeSearchInput() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                binding.searchInput.textChangesFlow()
+                    .map { it.trim() }
+                    .debounce(300)
+                    .distinctUntilChanged()
+                    .collect { query ->
+                        viewModel.updateSearchQuery(query)
+                    }
+            }
         }
     }
 

@@ -27,7 +27,6 @@ private const val TAG = "LearningViewModel"
 class FlashCardViewModel(application: Application) : AndroidViewModel(application) {
 
     private val appContainer = (application as FlashcardApp).container
-    private val deckRepository = appContainer.deckRepository
     private val getDeckByIdUseCase: GetDeckByIdUseCase = appContainer.getDeckByIdUseCase
     private val studyUseCases: StudyUseCases = appContainer.studyUseCases
 
@@ -341,7 +340,6 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             saveResult
                 .onSuccess {
                     Log.d(TAG, "saveReview success: cardId=${currentCard.id}, reviewDeckId=$reviewDeckId")
-                    deckRepository.touchDeckUpdatedAt(reviewDeckId)
                 }
                 .onFailure { throwable ->
                     Log.e(

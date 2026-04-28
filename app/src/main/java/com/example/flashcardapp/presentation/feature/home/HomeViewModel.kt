@@ -49,38 +49,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private var cachedDecks: List<Deck> = emptyList()
     private var lastOpenedDeckId: String? = null
-    private val apiCardCountByDeckId = mutableMapOf<String, Int>()
 
     init {
-        observeLocalDecks()
         syncDecksFromApi()
-    }
-
-    private fun observeLocalDecks() {
-        viewModelScope.launch {
-            deckRepository.getAllDecksWithCardCountFromDb().collect { aggregations ->
-                val baseDecks = aggregations.map { aggregation ->
-                    val entity = aggregation.deck
-                    val resolvedCardCount = maxOf(
-                        aggregation.cardCount,
-                        apiCardCountByDeckId[entity.id] ?: 0
-                    )
-                    Deck(
-                        id = entity.id,
-                        categoryId = entity.categoryId.orEmpty(),
-                        name = entity.name,
-                        description = entity.description,
-                        isPublic = entity.isPublic,
-                        createdAt = entity.createdAt,
-                        updatedAt = entity.updatedAt,
-                        customCardCount = resolvedCardCount
-                    )
-                }
-                val decks = enrichDecksWithProgress(baseDecks)
-                cachedDecks = decks
-                publishDecks(decks)
-            }
-        }
     }
 
     private fun publishDecks(decks: List<Deck>) {
@@ -112,25 +83,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
-                    apiCardCountByDeckId.clear()
-                    decks.forEach { deck ->
-                        apiCardCountByDeckId[deck.id] = deck.cardCount
+                    val baseDecks = decks.map { deck ->
+                        deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
                     }
-
-                    if (cachedDecks.isNotEmpty()) {
-                        val adjustedDecks = cachedDecks.map { deck ->
-                            val resolvedCardCount = maxOf(
-                                deck.cardCount,
-                                apiCardCountByDeckId[deck.id] ?: 0
-                            )
-                            deck.copy(
-                                customCardCount = resolvedCardCount,
-                                customStudiedCount = deck.studiedCount.coerceIn(0, resolvedCardCount)
-                            )
-                        }
-                        cachedDecks = adjustedDecks
-                        publishDecks(adjustedDecks)
-                    }
+                    val enrichedDecks = enrichDecksWithProgress(baseDecks)
+                    cachedDecks = enrichedDecks
+                    publishDecks(enrichedDecks)
                 }
                 .onFailure { throwable ->
                     _uiState.value = _uiState.value.copy(
@@ -181,17 +139,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun markDeckAsStudied(deckId: String) {
         lastOpenedDeckId = deckId
-
-        viewModelScope.launch {
-            deckRepository.touchDeckUpdatedAt(deckId)
-            cachedDecks.firstOrNull { it.id == deckId }?.let { openedDeck ->
-                val touchedDeck = openedDeck.copy(updatedAt = System.currentTimeMillis().toString())
-                val mergedDecks = cachedDecks.map { deck ->
-                    if (deck.id == deckId) touchedDeck else deck
-                }
-                cachedDecks = mergedDecks
-                publishDecks(mergedDecks)
+        cachedDecks.firstOrNull { it.id == deckId }?.let { openedDeck ->
+            val touchedDeck = openedDeck.copy(updatedAt = System.currentTimeMillis().toString())
+            val mergedDecks = cachedDecks.map { deck ->
+                if (deck.id == deckId) touchedDeck else deck
             }
+            cachedDecks = mergedDecks
+            publishDecks(mergedDecks)
         }
     }
 

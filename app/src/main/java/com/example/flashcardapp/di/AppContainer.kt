@@ -65,8 +65,7 @@ class AppContainer(private val applicationContext: Context) {
     }
 
     val deckRepository: DeckRepository by lazy {
-        val database = FlashCardDatabase.getInstance(applicationContext)
-        DeckRepository(RetrofitClient.deckApiService, database.deckDao())
+        DeckRepository(RetrofitClient.deckApiService)
     }
 
     val categoryRepository: CategoryRepository by lazy {

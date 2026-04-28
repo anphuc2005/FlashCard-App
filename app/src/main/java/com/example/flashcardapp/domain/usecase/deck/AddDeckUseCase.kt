@@ -18,6 +18,6 @@ class AddDeckUseCase(
             createdAt = currentTime,
             updatedAt = currentTime
         )
-        return deckRepository.createDeck(newDeck, isPublic)
+        return deckRepository.createDeck(newDeck)
     }
 }
