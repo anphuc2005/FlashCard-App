@@ -18,17 +18,42 @@ object MarkdownConverter {
     
     private val parser = Parser.builder(options).build()
     private val htmlRenderer = HtmlRenderer.builder(options).build()
+    private val tableSeparatorRegex = Regex("^\\s*\\|?\\s*:?-{3,}:?\\s*(\\|\\s*:?-{3,}:?\\s*)+\\|?\\s*$")
+    private val codeFenceRegex = Regex("(?m)^\\s*```")
 
     /**
      * Convert markdown string sang thẻ HTML (hỗ trợ cả Table)
      */
     fun markdownToHtml(markdownText: String): String {
         return try {
-            val document: Node = parser.parse(markdownText)
+            val normalizedMarkdown = normalizeForChatDisplay(markdownText)
+            val document: Node = parser.parse(normalizedMarkdown)
             htmlRenderer.render(document)
         } catch (e: Exception) {
             markdownText
         }
+    }
+
+    /**
+     * Chuẩn hóa Markdown trước khi render trên Android TextView.
+     * - Đóng code fence bị hở
+     * - Làm phẳng markdown table thành list để tránh lỗi hiển thị bảng
+     * - Chuẩn hóa line break
+     */
+    fun normalizeForChatDisplay(markdownText: String): String {
+        if (markdownText.isBlank()) return markdownText
+
+        var normalized = markdownText
+            .replace("\r\n", "\n")
+            .replace("\r", "\n")
+            .trim()
+
+        normalized = closeUnclosedCodeFence(normalized)
+        normalized = flattenMarkdownTables(normalized)
+
+        return normalized
+            .replace(Regex("\\n{3,}"), "\n\n")
+            .trim()
     }
 
     /**
@@ -88,7 +113,95 @@ object MarkdownConverter {
             .replace(Regex("\\n\\n+"), "\n\n") // Normalize multiple newlines
             .trim()
     }
+
+    private fun closeUnclosedCodeFence(markdownText: String): String {
+        val fenceCount = codeFenceRegex.findAll(markdownText).count()
+        return if (fenceCount % 2 == 0) markdownText else "$markdownText\n```"
+    }
+
+    private fun flattenMarkdownTables(markdownText: String): String {
+        val lines = markdownText.lines()
+        if (lines.isEmpty()) return markdownText
+
+        val output = mutableListOf<String>()
+        var index = 0
+        var inCodeBlock = false
+
+        while (index < lines.size) {
+            val currentLine = lines[index]
+            if (currentLine.trim().startsWith("```")) {
+                inCodeBlock = !inCodeBlock
+                output.add(currentLine)
+                index++
+                continue
+            }
+
+            val nextLine = lines.getOrNull(index + 1)
+
+            if (!inCodeBlock &&
+                isLikelyTableRow(currentLine) &&
+                nextLine != null &&
+                tableSeparatorRegex.matches(nextLine.trim())
+            ) {
+                val tableBlock = mutableListOf<String>()
+                tableBlock.add(currentLine)
+                tableBlock.add(nextLine)
+                index += 2
+
+                while (index < lines.size && isLikelyTableRow(lines[index]) && !lines[index].trim().startsWith("```")) {
+                    tableBlock.add(lines[index])
+                    index++
+                }
+
+                output.add(convertTableToList(tableBlock))
+            } else {
+                output.add(currentLine)
+                index++
+            }
+        }
+
+        return output.joinToString("\n")
+    }
+
+    private fun isLikelyTableRow(line: String): Boolean {
+        val trimmed = line.trim()
+        if (trimmed.isBlank()) return false
+        return trimmed.count { it == '|' } >= 2
+    }
+
+    private fun parseTableCells(line: String): List<String> {
+        return line.trim()
+            .trim('|')
+            .split('|')
+            .map { it.trim().replace("\\|", "|") }
+    }
+
+    private fun convertTableToList(tableLines: List<String>): String {
+        if (tableLines.size < 2) return tableLines.joinToString("\n")
+
+        val headers = parseTableCells(tableLines.first())
+        val rows = tableLines.drop(2).map(::parseTableCells)
+
+        if (headers.isEmpty() || rows.isEmpty()) {
+            return tableLines.joinToString("\n")
+        }
+
+        val builder = StringBuilder()
+        builder.append("**Bang du lieu:**\n")
+
+        rows.forEach { row ->
+            val pairs = headers.indices.mapNotNull { columnIndex ->
+                val header = headers[columnIndex].takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                val value = row.getOrElse(columnIndex) { "" }.trim()
+                if (value.isBlank()) null else "**$header**: $value"
+            }
+            if (pairs.isNotEmpty()) {
+                builder.append("- ")
+                builder.append(pairs.joinToString(" | "))
+                builder.append("\n")
+            }
+        }
+
+        return builder.toString().trimEnd()
+    }
 }
-
-
-

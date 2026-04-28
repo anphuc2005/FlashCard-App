@@ -33,6 +33,9 @@ interface DeckDao {
     @Query("SELECT d.*, (SELECT COUNT(id) FROM flashcard_table f WHERE f.deckId = d.id) AS cardCount FROM deck_table d")
     fun getAllDecksWithCardCount(): Flow<List<com.example.flashcardapp.data.datasource.local.entity.DeckWithCardCount>>
 
+    @Query("UPDATE deck_table SET updatedAt = :updatedAt WHERE id = :deckId")
+    suspend fun touchDeckUpdatedAt(deckId: String, updatedAt: String)
+
     @Query("DELETE FROM deck_table")
     suspend fun deleteAllDecks()
 }

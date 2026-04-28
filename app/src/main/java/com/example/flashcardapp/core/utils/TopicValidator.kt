@@ -5,6 +5,18 @@ package com.example.flashcardapp.utils
  */
 object TopicValidator {
 
+    enum class TopicDecision {
+        RELATED,
+        NEEDS_CLARIFICATION,
+        OUT_OF_SCOPE
+    }
+
+    data class TopicRelevanceResult(
+        val score: Int,
+        val decision: TopicDecision,
+        val detectedKeywords: List<String>
+    )
+
     // Các từ khóa liên quan đến FlashCard
     private val flashcardKeywords = setOf(
         // Tính năng chính
@@ -48,6 +60,33 @@ object TopicValidator {
         "công nghệ", "technology", "kỹ năng", "skill"
     )
 
+    // Các từ/ý định mang tính yêu cầu trợ giúp học tập
+    private val learningIntentKeywords = setOf(
+        "giúp", "hướng dẫn", "gợi ý", "đề xuất", "recommend", "suggest",
+        "học gì", "ôn gì", "how to study", "how can i", "làm sao", "nên học",
+        "tạo", "soạn", "review", "plan", "lộ trình", "practice"
+    )
+
+    // Dấu hiệu người dùng đang tiếp tục ngữ cảnh trước đó
+    private val continuationSignals = setOf(
+        "nó", "cái đó", "cái này", "tiếp", "tiếp theo", "chi tiết hơn", "mở rộng",
+        "thêm", "ví dụ", "còn lại", "that", "it", "continue", "more details"
+    )
+
+    // Các chủ đề ngoài phạm vi thường gặp
+    private val offTopicKeywords = setOf(
+        "bóng đá", "football", "nba", "kpop", "drama", "gossip", "tử vi",
+        "xổ số", "chứng khoán", "crypto", "bitcoin", "thời tiết", "weather",
+        "chính trị", "politics", "cá cược", "bet", "game online"
+    )
+
+    private val stopWords = setOf(
+        "và", "là", "của", "cho", "với", "các", "những", "để", "trong", "khi",
+        "the", "and", "for", "with", "that", "this", "from", "into"
+    )
+
+    private val tokenRegex = Regex("[\\p{L}\\p{N}]{2,}")
+
     /**
      * Kiểm tra câu hỏi/tin nhắn có liên quan đến FlashCard app hay không
      * 
@@ -55,27 +94,86 @@ object TopicValidator {
      * @return: true nếu liên quan đến FlashCard, false nếu ngoài lề
      */
     fun isFlashCardRelated(message: String): Boolean {
+        return evaluateRelevance(message).decision != TopicDecision.OUT_OF_SCOPE
+    }
+
+    /**
+     * Đánh giá mức độ liên quan của câu hỏi dựa trên nội dung + ngữ cảnh trước đó.
+     * Giúp tránh việc từ chối quá cứng khi người dùng đang nói tiếp một chủ đề học tập.
+     */
+    fun evaluateRelevance(
+        message: String,
+        conversationHistory: List<String> = emptyList()
+    ): TopicRelevanceResult {
         val lowerMessage = message.lowercase().trim()
-        
-        // Nếu rỗng hoặc quá ngắn, coi như không liên quan
-        if (lowerMessage.length < 3) return false
-        
-        // Kiểm tra xem có chứa bất kỳ từ khóa FlashCard nào
-        for (keyword in flashcardKeywords) {
+        if (lowerMessage.length < 2) {
+            return TopicRelevanceResult(
+                score = 0,
+                decision = TopicDecision.OUT_OF_SCOPE,
+                detectedKeywords = emptyList()
+            )
+        }
+
+        val tokens = tokenize(lowerMessage)
+        var score = 0
+        val detected = linkedSetOf<String>()
+
+        flashcardKeywords.forEach { keyword ->
             if (lowerMessage.contains(keyword)) {
-                return true
+                score += if (keyword.contains(" ")) 4 else 3
+                detected.add(keyword)
             }
         }
-        
-        // Kiểm tra xem có liên quan đến các chủ đề học tập không
-        // (người dùng có thể hỏi về nội dung học tập để tạo thẻ)
-        for (topic in educationalTopics) {
+
+        educationalTopics.forEach { topic ->
             if (lowerMessage.contains(topic)) {
-                return true
+                score += if (topic.contains(" ")) 3 else 2
+                detected.add(topic)
             }
         }
-        
-        return false
+
+        learningIntentKeywords.forEach { intent ->
+            if (lowerMessage.contains(intent)) {
+                score += 2
+                detected.add(intent)
+            }
+        }
+
+        if (tokens.size <= 2) {
+            score -= 1
+        }
+
+        val hasOffTopicKeyword = offTopicKeywords.any { lowerMessage.contains(it) }
+        if (hasOffTopicKeyword) {
+            score -= 4
+        }
+
+        val recentContext = conversationHistory
+            .takeLast(6)
+            .joinToString(" ")
+            .lowercase()
+
+        val contextLooksRelevant = flashcardKeywords.any { recentContext.contains(it) } ||
+            educationalTopics.any { recentContext.contains(it) }
+
+        val isContinuation = continuationSignals.any { lowerMessage.contains(it) }
+        if (contextLooksRelevant && isContinuation) {
+            score += 3
+        }
+
+        // Nếu nội dung ngắn nhưng có ngữ cảnh liên quan trước đó, ưu tiên hỏi làm rõ thay vì từ chối.
+        val decision = when {
+            score >= 5 -> TopicDecision.RELATED
+            score >= 2 -> TopicDecision.NEEDS_CLARIFICATION
+            contextLooksRelevant && tokens.size <= 4 -> TopicDecision.NEEDS_CLARIFICATION
+            else -> TopicDecision.OUT_OF_SCOPE
+        }
+
+        return TopicRelevanceResult(
+            score = score.coerceIn(-10, 50),
+            decision = decision,
+            detectedKeywords = detected.toList()
+        )
     }
 
     /**
@@ -92,16 +190,30 @@ object TopicValidator {
      */
     fun getOutOfTopicMessage(): String {
         return """
-Xin lỗi, tôi chỉ có thể giúp bạn với các câu hỏi liên quan đến ứng dụng FlashCard. 
+Xin lỗi, mình chỉ hỗ trợ tốt các chủ đề liên quan đến học tập và FlashCard.
 
-Tôi có thể hỗ trợ bạn trong:
-• Tạo và quản lý các bộ thẻ
-• Ôn tập từ vựng, khái niệm, công thức
-• Giải thích kiến thức để bạn tạo thẻ học tập
-• Gợi ý cách sử dụng ứng dụng hiệu quả
+Bạn có thể hỏi mình về:
+- Tạo và quản lý bộ thẻ
+- Gợi ý deck phù hợp mục tiêu học
 
-Vui lòng hỏi những câu liên quan đến học tập hoặc sử dụng ứng dụng!
+Bạn thử mô tả mục tiêu học của bạn (môn học, trình độ, thời gian ôn) để mình hỗ trợ chính xác hơn nhé.
         """.trim()
     }
-}
 
+    fun getClarificationSystemHint(): String {
+        return """
+Nếu câu hỏi chưa đủ rõ, đừng từ chối ngay.
+Hãy:
+1) Nêu giả định bạn đang hiểu.
+2) Hỏi đúng 1 câu làm rõ ngắn gọn.
+3) Đưa luôn gợi ý tạm thời để người dùng vẫn tiếp tục được.
+        """.trim()
+    }
+
+    private fun tokenize(text: String): List<String> {
+        return tokenRegex.findAll(text)
+            .map { it.value.lowercase() }
+            .filter { token -> token !in stopWords }
+            .toList()
+    }
+}

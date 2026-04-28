@@ -120,6 +120,8 @@
     <string name="ai_avatar">AI Avatar</string>
     <string name="retry">Thử lại</string>
     <string name="delete">Xóa</string>
+    <string name="ai_confirm_create_deck">Xác nhận tạo</string>
+    <string name="ai_cancel_create_deck">Hủy</string>
     <string name="error_message">Error: %s</string>
     <string name="reminder_notification_title">Đến giờ học rồi</string>
     <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
@@ -245,4 +247,3 @@
     <string name="logout_confirm_action">Đăng xuất</string>
     <string name="logout_confirm_cancel">Hủy</string>
 </resources>
-

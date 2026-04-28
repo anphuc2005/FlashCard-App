@@ -9,7 +9,9 @@ import com.example.flashcardapp.data.datasource.remote.model.GroqMessage
 import com.example.flashcardapp.data.datasource.remote.model.GroqRequest
 import com.example.flashcardapp.domain.model.ChatMessage
 import com.example.flashcardapp.domain.repository.ChatRepository
+import com.example.flashcardapp.utils.AISystemPrompts
 import com.example.flashcardapp.utils.TopicValidator
+import com.example.flashcardapp.utils.TopicValidator.TopicDecision
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,6 +26,12 @@ class GroqRepository(
     private val apiKey: String,
     private val chatMessageDao: ChatMessageDao
 ) : ChatRepository {
+
+    companion object {
+        private const val MAX_HISTORY_MESSAGES = 12
+        private const val MAX_CONTEXT_CHARS = 2500
+        private const val MAX_MESSAGE_CHARS = 1600
+    }
 
     override fun observeMessages(): Flow<List<ChatMessage>> =
         chatMessageDao.getAllMessages()
@@ -45,28 +53,50 @@ class GroqRepository(
 
     override suspend fun sendMessage(
         userMessage: String,
-        chatHistory: List<ChatMessage>,
+        history: List<ChatMessage>,
         contextMessage: String?
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            if (!TopicValidator.isFlashCardRelated(userMessage)) {
+            val relevance = TopicValidator.evaluateRelevance(
+                message = userMessage,
+                conversationHistory = history.map { it.message }
+            )
+
+            if (relevance.decision == TopicDecision.OUT_OF_SCOPE) {
                 return@withContext Result.success(TopicValidator.getOutOfTopicMessage())
             }
 
             val messages = mutableListOf<GroqMessage>()
+            messages.add(
+                GroqMessage(
+                    role = "system",
+                    content = AISystemPrompts.getSystemPromptMessage()
+                )
+            )
+
             if (contextMessage != null) {
                 messages.add(
                     GroqMessage(
                         role = "system",
-                        content = contextMessage
+                        content = truncate(contextMessage, MAX_CONTEXT_CHARS)
                     )
                 )
             }
-            chatHistory.forEach { chatMessage ->
+
+            if (relevance.decision == TopicDecision.NEEDS_CLARIFICATION) {
+                messages.add(
+                    GroqMessage(
+                        role = "system",
+                        content = TopicValidator.getClarificationSystemHint()
+                    )
+                )
+            }
+
+            history.takeLast(MAX_HISTORY_MESSAGES).forEach { chatMessage ->
                 messages.add(
                     GroqMessage(
                         role = if (chatMessage.sender == "user") "user" else "assistant",
-                        content = chatMessage.message
+                        content = truncate(chatMessage.message, MAX_MESSAGE_CHARS)
                     )
                 )
             }
@@ -74,7 +104,7 @@ class GroqRepository(
             messages.add(
                 GroqMessage(
                     role = "user",
-                    content = userMessage
+                    content = truncate(userMessage, MAX_MESSAGE_CHARS)
                 )
             )
 
@@ -96,9 +126,21 @@ class GroqRepository(
 
             Result.success(aiText)
         } catch (e: HttpException) {
+            val errorDetail = e.response()
+                ?.errorBody()
+                ?.string()
+                ?.replace(Regex("\\s+"), " ")
+                ?.take(320)
+                .orEmpty()
+
             val errorMessage = when (e.code()) {
                 403 -> "Lỗi 403: API Key không hợp lệ hoặc không có quyền truy cập. Kiểm tra Groq API Key trong local.properties"
                 401 -> "Lỗi 401: Unauthorized - API Key không hợp lệ"
+                400 -> if (errorDetail.isNotBlank()) {
+                    "Lỗi 400: Request không hợp lệ. Chi tiết: $errorDetail"
+                } else {
+                    "Lỗi 400: Request không hợp lệ (có thể do payload quá dài hoặc format message sai)."
+                }
                 429 -> "Lỗi 429: Quá nhiều request - Chờ một lúc rồi thử lại"
                 500 -> "Lỗi 500: Lỗi server của Groq"
                 else -> "Lỗi ${e.code()}: ${e.message}"
@@ -125,4 +167,9 @@ class GroqRepository(
         timestamp = timestamp,
         status = "SUCCESS"
     )
+
+    private fun truncate(text: String, maxLength: Int): String {
+        if (text.length <= maxLength) return text
+        return text.take(maxLength).trimEnd() + "..."
+    }
 }

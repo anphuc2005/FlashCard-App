@@ -10,6 +10,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.core.utils.chart.WeeklyBarChartView
 import com.example.flashcardapp.databinding.FragmentStatisticBinding
@@ -18,6 +20,7 @@ import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.example.flashcardapp.presentation.feature.statistics.adapter.DeckStatisticsAdapter
 import com.example.flashcardapp.presentation.feature.statistics.adapter.StatisticAchievementAdapter
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -31,6 +34,10 @@ class StatisticFragment : Fragment() {
     private lateinit var achievementAdapter: StatisticAchievementAdapter
     private lateinit var deckStatisticsAdapter: DeckStatisticsAdapter
     private var allAchievements: List<StatisticAchievementItem> = emptyList()
+
+    private var avatarLoadJob: Job? = null
+
+    private var skipNextResumeAvatarRefresh = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +54,8 @@ class StatisticFragment : Fragment() {
         setupAdapters()
         observeUiState()
         setupListeners()
+        renderCachedAvatar()
+        loadUserAvatar(forceRefresh = false)
     }
 
     private fun setupAdapters() {
@@ -159,6 +168,43 @@ class StatisticFragment : Fragment() {
         deckStatisticsAdapter.submitList(emptyList())
         val safeMessage = if (message.isBlank()) getString(R.string.stat_error_load) else message
         showAppError(safeMessage)
+    }
+
+    private fun renderCachedAvatar() {
+        val cachedProfile = (requireActivity().application as FlashcardApp)
+            .container
+            .getMyProfileUseCase
+            .getCachedProfile()
+        renderAvatar(cachedProfile?.avatarUrl)
+    }
+
+    private fun loadUserAvatar(forceRefresh: Boolean) {
+        avatarLoadJob?.cancel()
+        avatarLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val profileResult = (requireActivity().application as FlashcardApp)
+                .container
+                .getMyProfileUseCase(forceRefresh = forceRefresh)
+
+            profileResult.onSuccess { profile ->
+                renderAvatar(profile.avatarUrl)
+            }
+
+            profileResult.onFailure {
+                renderAvatar(null)
+            }
+        }
+    }
+
+    private fun renderAvatar(avatarUrl: String?) {
+        if (avatarUrl.isNullOrBlank()) {
+            binding.imgAvatar.setImageResource(R.drawable.user)
+        } else {
+            Glide.with(this@StatisticFragment)
+                .load(avatarUrl)
+                .placeholder(R.drawable.user)
+                .error(R.drawable.user)
+                .into(binding.imgAvatar)
+        }
     }
 
     override fun onDestroyView() {

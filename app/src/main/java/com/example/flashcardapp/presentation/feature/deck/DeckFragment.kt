@@ -32,7 +32,11 @@ class DeckFragment : Fragment() {
 
     private lateinit var binding: FragmentDeckBinding
     private val deckViewModel: DeckViewModel by viewModels {
-        DeckViewModelFactory((requireActivity().application as FlashcardApp).container.deckRepository)
+        val container = (requireActivity().application as FlashcardApp).container
+        DeckViewModelFactory(
+            deckRepository = container.deckRepository,
+            getReviewedCardIdsUseCase = container.studyUseCases.getReviewedCardIds
+        )
     }
     private lateinit var deckAdapter: DeckAdapter
 

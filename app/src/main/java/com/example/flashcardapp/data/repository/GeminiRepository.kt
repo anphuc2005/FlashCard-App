@@ -10,7 +10,9 @@ import com.example.flashcardapp.data.datasource.remote.model.GeminiPart
 import com.example.flashcardapp.data.datasource.remote.model.GeminiRequest
 import com.example.flashcardapp.domain.model.ChatMessage
 import com.example.flashcardapp.domain.repository.ChatRepository
+import com.example.flashcardapp.utils.AISystemPrompts
 import com.example.flashcardapp.utils.TopicValidator
+import com.example.flashcardapp.utils.TopicValidator.TopicDecision
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,6 +25,12 @@ class GeminiRepository(
     private val apiKey: String,
     private val chatMessageDao: ChatMessageDao
 ) : ChatRepository {
+
+    companion object {
+        private const val MAX_HISTORY_MESSAGES = 10
+        private const val MAX_CONTEXT_CHARS = 2400
+        private const val MAX_MESSAGE_CHARS = 1600
+    }
 
     override fun observeMessages(): Flow<List<ChatMessage>> =
         chatMessageDao.getAllMessages()
@@ -44,17 +52,51 @@ class GeminiRepository(
 
     override suspend fun sendMessage(
         userMessage: String,
-        chatHistory: List<ChatMessage>,
+        history: List<ChatMessage>,
         contextMessage: String?
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            if (!TopicValidator.isFlashCardRelated(userMessage)) {
+            val relevance = TopicValidator.evaluateRelevance(
+                message = userMessage,
+                conversationHistory = history.map { it.message }
+            )
+
+            if (relevance.decision == TopicDecision.OUT_OF_SCOPE) {
                 return@withContext Result.success(TopicValidator.getOutOfTopicMessage())
             }
 
+            val promptBuilder = StringBuilder()
+            promptBuilder.append("System:\n")
+            promptBuilder.append(AISystemPrompts.getSystemPromptMessage())
+            promptBuilder.append("\n\n")
+
+            if (!contextMessage.isNullOrBlank()) {
+                promptBuilder.append("System Context:\n")
+                promptBuilder.append(truncate(contextMessage.trim(), MAX_CONTEXT_CHARS))
+                promptBuilder.append("\n\n")
+            }
+
+            if (relevance.decision == TopicDecision.NEEDS_CLARIFICATION) {
+                promptBuilder.append("System Clarification Hint:\n")
+                promptBuilder.append(TopicValidator.getClarificationSystemHint())
+                promptBuilder.append("\n\n")
+            }
+
+            if (history.isNotEmpty()) {
+                promptBuilder.append("Lịch sử hội thoại gần đây:\n")
+                history.takeLast(MAX_HISTORY_MESSAGES).forEach { chatMessage ->
+                    val role = if (chatMessage.sender == "user") "Người dùng" else "Trợ lý"
+                    promptBuilder.append("- $role: ${truncate(chatMessage.message, MAX_MESSAGE_CHARS)}\n")
+                }
+                promptBuilder.append("\n")
+            }
+
+            promptBuilder.append("Người dùng: ${truncate(userMessage, MAX_MESSAGE_CHARS)}\n")
+            promptBuilder.append("Trợ lý:")
+
             val payload = GeminiRequest(
                 contents = listOf(
-                    GeminiContent(parts = listOf(GeminiPart(text = userMessage)))
+                    GeminiContent(parts = listOf(GeminiPart(text = promptBuilder.toString().trim())))
                 )
             )
             val response = apiService.generateContent(apiKey = apiKey, request = payload)
@@ -65,19 +107,23 @@ class GeminiRepository(
                 ?.text
                 ?: throw Exception("Empty response from AI")
 
-            val chatHistoryBuilder = StringBuilder()
-            if (contextMessage != null) {
-                chatHistoryBuilder.append("system: $contextMessage\n")
-            }
-            chatHistory.forEach { chatMessage ->
-                chatHistoryBuilder.append("${chatMessage.sender}: ${chatMessage.message}\n")
-            }
-
             Result.success(aiText)
         } catch (e: HttpException) {
+            val errorDetail = e.response()
+                ?.errorBody()
+                ?.string()
+                ?.replace(Regex("\\s+"), " ")
+                ?.take(320)
+                .orEmpty()
+
             val errorMessage = when (e.code()) {
                 403 -> "Lỗi 403: API Key không hợp lệ hoặc không có quyền truy cập. Kiểm tra Gemini API Key trong local.properties"
                 401 -> "Lỗi 401: Unauthorized - API Key không hợp lệ"
+                400 -> if (errorDetail.isNotBlank()) {
+                    "Lỗi 400: Request không hợp lệ. Chi tiết: $errorDetail"
+                } else {
+                    "Lỗi 400: Request không hợp lệ (có thể do payload quá dài hoặc format message sai)."
+                }
                 429 -> "Lỗi 429: Quá nhiều request - Chờ một lúc rồi thử lại"
                 500 -> "Lỗi 500: Lỗi server của Gemini"
                 else -> "Lỗi ${e.code()}: ${e.message}"
@@ -104,4 +150,9 @@ class GeminiRepository(
         timestamp = timestamp,
         status = "SUCCESS"
     )
+
+    private fun truncate(text: String, maxLength: Int): String {
+        if (text.length <= maxLength) return text
+        return text.take(maxLength).trimEnd() + "..."
+    }
 }

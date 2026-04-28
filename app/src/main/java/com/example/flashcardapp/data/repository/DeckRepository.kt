@@ -204,6 +204,14 @@ class DeckRepository(
         deckDao.updateDeck(deckEntity)
     }
 
+    // Chỉ cập nhật thời gian học gần nhất của bộ thẻ tại local
+    suspend fun touchDeckUpdatedAt(
+        deckId: String,
+        updatedAt: String = System.currentTimeMillis().toString()
+    ) = withContext(Dispatchers.IO) {
+        deckDao.touchDeckUpdatedAt(deckId, updatedAt)
+    }
+
     // Xóa bộ thẻ
     suspend fun deleteDeck(id: String): Result<String> {
         return withContext(Dispatchers.IO) {

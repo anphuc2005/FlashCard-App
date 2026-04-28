@@ -69,6 +69,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
+        binding.tvProgressPercent.text = getString(R.string.home_progress_format, 0)
+        binding.progressBar.setProgress(0f)
         observeUiState()
         setupListeners()
         renderCachedAvatar()
@@ -139,13 +141,15 @@ class HomeFragment : Fragment() {
                                 com.example.flashcardapp.R.string.home_progress_format,
                                 state.userProgress
                             )
-                            progressBar.setProgress(state.userProgress.toFloat())
-                            btnStart.isEnabled = !state.isLoading
+                            progressBar.setProgress(state.userProgressRaw)
                         }
                     } ?: run {
                         binding.apply {
                             tvCourseTitle.text = getString(com.example.flashcardapp.R.string.home_no_active_deck)
-                            tvProgressPercent.text = "0%"
+                            tvProgressPercent.text = getString(
+                                com.example.flashcardapp.R.string.home_progress_format,
+                                0
+                            )
                             progressBar.setProgress(0f)
                         }
                     }
@@ -159,7 +163,7 @@ class HomeFragment : Fragment() {
                     }
 
                     // Handle loading state
-                    binding.btnStart.isEnabled = !state.isLoading
+                    binding.btnStart.isEnabled = !state.isLoading && state.activeDeck != null
 
                     // Handle error state
                     state.error?.let { error ->
@@ -215,6 +219,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun navigateToDeckDetail(deckId: String) {
+        viewModel.markDeckAsStudied(deckId)
         val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
             putExtra("DECK_ID", deckId)
         }
