@@ -7,6 +7,7 @@
     android:background="?attr/colorOnBackground">
 
     <LinearLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -184,14 +185,6 @@
                         android:textStyle="bold"/>
                 </LinearLayout>
 
-                <com.example.flashcardapp.core.utils.chart.ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="16dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_Start"
                     android:layout_width="match_parent"
@@ -273,5 +266,88 @@
             android:clipToPadding="false"
             android:paddingHorizontal="2dp"
             tools:listitem="@layout/item_recent_deck"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/skeletonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="@dimen/skeleton_home_line_title_width"
+            android:layout_height="@dimen/skeleton_home_line_title_height"
+            android:background="@drawable/bg_skeleton_blur" />
+
+        <View
+            android:layout_width="@dimen/skeleton_home_line_subtitle_width"
+            android:layout_height="@dimen/skeleton_home_line_subtitle_height"
+            android:layout_marginTop="@dimen/learning_space_md"
+            android:background="@drawable/bg_skeleton_blur" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/skeleton_home_feature_card_height"
+            android:layout_marginTop="@dimen/skeleton_home_spacing_lg"
+            android:background="@drawable/bg_skeleton_blur" />
+
+        <View
+            android:layout_width="@dimen/skeleton_home_section_title_width"
+            android:layout_height="@dimen/skeleton_stat_section_height"
+            android:layout_marginTop="@dimen/home_section_title_margin_top"
+            android:background="@drawable/bg_skeleton_blur" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/skeleton_home_shortcut_item_height"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/skeleton_home_spacing_sm"
+                android:background="@drawable/bg_skeleton_blur" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/skeleton_home_shortcut_item_height"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="@dimen/skeleton_home_spacing_sm"
+                android:background="@drawable/bg_skeleton_blur" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/skeleton_home_shortcut_item_height"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/skeleton_home_spacing_sm"
+                android:background="@drawable/bg_skeleton_blur" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="@dimen/skeleton_home_section_title_width"
+            android:layout_height="@dimen/skeleton_stat_section_height"
+            android:layout_marginTop="@dimen/skeleton_home_spacing_lg"
+            android:background="@drawable/bg_skeleton_blur" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="@dimen/skeleton_home_recent_item_width"
+                android:layout_height="@dimen/skeleton_home_recent_item_height"
+                android:layout_marginEnd="@dimen/skeleton_home_spacing_md"
+                android:background="@drawable/bg_skeleton_blur" />
+
+            <View
+                android:layout_width="@dimen/skeleton_home_recent_item_width"
+                android:layout_height="@dimen/skeleton_home_recent_item_height"
+                android:background="@drawable/bg_skeleton_blur" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

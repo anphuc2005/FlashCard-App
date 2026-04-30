@@ -221,6 +221,47 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSpacedRepetition"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_order_card_height"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:backgroundTint="@color/learning_surface"
+                app:cardCornerRadius="@dimen/learning_card_radius_medium"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/learning_border"
+                app:strokeWidth="@dimen/learning_stroke_width">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/learning_card_padding">
+
+                    <ImageView
+                        android:layout_width="@dimen/learning_feedback_icon_size"
+                        android:layout_height="@dimen/learning_feedback_icon_size"
+                        android:src="@drawable/ic_calendar" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/learning_space_md"
+                        android:layout_weight="1"
+                        android:text="@string/learning_order_spaced_repetition"
+                        android:textColor="@color/learning_text_primary"
+                        android:textSize="@dimen/learning_body_text_size"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbSpacedRepetition"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/learning_primary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:id="@+id/layoutTimeLimit"
                 android:layout_width="match_parent"

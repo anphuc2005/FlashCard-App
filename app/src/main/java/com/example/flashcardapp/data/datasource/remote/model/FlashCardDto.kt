@@ -8,7 +8,8 @@ data class FlashCardDto(
     @SerializedName("term") val question: String,
     @SerializedName("definition") val answer: String,
     @SerializedName("imageUrl") val imageUrl: String? = null,
-    @SerializedName("deckId") val deckId: String
+    @SerializedName("deckId") val deckId: String,
+    @SerializedName("repetition") val repetition: Int = 0
 ) {
     fun toDomain(): FlashCard {
         return FlashCard(
@@ -16,7 +17,8 @@ data class FlashCardDto(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
-            deckId = deckId
+            deckId = deckId,
+            repetition = repetition
         )
     }
 }
@@ -27,7 +29,7 @@ fun FlashCard.toDto(): FlashCardDto {
         question = question,
         answer = answer,
         imageUrl = imageUrl,
-        deckId = deckId
+        deckId = deckId,
+        repetition = repetition
     )
 }
-

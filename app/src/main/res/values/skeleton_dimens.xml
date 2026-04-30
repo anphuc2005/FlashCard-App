@@ -1,0 +1,43 @@
+<resources>
+    <dimen name="skeleton_radius">12dp</dimen>
+
+    <dimen name="skeleton_home_line_title_width">190dp</dimen>
+    <dimen name="skeleton_home_line_subtitle_width">130dp</dimen>
+    <dimen name="skeleton_home_line_title_height">20dp</dimen>
+    <dimen name="skeleton_home_line_subtitle_height">14dp</dimen>
+    <dimen name="skeleton_home_feature_card_height">220dp</dimen>
+    <dimen name="skeleton_home_shortcut_item_height">70dp</dimen>
+    <dimen name="skeleton_home_recent_item_width">220dp</dimen>
+    <dimen name="skeleton_home_recent_item_height">140dp</dimen>
+    <dimen name="skeleton_home_section_title_width">180dp</dimen>
+    <dimen name="skeleton_home_spacing_sm">6dp</dimen>
+    <dimen name="skeleton_home_spacing_md">12dp</dimen>
+    <dimen name="skeleton_home_spacing_lg">16dp</dimen>
+
+    <dimen name="skeleton_deck_item_height">118dp</dimen>
+    <dimen name="skeleton_deck_item_spacing">12dp</dimen>
+
+    <dimen name="skeleton_discover_title_width">160dp</dimen>
+    <dimen name="skeleton_discover_title_height">16dp</dimen>
+    <dimen name="skeleton_discover_chip_height">38dp</dimen>
+    <dimen name="skeleton_discover_card_height">112dp</dimen>
+    <dimen name="skeleton_discover_spacing_sm">8dp</dimen>
+    <dimen name="skeleton_discover_spacing_md">10dp</dimen>
+    <dimen name="skeleton_discover_spacing_lg">20dp</dimen>
+    <dimen name="skeleton_discover_section_width">180dp</dimen>
+
+    <dimen name="skeleton_stat_title_width">180dp</dimen>
+    <dimen name="skeleton_stat_subtitle_width">130dp</dimen>
+    <dimen name="skeleton_stat_title_height">20dp</dimen>
+    <dimen name="skeleton_stat_subtitle_height">14dp</dimen>
+    <dimen name="skeleton_stat_quick_card_height">110dp</dimen>
+    <dimen name="skeleton_stat_chart_height">220dp</dimen>
+    <dimen name="skeleton_stat_section_width">200dp</dimen>
+    <dimen name="skeleton_stat_section_height">18dp</dimen>
+    <dimen name="skeleton_stat_list_item_height">84dp</dimen>
+
+    <dimen name="skeleton_learning_title_width">220dp</dimen>
+    <dimen name="skeleton_learning_title_height">24dp</dimen>
+    <dimen name="skeleton_learning_subtitle_height">16dp</dimen>
+    <dimen name="skeleton_learning_tab_height">72dp</dimen>
+</resources>

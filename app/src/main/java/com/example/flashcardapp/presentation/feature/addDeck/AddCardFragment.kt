@@ -33,13 +33,13 @@ class AddCardFragment : Fragment() {
     private val requestImagePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) openImagePicker.launch("image/*")
-            else showAppWarning("Cần cấp quyền để thêm ảnh")
+            else showAppWarning(getString(com.example.flashcardapp.R.string.add_card_permission_image_denied))
         }
 
     private val requestAudioPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) openAudioPicker.launch("audio/*")
-            else showAppWarning("Cần cấp quyền để thêm âm thanh")
+            else showAppWarning(getString(com.example.flashcardapp.R.string.add_card_permission_audio_denied))
         }
 
     private val openImagePicker =
@@ -154,7 +154,7 @@ class AddCardFragment : Fragment() {
                                 // Show loading
                             }
                             is AddCardState.Success -> {
-                                Toast.makeText(requireContext(), "Lưu thẻ thành công!", Toast.LENGTH_SHORT).show()
+                                showAppSuccess(getString(com.example.flashcardapp.R.string.add_card_save_success))
                                 binding.etFront.text?.clear()
                                 binding.etBack.text?.clear()
                                 
@@ -174,7 +174,7 @@ class AddCardFragment : Fragment() {
                                 viewModel.resetState()
                             }
                             is AddCardState.Error -> {
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                showAppError(state.message)
                             }
                         }
                     }
@@ -186,15 +186,15 @@ class AddCardFragment : Fragment() {
                         when (state) {
                             is UploadState.Idle -> {}
                             is UploadState.Loading -> {
-                                Toast.makeText(requireContext(), "Đang tải ảnh lên...", Toast.LENGTH_SHORT).show()
+                                showAppWarning(getString(com.example.flashcardapp.R.string.add_card_uploading_image))
                             }
                             is UploadState.Success -> {
-                                Toast.makeText(requireContext(), "Tải ảnh xong", Toast.LENGTH_SHORT).show()
+                                showAppSuccess(getString(com.example.flashcardapp.R.string.add_card_upload_image_success))
                                 // TODO: state.url là link cloud, b có thể lưu url này vào để truyền cùng submitCard.
                                 viewModel.resetUploadState()
                             }
                             is UploadState.Error -> {
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                showAppError(state.message)
                                 viewModel.resetUploadState()
                             }
                         }

@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flashcardapp.R
-import com.example.flashcardapp.core.utils.chart.ProgressBar
 import com.example.flashcardapp.domain.model.statistics.DeckStatistics
 import com.example.flashcardapp.presentation.feature.statistics.StatisticFormatter
 
@@ -36,13 +35,11 @@ class DeckStatisticsAdapter(
     ) : RecyclerView.ViewHolder(itemView) {
         private val deckNameTextView: TextView = itemView.findViewById(R.id.tvDeckName)
         private val progressPercentTextView: TextView = itemView.findViewById(R.id.prog2Percent)
-        private val progressBar: ProgressBar = itemView.findViewById(R.id.prog2)
 
         // Gán dữ liệu từ model vào các view hiển thị.
         fun bind(item: DeckStatistics) {
             deckNameTextView.text = item.deckName
             progressPercentTextView.text = formatter.formatPercent(item.progressPercent)
-            progressBar.setProgress(item.progressPercent.toFloat())
         }
     }
 
@@ -56,4 +53,3 @@ class DeckStatisticsAdapter(
         }
     }
 }
-

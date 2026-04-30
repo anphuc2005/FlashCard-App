@@ -11,6 +11,7 @@ import com.example.flashcardapp.data.repository.StudyRepository
 import com.example.flashcardapp.data.repository.CategoryRepository
 import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
 import com.example.flashcardapp.data.repository.ProfileRepository
+import com.example.flashcardapp.data.repository.StatisticsRepository
 import com.example.flashcardapp.data.repository.UploadRepositoryImpl
 import com.example.flashcardapp.domain.repository.UploadRepository
 import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
@@ -83,6 +84,10 @@ class AppContainer(private val applicationContext: Context) {
 
     val profileRepository: ProfileRepository by lazy {
         ProfileRepository(RetrofitClient.profileApiService)
+    }
+
+    val statisticsRepository: StatisticsRepository by lazy {
+        StatisticsRepository(RetrofitClient.statisticsApiService)
     }
 
         val studyRepository: StudyRepository by lazy {

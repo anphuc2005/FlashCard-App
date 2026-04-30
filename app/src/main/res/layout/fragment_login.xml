@@ -72,14 +72,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/auth_field_spacing_top"
                 android:hint="@string/app_login_email_hint"
+                app:errorEnabled="false"
                 app:boxBackgroundColor="@color/auth_input_background"
                 app:boxCornerRadiusBottomEnd="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusBottomStart="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusTopEnd="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusTopStart="@dimen/auth_input_corner_radius"
-                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeColor="@color/auth_login_input_stroke_selector"
                 app:boxStrokeWidth="@dimen/auth_input_stroke_width"
-                app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width">
+                app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width_focused">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputEmail"
@@ -109,14 +110,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/auth_field_spacing_top"
                 android:hint="@string/app_login_pass_hint"
+                app:errorEnabled="false"
                 app:boxBackgroundColor="@color/auth_input_background"
                 app:boxCornerRadiusBottomEnd="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusBottomStart="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusTopEnd="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusTopStart="@dimen/auth_input_corner_radius"
-                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeColor="@color/auth_login_input_stroke_selector"
                 app:boxStrokeWidth="@dimen/auth_input_stroke_width"
-                app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width"
+                app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width_focused"
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/auth_input_hint">
 

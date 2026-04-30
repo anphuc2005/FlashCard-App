@@ -156,8 +156,13 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
     fun setStudyMode(mode: LearningStudyMode) {
         val state = _uiState.value
         Log.d(TAG, "setStudyMode: mode=$mode")
+        val resolvedFilter = if (mode == LearningStudyMode.SPACED_REPETITION) {
+            LearningCardFilter.ALL
+        } else {
+            state.settings.filter
+        }
         _uiState.value = state.copy(
-            settings = state.settings.copy(mode = mode)
+            settings = state.settings.copy(mode = mode, filter = resolvedFilter)
         )
     }
 
@@ -379,9 +384,15 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
     ): List<FlashCard> {
         return when (filter) {
             LearningCardFilter.ALL -> cards
-            LearningCardFilter.NEW -> cards.filterNot { reviewedCardIds.contains(it.id) }
+            LearningCardFilter.NEW -> {
+                if (trustReviewCards) {
+                    cards.filter { it.repetition == 0 }
+                } else {
+                    cards.filterNot { reviewedCardIds.contains(it.id) }
+                }
+            }
             LearningCardFilter.REVIEW -> if (trustReviewCards) {
-                cards
+                cards.filter { it.repetition > 0 }
             } else {
                 cards.filter { reviewedCardIds.contains(it.id) }
             }

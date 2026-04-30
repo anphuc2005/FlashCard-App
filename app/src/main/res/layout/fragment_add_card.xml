@@ -13,7 +13,7 @@
         android:layout_height="56dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="14dp"
-        android:background="#FFFFFF"
+        android:backgroundTint="?attr/colorOnBackground"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Thêm thẻ mới"
+            android:text="@string/add_card_header_title"
             android:textStyle="bold"
             android:textSize="18sp"
             android:textColor="?attr/textColor"/>
@@ -63,7 +63,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mặt trước (Câu hỏi)"
+                android:text="@string/add_card_front_label"
                 android:textStyle="bold"
                 android:textColor="?attr/textColor"
                 android:textSize="14sp"
@@ -90,7 +90,7 @@
                     android:layout_height="120dp"
                     android:background="@null"
                     android:gravity="top|start"
-                    android:hint="Nhập nội dung câu hỏi tại đây..."
+                    android:hint="@string/add_card_front_hint"
                     android:padding="12dp"
                     android:textSize="15sp"
                     android:textColor="?attr/textColor"
@@ -102,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:text="Mặt sau (Câu trả lời)"
+                android:text="@string/add_card_back_label"
                 android:textStyle="bold"
                 android:textColor="?attr/textColor"
                 android:textSize="14sp"
@@ -129,7 +129,7 @@
                     android:layout_height="120dp"
                     android:background="@null"
                     android:gravity="top|start"
-                    android:hint="Nhập câu trả lời hoặc định nghĩa..."
+                    android:hint="@string/add_card_back_hint"
                     android:padding="12dp"
                     android:textSize="15sp"
                     android:textColor="?attr/textColor"
@@ -183,7 +183,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
-                                android:text="Thêm ảnh"
+                                android:text="@string/add_card_add_image"
                                 android:textColor="?attr/subTitleColor"
                                 android:textSize="13sp"/>
                         </LinearLayout>
@@ -234,8 +234,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
-                                android:text="Âm thanh"
-                                android:textColor="#4A5668"
+                                android:text="@string/add_card_add_audio"
+                                android:textColor="?attr/subTitleColor"
                                 android:textSize="13sp"/>
                         </LinearLayout>
 
@@ -261,9 +261,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Đã chọn"
+                                android:text="@string/add_card_selected"
                                 android:textStyle="bold"
-                                android:textColor="#2E6BFF"
+                                android:textColor="?attr/iconBlue"
                                 android:textSize="13sp"/>
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -275,7 +275,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:text="Nhãn (Tag)"
+                android:text="@string/add_card_tag_label"
                 android:textColor="?attr/textColor"
                 android:textStyle="bold"
                 android:textSize="14sp"
@@ -283,21 +283,25 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilTag"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#FFFFFF"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/etTag"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:hint="Ví dụ: Từ vựng, IELTS..."
+                    android:background="@null"
+                    android:hint="@string/add_card_tag_hint"
                     android:textColor="?attr/textColor"
                     android:textColorHint="?attr/subTitleColor"
                     android:paddingHorizontal="12dp"
@@ -309,7 +313,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:text="Ghi chú"
+                android:text="@string/add_card_note_label"
                 android:textColor="?attr/textColor"
                 android:textStyle="bold"
                 android:textSize="14sp"
@@ -317,22 +321,26 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilNote"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#FFFFFF"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNote"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:background="@null"
                     android:gravity="top|start"
-                    android:hint="Thêm ghi chú phụ (không bắt buộc)"
+                    android:hint="@string/add_card_note_hint"
                     android:paddingHorizontal="12dp"
                     android:textSize="15sp"
                     android:textColor="?attr/textColor"
@@ -349,7 +357,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="#F6F8FB"
+        android:background="?attr/componentBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -359,8 +367,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Tiếp tục: Thêm thẻ tiếp theo"
-            android:textColor="#2E6BFF"
+            android:text="@string/add_card_add_another"
+            android:textColor="?attr/iconBlue"
             android:textStyle="bold"
             android:textSize="14sp"
             android:paddingVertical="10dp"/>
@@ -371,11 +379,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="6dp"
-            android:text="Hoàn tất - lưu bộ thẻ"
+            android:text="@string/add_card_save_all"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:backgroundTint="#2E6BFF"
+            android:backgroundTint="?attr/buttonColor"
             android:textColor="#FFFFFF"
             app:cornerRadius="14dp"/>
     </LinearLayout>

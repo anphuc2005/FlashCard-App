@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -224,10 +225,18 @@ class DeckFragment : Fragment() {
 
     private fun showLoading() {
         binding.decksRecycler.visibility = View.GONE
+        binding.skeletonDecks.visibility = View.VISIBLE
+        if (binding.skeletonDecks.animation == null) {
+            binding.skeletonDecks.startAnimation(
+                AnimationUtils.loadAnimation(requireContext(), R.anim.skeleton_pulse)
+            )
+        }
     }
 
     private fun hideLoading() {
         binding.decksRecycler.visibility = View.VISIBLE
+        binding.skeletonDecks.visibility = View.GONE
+        binding.skeletonDecks.clearAnimation()
     }
 
     private fun showError(message: String) {

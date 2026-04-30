@@ -18,10 +18,10 @@ import com.example.flashcardapp.databinding.FragmentDiscoverBinding
 import com.example.flashcardapp.presentation.common.adapter.CategoryAdapter
 import com.example.flashcardapp.presentation.common.adapter.CourseAdapter
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
-import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import android.view.animation.AnimationUtils
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -36,8 +36,6 @@ class DiscoverFragment : Fragment() {
 
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var courseAdapter: CourseAdapter
-
-    private var loadingDialog: LoadingDialogFragment? = null
 
     private val viewModel: DiscoverViewModel by viewModels {
         val appContainer = (requireActivity().application as FlashcardApp).container
@@ -141,15 +139,7 @@ class DiscoverFragment : Fragment() {
                 }
                 launch {
                     viewModel.isLoading.collectLatest { isLoading ->
-                        if (isLoading) {
-                            if (loadingDialog == null) {
-                                loadingDialog = LoadingDialogFragment.newInstance("Đang tải dữ liệu...")
-                                loadingDialog?.show(childFragmentManager, "LoadingDialog")
-                            }
-                        } else {
-                            loadingDialog?.dismiss()
-                            loadingDialog = null
-                        }
+                        renderLoadingState(isLoading)
                     }
                 }
                 launch {
@@ -169,5 +159,20 @@ class DiscoverFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun renderLoadingState(isLoading: Boolean) {
+        binding.layoutPopularCategoriesHeader.visibility = if (isLoading) View.GONE else View.VISIBLE
+        binding.rvCategories.visibility = if (isLoading) View.GONE else View.VISIBLE
+        binding.layoutFeaturedCoursesHeader.visibility = if (isLoading) View.GONE else View.VISIBLE
+        binding.rvCourses.visibility = if (isLoading) View.GONE else View.VISIBLE
+        binding.skeletonDiscover.visibility = if (isLoading) View.VISIBLE else View.GONE
+        if (isLoading && binding.skeletonDiscover.animation == null) {
+            binding.skeletonDiscover.startAnimation(
+                AnimationUtils.loadAnimation(requireContext(), R.anim.skeleton_pulse)
+            )
+        } else if (!isLoading) {
+            binding.skeletonDiscover.clearAnimation()
+        }
     }
 }

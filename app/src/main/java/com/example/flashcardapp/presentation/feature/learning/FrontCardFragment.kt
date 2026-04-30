@@ -80,6 +80,11 @@ class FrontCardFragment : Fragment() {
         }
         binding.progressBar.setProgress(state.progressPercent)
         binding.questionText.text = card?.question ?: getString(R.string.learning_no_cards)
+        binding.questionLabel.text = when {
+            card == null -> getString(R.string.learning_question_label)
+            card.repetition > 0 -> getString(R.string.learning_card_badge_review)
+            else -> getString(R.string.learning_card_badge_new)
+        }
         renderTimer(state.timeRemainingSeconds)
     }
 
