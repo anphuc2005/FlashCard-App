@@ -125,9 +125,13 @@
             android:id="@+id/btnSeeAllCategories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_theme_option_unselected"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
             android:text="@string/discover_all"
             android:textColor="?attr/buttonColor"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

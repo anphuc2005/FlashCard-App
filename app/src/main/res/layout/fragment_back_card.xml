@@ -257,6 +257,17 @@
                     android:textColor="@color/learning_text_secondary"
                     android:textSize="@dimen/learning_answer_text_size"
                     tools:text="The detailed explanation or translation of the flashcard content goes here." />
+
+                <ImageButton
+                    android:id="@+id/btnSpeakAnswer"
+                    android:layout_width="@dimen/learning_icon_button_size"
+                    android:layout_height="@dimen/learning_icon_button_size"
+                    android:layout_marginTop="@dimen/learning_space_lg"
+                    android:background="@drawable/bg_learning_icon_soft"
+                    android:contentDescription="@string/learning_tts_read_answer"
+                    android:padding="@dimen/learning_space_sm"
+                    android:src="@drawable/ic_volume_up"
+                    app:tint="@color/learning_primary" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
