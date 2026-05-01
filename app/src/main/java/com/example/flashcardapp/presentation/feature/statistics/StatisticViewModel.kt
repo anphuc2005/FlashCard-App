@@ -9,7 +9,9 @@ import com.example.flashcardapp.domain.model.statistics.DeckStatistics
 import com.example.flashcardapp.domain.model.statistics.StatisticsOverview
 import com.example.flashcardapp.domain.model.statistics.TimeStatistics
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlin.math.roundToInt
 
 const val STAT_RANGE_DAY = "day"
@@ -129,9 +131,16 @@ class StatisticViewModel(
     }
 
     private suspend fun loadFallbackEndpoints(days: Int) {
-        val achievementsResult = repository.getAchievements(featuredLimit = 4)
-        val decksResult = repository.getDeckStatistics()
-        val rangeResult = repository.getRangeSummary(days)
+        val (achievementsResult, decksResult, rangeResult) = supervisorScope {
+            val achievementsDeferred = async { repository.getAchievements(featuredLimit = 4) }
+            val decksDeferred = async { repository.getDeckStatistics() }
+            val rangeDeferred = async { repository.getRangeSummary(days) }
+            Triple(
+                achievementsDeferred.await(),
+                decksDeferred.await(),
+                rangeDeferred.await()
+            )
+        }
 
         if (rangeResult.isFailure && achievementsResult.isFailure && decksResult.isFailure) {
             _uiState.value = _uiState.value.copy(

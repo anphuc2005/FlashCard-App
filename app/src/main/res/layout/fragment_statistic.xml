@@ -352,13 +352,67 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
 
-                <View
+                <LinearLayout
                     android:id="@+id/weeklyBlurPlaceholder"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="14dp"
-                    android:background="@drawable/bg_learning_visual_placeholder"
-                    android:visibility="gone" />
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="10dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="68dp"
+                    android:visibility="gone">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="62dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="72dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="54dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="32dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="58dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/bg_learning_visual_placeholder" />
+                </LinearLayout>
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 

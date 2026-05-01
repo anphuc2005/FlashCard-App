@@ -143,9 +143,7 @@ class StatisticFragment : Fragment() {
             statisticFormatter.formatNumber(timeStatistics.totalReviewedCards)
         )
 
-        val chartEntries = timeStatistics.labels.zip(timeStatistics.values).map { (label, value) ->
-            WeeklyBarChartView.DayEntry(label = label, value = value.toFloat())
-        }
+        val chartEntries = buildChartEntries(timeStatistics)
 
         val highlightIndex = when {
             chartEntries.isEmpty() -> -1
@@ -161,6 +159,21 @@ class StatisticFragment : Fragment() {
 
         achievementAdapter.submitList(state.achievements)
         deckStatisticsAdapter.submitList(state.deckStatistics)
+    }
+
+    private fun buildChartEntries(timeStatistics: com.example.flashcardapp.domain.model.statistics.TimeStatistics): List<WeeklyBarChartView.DayEntry> {
+        val defaultLabels = listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN")
+        val labels = timeStatistics.labels
+        val values = timeStatistics.values
+        if (labels.isEmpty() && values.isEmpty()) {
+            return defaultLabels.map { WeeklyBarChartView.DayEntry(it, 0f) }
+        }
+        val size = maxOf(labels.size, values.size)
+        return (0 until size).map { index ->
+            val label = labels.getOrNull(index) ?: defaultLabels.getOrElse(index) { "${index + 1}" }
+            val value = values.getOrNull(index)?.toFloat() ?: 0f
+            WeeklyBarChartView.DayEntry(label = label, value = value)
+        }
     }
 
     private fun renderError(message: String) {
