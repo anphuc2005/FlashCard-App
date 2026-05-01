@@ -26,6 +26,7 @@ class SessionSettingFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: FlashCardViewModel by activityViewModels()
+    private var hasAutoStartHandled = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,6 +104,7 @@ class SessionSettingFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     renderState(state)
+                    maybeAutoStartRecentSession(state)
                     state.errorMessage?.let { message ->
                         Log.e(TAG, "UI error received: deckId=${state.deckId}, message=$message")
                         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
@@ -141,6 +143,29 @@ class SessionSettingFragment : Fragment() {
         binding.chipTimeFiveMinutes.isChecked = state.settings.timeLimitMinutes == 5
         renderTimeAttackOptions(state.settings.mode == LearningStudyMode.TIME_ATTACK)
         binding.btnStart.isEnabled = state.cards.isNotEmpty()
+    }
+
+    private fun maybeAutoStartRecentSession(state: LearningUiState) {
+        if (hasAutoStartHandled) return
+        val intent = requireActivity().intent
+        val autoStart = intent.getBooleanExtra(EXTRA_AUTO_START_SESSION, false)
+        if (!autoStart || state.isLoading || state.cards.isEmpty()) return
+
+        hasAutoStartHandled = true
+        val mode = LearningStudyMode.fromSessionMode(intent.getStringExtra(EXTRA_STUDY_MODE))
+        val startIndex = intent.getIntExtra(EXTRA_START_INDEX, 0).coerceAtLeast(0)
+        val cardSequence = intent.getStringArrayListExtra(EXTRA_CARD_SEQUENCE)?.toList().orEmpty()
+        intent.putExtra(EXTRA_AUTO_START_SESSION, false)
+
+        viewModel.startSession(
+            initialIndex = startIndex,
+            forcedMode = mode,
+            forcedCardSequence = cardSequence
+        ) { isReady ->
+            if (isReady && isAdded) {
+                findNavController().navigate(R.id.action_sessionSettingFragment_to_learningCardsFragment)
+            }
+        }
     }
 
     private fun selectOrder(order: LearningCardOrder) {

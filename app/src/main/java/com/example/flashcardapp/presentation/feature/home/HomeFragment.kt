@@ -21,14 +21,22 @@ import com.bumptech.glide.Glide
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentHomeBinding
+import com.example.flashcardapp.domain.model.study.StudyRecentSession
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_AUTO_START_SESSION
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_CARD_SEQUENCE
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_DECK_ID
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_START_INDEX
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_STUDY_MODE
 import com.example.flashcardapp.presentation.common.adapter.RecentDeckAdapter
 import com.example.flashcardapp.presentation.common.adapter.ShortcutAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
+import com.example.flashcardapp.presentation.common.notification.showAppError
 import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -55,6 +63,7 @@ class HomeFragment : Fragment() {
     private var reminderMinute = 0
     private var reminderEnabled = true
     private var avatarLoadJob: Job? = null
+    private var skipNextResumeHomeRefresh = true
     private var skipNextResumeAvatarRefresh = true
 
     override fun onCreateView(
@@ -80,6 +89,12 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        if (skipNextResumeHomeRefresh) {
+            skipNextResumeHomeRefresh = false
+        } else {
+            viewModel.refreshHomeRealtime()
+        }
+
         if (skipNextResumeAvatarRefresh) {
             skipNextResumeAvatarRefresh = false
             return
@@ -183,8 +198,16 @@ class HomeFragment : Fragment() {
     private fun setupListeners() {
         binding.apply {
             btnStart.setOnClickListener {
-                viewModel.uiState.value.activeDeck?.let { deck ->
-                    navigateToDeckDetail(deck.id)
+                val state = viewModel.uiState.value
+                val activeDeck = state.activeDeck ?: return@setOnClickListener
+                val recentSession = state.recentStudySession
+                if (recentSession != null &&
+                    recentSession.deckId == activeDeck.id &&
+                    recentSession.canResume
+                ) {
+                    showRecentSessionDialog(activeDeck.id, recentSession)
+                } else {
+                    navigateToDeckDetail(activeDeck.id)
                 }
             }
 
@@ -224,12 +247,77 @@ class HomeFragment : Fragment() {
         viewModel.clearError()
     }
 
-    private fun navigateToDeckDetail(deckId: String) {
+    private fun navigateToDeckDetail(
+        deckId: String,
+        autoStartSession: Boolean = false,
+        mode: String? = null,
+        startIndex: Int = 0,
+        cardSequence: List<String> = emptyList()
+    ) {
         viewModel.markDeckAsStudied(deckId)
         val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
-            putExtra("DECK_ID", deckId)
+            putExtra(EXTRA_DECK_ID, deckId)
+            putExtra(EXTRA_AUTO_START_SESSION, autoStartSession)
+            putExtra(EXTRA_START_INDEX, startIndex)
+            if (!mode.isNullOrBlank()) {
+                putExtra(EXTRA_STUDY_MODE, mode)
+            }
+            if (cardSequence.isNotEmpty()) {
+                putStringArrayListExtra(EXTRA_CARD_SEQUENCE, ArrayList(cardSequence))
+            }
         }
         startActivity(intent)
+    }
+
+    private fun showRecentSessionDialog(deckId: String, recentSession: StudyRecentSession) {
+        val dialog = AppConfirmDialog.newInstance(
+            title = getString(R.string.learning_recent_dialog_title),
+            message = getString(
+                R.string.learning_recent_dialog_message,
+                (recentSession.currentIndex + 1).coerceAtLeast(1),
+                recentSession.totalCards.coerceAtLeast(1)
+            ),
+            confirmText = getString(R.string.learning_recent_dialog_restart),
+            cancelText = getString(R.string.learning_recent_dialog_resume),
+            iconRes = R.drawable.ic_cards,
+            destructive = false
+        )
+        dialog.isCancelable = false
+        dialog.listener = object : AppConfirmDialog.Listener {
+            override fun onConfirm() {
+                viewModel.restartRecentSession { success, message ->
+                    if (!isAdded) return@restartRecentSession
+                    if (success) {
+                        navigateToDeckDetail(
+                            deckId = deckId,
+                            autoStartSession = true,
+                            mode = recentSession.mode,
+                            startIndex = 0
+                        )
+                    } else {
+                        showAppError(message ?: getString(R.string.learning_recent_delete_failed))
+                    }
+                }
+            }
+
+            override fun onCancel() {
+                viewModel.resolveRecentSessionForResume { payload, _ ->
+                    if (!isAdded) return@resolveRecentSessionForResume
+                    val resumePayload = payload ?: run {
+                        showAppError(getString(R.string.learning_recent_delete_failed))
+                        return@resolveRecentSessionForResume
+                    }
+                    navigateToDeckDetail(
+                        deckId = deckId,
+                        autoStartSession = true,
+                        mode = resumePayload.mode,
+                        startIndex = resumePayload.currentIndex,
+                        cardSequence = resumePayload.cardSequence
+                    )
+                }
+            }
+        }
+        dialog.show(childFragmentManager, "recent_learning_session_dialog")
     }
 
     private fun navigateToAllDecks() {

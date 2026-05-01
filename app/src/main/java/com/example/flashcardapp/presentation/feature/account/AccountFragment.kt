@@ -303,7 +303,9 @@ class AccountFragment : Fragment() {
         )
         dialog.listener = object : AppConfirmDialog.Listener {
             override fun onConfirm() {
-                val sessionManager = (requireActivity().application as FlashcardApp).container.sessionManager
+                val container = (requireActivity().application as FlashcardApp).container
+                container.profileRepository.clearCachedProfile()
+                val sessionManager = container.sessionManager
                 sessionManager.clearLoginSession()
 
                 val intent = Intent(requireContext(), AuthActivity::class.java).apply {

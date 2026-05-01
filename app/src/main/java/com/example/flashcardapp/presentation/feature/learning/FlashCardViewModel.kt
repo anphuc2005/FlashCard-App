@@ -174,12 +174,20 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         )
     }
 
-    fun startSession(onSessionReady: (Boolean) -> Unit) {
+    fun startSession(
+        initialIndex: Int = 0,
+        forcedMode: LearningStudyMode? = null,
+        forcedCardSequence: List<String> = emptyList(),
+        onSessionReady: (Boolean) -> Unit
+    ) {
         val state = _uiState.value
         val deckId = state.deckId
+        val effectiveMode = forcedMode ?: state.settings.mode
+        val effectiveFilter = if (forcedMode != null) LearningCardFilter.ALL else state.settings.filter
+        val effectiveCardLimit = if (forcedMode != null) Int.MAX_VALUE else state.settings.cardLimit
         Log.d(
             TAG,
-            "startSession requested: deckId=$deckId, mode=${state.settings.mode}, order=${state.settings.order}, filter=${state.settings.filter}, cardLimit=${state.settings.cardLimit}, cachedCards=${state.cards.size}"
+            "startSession requested: deckId=$deckId, mode=$effectiveMode, order=${state.settings.order}, filter=$effectiveFilter, cardLimit=$effectiveCardLimit, cachedCards=${state.cards.size}, initialIndex=$initialIndex, forcedSequence=${forcedCardSequence.size}"
         )
         if (deckId.isNullOrBlank()) {
             Log.w(TAG, "startSession aborted: missing deckId")
@@ -196,10 +204,10 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             val reviewedCardIds = studyUseCases.getReviewedCardIds(deckId).getOrElse { state.reviewedCardIds }
 
-            val sourceCards = studyUseCases.getSessionCards(deckId, state.settings.mode.sessionMode)
+            val sourceCards = studyUseCases.getSessionCards(deckId, effectiveMode.sessionMode)
             Log.d(
                 TAG,
-                "startSession sourceCards result: deckId=$deckId, success=${sourceCards.isSuccess}, reviewed=${reviewedCardIds.size}, sessionMode=${state.settings.mode.sessionMode}"
+                "startSession sourceCards result: deckId=$deckId, success=${sourceCards.isSuccess}, reviewed=${reviewedCardIds.size}, sessionMode=${effectiveMode.sessionMode}"
             )
 
             if (sourceCards.isFailure) {
@@ -210,16 +218,25 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 )
                 val fallbackCards = filterCards(
                     cards = state.cards,
-                    filter = state.settings.filter,
+                    filter = effectiveFilter,
                     reviewedCardIds = reviewedCardIds,
                     trustReviewCards = false
                 )
                 Log.w(
                     TAG,
-                    "startSession using fallback cache: deckId=$deckId, fallbackCards=${fallbackCards.size}, filter=${state.settings.filter}"
+                    "startSession using fallback cache: deckId=$deckId, fallbackCards=${fallbackCards.size}, filter=$effectiveFilter"
                 )
                 if (fallbackCards.isNotEmpty()) {
-                    startOfflineSession(fallbackCards, state, reviewedCardIds, onSessionReady)
+                    startOfflineSession(
+                        cards = fallbackCards,
+                        state = state,
+                        reviewedCardIds = reviewedCardIds,
+                        mode = effectiveMode,
+                        cardLimit = effectiveCardLimit,
+                        initialIndex = initialIndex,
+                        forcedCardSequence = forcedCardSequence,
+                        onSessionReady = onSessionReady
+                    )
                     return@launch
                 } else {
                     Log.e(TAG, "startSession failed: no fallback cards available for deckId=$deckId")
@@ -235,22 +252,23 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
 
             val availableCards = filterCards(
                 cards = sourceCards.getOrDefault(emptyList()),
-                filter = state.settings.filter,
+                filter = effectiveFilter,
                 reviewedCardIds = reviewedCardIds,
-                trustReviewCards = state.settings.filter == LearningCardFilter.REVIEW
+                trustReviewCards = effectiveFilter == LearningCardFilter.REVIEW
             )
+            val orderedCards = applyCardSequenceIfAvailable(availableCards, forcedCardSequence)
             Log.d(
                 TAG,
-                "startSession filtered cards: deckId=$deckId, source=${sourceCards.getOrDefault(emptyList()).size}, available=${availableCards.size}, filter=${state.settings.filter}"
+                "startSession filtered cards: deckId=$deckId, source=${sourceCards.getOrDefault(emptyList()).size}, available=${availableCards.size}, ordered=${orderedCards.size}, filter=$effectiveFilter"
             )
-            if (availableCards.isEmpty()) {
+            if (orderedCards.isEmpty()) {
                 Log.w(
                     TAG,
-                    "startSession aborted: no available cards for deckId=$deckId, mode=${state.settings.mode}, filter=${state.settings.filter}"
+                    "startSession aborted: no available cards for deckId=$deckId, mode=$effectiveMode, filter=$effectiveFilter"
                 )
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = when (state.settings.mode) {
+                    errorMessage = when (effectiveMode) {
                         LearningStudyMode.SPACED_REPETITION -> stringRes(R.string.learning_due_completed)
                         else -> stringRes(R.string.learning_session_empty)
                     }
@@ -259,10 +277,14 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 return@launch
             }
 
-            val sessionCards = availableCards.take(state.settings.cardLimit)
+            val sessionCards = if (effectiveCardLimit == Int.MAX_VALUE) {
+                orderedCards
+            } else {
+                orderedCards.take(effectiveCardLimit)
+            }
 
             if (sessionCards.isEmpty()) {
-                Log.w(TAG, "startSession aborted: sessionCards empty after take, deckId=$deckId, cardLimit=${state.settings.cardLimit}")
+                Log.w(TAG, "startSession aborted: sessionCards empty after take, deckId=$deckId, cardLimit=$effectiveCardLimit")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = stringRes(R.string.learning_no_cards)
@@ -278,16 +300,25 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             )
             _uiState.value = _uiState.value.copy(
                 sessionCards = sessionCards,
-                currentIndex = 0,
+                currentIndex = initialIndex.coerceIn(0, sessionCards.lastIndex),
                 ratings = emptyMap(),
                 isLoading = false,
                 isSessionStarted = true,
                 isCompleted = false,
                 isTimeExpired = false,
                 reviewedCardIds = reviewedCardIds,
-                timeRemainingSeconds = initialTimeRemainingSeconds(state.settings),
+                settings = _uiState.value.settings.copy(mode = effectiveMode, filter = effectiveFilter),
+                timeRemainingSeconds = initialTimeRemainingSeconds(
+                    state.settings.copy(mode = effectiveMode, filter = effectiveFilter)
+                ),
                 errorMessage = null,
                 result = LearningResult()
+            )
+            persistSessionStateIfPossible(
+                deckId = deckId,
+                mode = effectiveMode.sessionMode,
+                cardIds = sessionCards.map { it.id },
+                currentIndex = initialIndex.coerceIn(0, sessionCards.lastIndex)
             )
             startTimerIfNeeded()
             onSessionReady(true)
@@ -354,6 +385,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                     )
                 }
             if (isCompleted) {
+                persistCurrentSessionState()
                 Log.d(TAG, "saveReview completed final card, syncing reviews for deckId=$reviewDeckId")
                 studyUseCases.syncReviews()
             }
@@ -399,6 +431,21 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    private fun applyCardSequenceIfAvailable(
+        cards: List<FlashCard>,
+        cardSequence: List<String>
+    ): List<FlashCard> {
+        if (cards.isEmpty() || cardSequence.isEmpty()) return cards
+
+        val cardMap = cards.associateBy { it.id }
+        val orderedCards = cardSequence.mapNotNull { cardId -> cardMap[cardId] }
+        if (orderedCards.isEmpty()) return cards
+
+        val orderedIds = orderedCards.map { it.id }.toSet()
+        val remainingCards = cards.filterNot { orderedIds.contains(it.id) }
+        return orderedCards + remainingCards
+    }
+
     private fun buildResult(
         ratings: Map<String, LearningRating>,
         studiedCount: Int
@@ -419,19 +466,24 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         cards: List<FlashCard>,
         state: LearningUiState,
         reviewedCardIds: Set<String>,
+        mode: LearningStudyMode,
+        cardLimit: Int,
+        initialIndex: Int,
+        forcedCardSequence: List<String>,
         onSessionReady: (Boolean) -> Unit
     ) {
         Log.d(
             TAG,
-            "startOfflineSession: sourceCards=${cards.size}, mode=${state.settings.mode}, order=${state.settings.order}, cardLimit=${state.settings.cardLimit}, reviewed=${reviewedCardIds.size}"
+            "startOfflineSession: sourceCards=${cards.size}, mode=$mode, order=${state.settings.order}, cardLimit=$cardLimit, reviewed=${reviewedCardIds.size}, initialIndex=$initialIndex, forcedSequence=${forcedCardSequence.size}"
         )
-        val orderedCards = when (state.settings.mode) {
+        val orderedCards = when (mode) {
             LearningStudyMode.RANDOM,
             LearningStudyMode.TIME_ATTACK -> cards.shuffled()
             LearningStudyMode.SEQUENTIAL,
             LearningStudyMode.SPACED_REPETITION -> cards
         }
-        val sessionCards = orderedCards.take(state.settings.cardLimit)
+        val resumeOrderedCards = applyCardSequenceIfAvailable(orderedCards, forcedCardSequence)
+        val sessionCards = if (cardLimit == Int.MAX_VALUE) resumeOrderedCards else resumeOrderedCards.take(cardLimit)
         if (sessionCards.isEmpty()) {
             Log.w(TAG, "startOfflineSession aborted: no cards after ordering/take")
             _uiState.value = _uiState.value.copy(
@@ -449,17 +501,26 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         )
         _uiState.value = _uiState.value.copy(
             sessionCards = sessionCards,
-            currentIndex = 0,
+            currentIndex = initialIndex.coerceIn(0, sessionCards.lastIndex),
             ratings = emptyMap(),
             isLoading = false,
             isSessionStarted = true,
             isCompleted = false,
             isTimeExpired = false,
             reviewedCardIds = reviewedCardIds,
-            timeRemainingSeconds = initialTimeRemainingSeconds(state.settings),
+            settings = _uiState.value.settings.copy(mode = mode),
+            timeRemainingSeconds = initialTimeRemainingSeconds(state.settings.copy(mode = mode)),
             errorMessage = null,
             result = LearningResult()
         )
+        state.deckId?.let { deckId ->
+            persistSessionStateIfPossible(
+                deckId = deckId,
+                mode = mode.sessionMode,
+                cardIds = sessionCards.map { it.id },
+                currentIndex = initialIndex.coerceIn(0, sessionCards.lastIndex)
+            )
+        }
         startTimerIfNeeded()
         onSessionReady(true)
     }
@@ -520,6 +581,65 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             syncPendingReviews()
         }
+        persistCurrentSessionState()
+    }
+
+    fun persistCurrentSessionState() {
+        viewModelScope.launch {
+            persistCurrentSessionStateNow().onFailure { throwable ->
+                Log.e(
+                    TAG,
+                    "persistCurrentSessionState failed: message=${throwable.message}",
+                    throwable
+                )
+            }
+        }
+    }
+
+    suspend fun persistCurrentSessionStateNow(): Result<Unit> {
+        val state = _uiState.value
+        val deckId = state.deckId ?: return Result.success(Unit)
+        if (state.sessionCards.isEmpty()) return Result.success(Unit)
+        val sessionSize = state.sessionCards.size
+        val safeCurrentIndex = state.currentIndex.coerceIn(0, sessionSize - 1)
+        val persistedIndex = if (state.isCompleted) sessionSize else safeCurrentIndex
+        return saveSessionState(
+            deckId = deckId,
+            mode = state.settings.mode.sessionMode,
+            cardIds = state.sessionCards.map { it.id },
+            currentIndex = persistedIndex
+        )
+    }
+
+    private fun persistSessionStateIfPossible(
+        deckId: String,
+        mode: String,
+        cardIds: List<String>,
+        currentIndex: Int
+    ) {
+        if (deckId.isBlank() || mode.isBlank() || cardIds.isEmpty()) return
+        val safeCurrentIndex = currentIndex.coerceAtLeast(0)
+        viewModelScope.launch {
+            saveSessionState(deckId, mode, cardIds, safeCurrentIndex)
+                .onFailure { throwable ->
+                    Log.e(
+                        TAG,
+                        "persistSessionState failed: deckId=$deckId, mode=$mode, cards=${cardIds.size}, currentIndex=$safeCurrentIndex, message=${throwable.message}",
+                        throwable
+                    )
+                }
+        }
+    }
+
+    private suspend fun saveSessionState(
+        deckId: String,
+        mode: String,
+        cardIds: List<String>,
+        currentIndex: Int
+    ): Result<Unit> {
+        return studyUseCases
+            .saveSessionState(deckId, mode, cardIds, currentIndex)
+            .map { Unit }
     }
 
     private suspend fun syncPendingReviews() {
@@ -549,5 +669,9 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             TAG,
             "loadDeck results: deckId=$deckId, deckFound=${deck != null}, deckError=${deckError?.message}, cards=${cards?.size ?: 0}, cardsError=${cardsError?.message}, reviewed=$reviewedCount"
         )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }

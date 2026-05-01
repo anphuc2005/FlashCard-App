@@ -162,9 +162,14 @@
     <string name="learning_session_title_english">Learning Session</string>
     <string name="learning_session_progress">Tiến độ học tập</string>
     <string name="learning_exit_dialog_title">Thoát buổi học?</string>
-    <string name="learning_exit_dialog_message">Bạn có chắc chắn muốn thoát? Tiến độ học hiện tại sẽ không được lưu.</string>
+    <string name="learning_exit_dialog_message">Bạn có chắc chắn muốn thoát? Tiến độ học hiện tại sẽ được lưu để học tiếp.</string>
     <string name="learning_exit_dialog_continue">Tiếp tục học</string>
     <string name="learning_exit_dialog_exit">Thoát</string>
+    <string name="learning_recent_dialog_title">Phiên học gần nhất</string>
+    <string name="learning_recent_dialog_message">Bạn đang học dở ở thẻ %1$d/%2$d. Bạn muốn học tiếp hay học lại từ đầu?</string>
+    <string name="learning_recent_dialog_resume">Học tiếp</string>
+    <string name="learning_recent_dialog_restart">Học lại từ đầu</string>
+    <string name="learning_recent_delete_failed">Không thể bắt đầu lại phiên học. Vui lòng thử lại.</string>
     <string name="learning_session_limit_value">%1$d/%2$d thẻ</string>
     <string name="learning_order_title">Thứ tự</string>
     <string name="learning_order_random">Ngẫu nhiên</string>

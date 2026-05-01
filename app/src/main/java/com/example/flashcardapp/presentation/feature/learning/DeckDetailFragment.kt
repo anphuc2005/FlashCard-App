@@ -32,6 +32,7 @@ class DeckDetailFragment : Fragment() {
 
     private val viewModel: FlashCardViewModel by activityViewModels()
     private lateinit var cardPreviewAdapter: LearningCardPreviewAdapter
+    private var hasAutoNavigatedToSessionSetting = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -125,10 +126,23 @@ class DeckDetailFragment : Fragment() {
         binding.rvCards.isVisible = !state.isLoading
         binding.cardsPlaceholderContainer.isVisible = state.isLoading
         cardPreviewAdapter.submitList(state.previewCards)
+        maybeAutoNavigateToSessionSetting(state)
     }
 
     private fun renderLoadingState(isLoading: Boolean) {
         binding.scroll.visibility = View.VISIBLE
+    }
+
+    private fun maybeAutoNavigateToSessionSetting(state: LearningUiState) {
+        if (hasAutoNavigatedToSessionSetting) return
+        val autoStartSession = requireActivity().intent.getBooleanExtra(EXTRA_AUTO_START_SESSION, false)
+        if (!autoStartSession || state.isLoading || state.cards.isEmpty()) return
+
+        hasAutoNavigatedToSessionSetting = true
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.deckDetailFragment) {
+            navController.navigate(R.id.action_deckDetailFragment_to_sessionSettingFragment)
+        }
     }
 
     private class LearningTabSelectedListener(

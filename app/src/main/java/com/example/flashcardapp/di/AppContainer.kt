@@ -38,7 +38,11 @@ import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
 import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetCurrentStudyStreakUseCase
+import com.example.flashcardapp.domain.usecase.study.GetRecentStudySessionUseCase
+import com.example.flashcardapp.domain.usecase.study.GetStudySessionByDeckUseCase
 import com.example.flashcardapp.domain.usecase.study.HasStudiedTodayUseCase
+import com.example.flashcardapp.domain.usecase.study.DeleteStudySessionByDeckUseCase
+import com.example.flashcardapp.domain.usecase.study.SaveStudySessionStateUseCase
 import com.example.flashcardapp.domain.usecase.study.SaveStudyReviewUseCase
 import com.example.flashcardapp.domain.usecase.study.StudyUseCases
 import com.example.flashcardapp.domain.usecase.study.SyncStudyReviewsUseCase
@@ -84,7 +88,10 @@ class AppContainer(private val applicationContext: Context) {
     }
 
     val profileRepository: ProfileRepository by lazy {
-        ProfileRepository(RetrofitClient.profileApiService)
+        ProfileRepository(
+            profileApiService = RetrofitClient.profileApiService,
+            sessionTokenProvider = { sessionManager.accessToken }
+        )
     }
 
     val statisticsRepository: StatisticsRepository by lazy {
@@ -178,6 +185,10 @@ class AppContainer(private val applicationContext: Context) {
         val studyUseCases: StudyUseCases by lazy {
             StudyUseCases(
                 getSessionCards = GetStudySessionCardsUseCase(studyRepository),
+                getRecentSession = GetRecentStudySessionUseCase(studyRepository),
+                getSessionByDeck = GetStudySessionByDeckUseCase(studyRepository),
+                saveSessionState = SaveStudySessionStateUseCase(studyRepository),
+                deleteSessionByDeck = DeleteStudySessionByDeckUseCase(studyRepository),
                 getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
                 saveReview = SaveStudyReviewUseCase(studyRepository),
                 syncReviews = SyncStudyReviewsUseCase(studyRepository),
