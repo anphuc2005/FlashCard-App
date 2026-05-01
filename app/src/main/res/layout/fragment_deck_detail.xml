@@ -81,6 +81,14 @@
                 android:textStyle="bold"
                 tools:text="IELTS Vocabulary" />
 
+            <View
+                android:id="@+id/titlePlaceholder"
+                android:layout_width="220dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:background="@drawable/bg_learning_visual_placeholder"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/deckDesc"
                 android:layout_width="match_parent"
@@ -89,6 +97,14 @@
                 android:textColor="?attr/subTitleColor"
                 android:textSize="@dimen/learning_caption_text_size"
                 tools:text="Essential vocabulary for preparation." />
+
+            <View
+                android:id="@+id/descPlaceholder"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_marginTop="@dimen/learning_space_xs"
+                android:background="@drawable/bg_learning_visual_placeholder"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -157,6 +173,32 @@
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
                 tools:listitem="@layout/item_learning_card_preview" />
+
+            <LinearLayout
+                android:id="@+id/cardsPlaceholderContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:layout_marginBottom="@dimen/learning_space_sm"
+                    android:background="@drawable/bg_learning_visual_placeholder" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:layout_marginBottom="@dimen/learning_space_sm"
+                    android:background="@drawable/bg_learning_visual_placeholder" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:background="@drawable/bg_learning_visual_placeholder" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -179,74 +221,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/skeletonDeckDetail"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:paddingHorizontal="@dimen/learning_space_lg"
-        android:paddingTop="@dimen/learning_space_md"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toTopOf="@id/ctaButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <View
-            android:layout_width="@dimen/skeleton_learning_title_width"
-            android:layout_height="@dimen/skeleton_learning_title_height"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_learning_subtitle_height"
-            android:layout_marginTop="@dimen/learning_space_md"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="88dp"
-            android:layout_marginTop="@dimen/learning_space_lg"
-            android:orientation="horizontal">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginEnd="@dimen/learning_space_sm"
-                android:background="@drawable/bg_skeleton_blur" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="@dimen/learning_space_sm"
-                android:background="@drawable/bg_skeleton_blur" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/learning_space_sm"
-                android:background="@drawable/bg_skeleton_blur" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_learning_tab_height"
-            android:layout_marginTop="@dimen/learning_space_lg"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_learning_tab_height"
-            android:layout_marginTop="@dimen/learning_space_md"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_learning_tab_height"
-            android:layout_marginTop="@dimen/learning_space_md"
-            android:background="@drawable/bg_skeleton_blur" />
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

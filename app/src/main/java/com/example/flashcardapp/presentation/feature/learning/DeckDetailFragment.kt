@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.view.isVisible
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentDeckDetailBinding
 import com.example.flashcardapp.presentation.common.notification.showAppError
@@ -118,6 +119,12 @@ class DeckDetailFragment : Fragment() {
         binding.statNewCard.statLabel.text = getString(R.string.learning_stat_new)
         binding.statNewCard.statValue.text = state.deckSummary.newCards.toString()
         binding.ctaButton.isEnabled = !state.isLoading && state.cards.isNotEmpty()
+        binding.deckTitle.isVisible = !state.isLoading
+        binding.deckDesc.isVisible = !state.isLoading
+        binding.titlePlaceholder.isVisible = state.isLoading
+        binding.descPlaceholder.isVisible = state.isLoading
+        binding.rvCards.isVisible = !state.isLoading
+        binding.cardsPlaceholderContainer.isVisible = state.isLoading
         cardPreviewAdapter.submitList(state.previewCards)
     }
 

@@ -1,27 +1,24 @@
 package com.example.flashcardapp.presentation.feature.addDeck
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.example.flashcardapp.databinding.FragmentAddCardBinding
 
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.presentation.common.notification.showAppError
-import com.example.flashcardapp.presentation.common.notification.showAppSuccess
-import com.example.flashcardapp.presentation.common.notification.showAppWarning
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -29,18 +26,8 @@ class AddCardFragment : Fragment() {
     private lateinit var binding: FragmentAddCardBinding
     private var selectedImageUri: Uri? = null
     private var selectedAudioUri: Uri? = null
-
-    private val requestImagePermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) openImagePicker.launch("image/*")
-            else showAppWarning(getString(com.example.flashcardapp.R.string.add_card_permission_image_denied))
-        }
-
-    private val requestAudioPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) openAudioPicker.launch("audio/*")
-            else showAppWarning(getString(com.example.flashcardapp.R.string.add_card_permission_audio_denied))
-        }
+    private var saveProgressJob: Job? = null
+    private val defaultSaveText = "Hoàn tất - lưu bộ thẻ"
 
     private val openImagePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -49,6 +36,9 @@ class AddCardFragment : Fragment() {
                 binding.layoutImageEmpty.visibility = View.GONE
                 binding.ivSelectedImage.visibility = View.VISIBLE
                 binding.ivSelectedImage.setImageURI(it)
+                createTempFileFromUri(it)?.let { imageFile ->
+                    viewModel.uploadImage(imageFile)
+                } ?: showAppError("Không thể đọc ảnh đã chọn")
             }
         }
 
@@ -64,7 +54,7 @@ class AddCardFragment : Fragment() {
     private val viewModel: AddCardViewModel by viewModels {
         val appContainer = (requireActivity().application as FlashcardApp).container
         AddCardViewModelFactory(
-            appContainer.addFlashCardUseCase,
+            appContainer.addFlashCardsBulkUseCase,
             appContainer.uploadImageUseCase
         )
     }
@@ -84,17 +74,22 @@ class AddCardFragment : Fragment() {
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        saveProgressJob?.cancel()
+        super.onDestroyView()
+    }
+
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressed()
         }
 
         binding.btnAddAnother.setOnClickListener {
-            submitCard()
+            addCardToList()
         }
 
         binding.btnSave.setOnClickListener {
-            submitCard(shouldFinish = true)
+            saveAllCards()
         }
 
         binding.cardImage.setOnClickListener {
@@ -107,37 +102,25 @@ class AddCardFragment : Fragment() {
     }
 
     private fun checkAndRequestPermission(isImage: Boolean) {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (isImage) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_MEDIA_AUDIO
+        if (isImage) {
+            openImagePicker.launch("image/*")
         } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-
-        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            if (isImage) openImagePicker.launch("image/*") else openAudioPicker.launch("audio/*")
-        } else {
-            if (isImage) requestImagePermissionLauncher.launch(permission) else requestAudioPermissionLauncher.launch(permission)
+            openAudioPicker.launch("audio/*")
         }
     }
 
-    private fun submitCard(shouldFinish: Boolean = false) {
+    private fun addCardToList() {
         val question = binding.etFront.text.toString().trim()
         val answer = binding.etBack.text.toString().trim()
-        
-        // TODO: Get actual deckId from arguments
         val deckId = arguments?.getString("DECK_ID") ?: "default_deck_id"
-        
-        // Lệnh này dùng để check state finish hay continue phía sau
-        view?.setTag(com.example.flashcardapp.R.id.nav_host_fragment_add_deck, shouldFinish)
-        
-        var imageFile: File? = null
-        selectedImageUri?.let { uri ->
-            val inputStream = requireContext().contentResolver.openInputStream(uri)
-            imageFile = File(requireContext().cacheDir, "temp_img_${System.currentTimeMillis()}.jpg")
-            imageFile?.outputStream()?.use { out -> inputStream?.copyTo(out) }
-        }
+        viewModel.addCardToPending(question, answer, deckId)
+    }
 
-        viewModel.submitCard(question, answer, deckId, imageFile)
+    private fun saveAllCards() {
+        val question = binding.etFront.text.toString().trim()
+        val answer = binding.etBack.text.toString().trim()
+        val deckId = arguments?.getString("DECK_ID") ?: "default_deck_id"
+        viewModel.saveAllPendingCards(question, answer, deckId)
     }
 
     private fun observeViewModel() {
@@ -148,13 +131,16 @@ class AddCardFragment : Fragment() {
                     viewModel.uiState.collect { state ->
                         when (state) {
                             is AddCardState.Idle -> {
-                                // Do nothing
+                                binding.loadingOverlay.isVisible = false
+                                renderSaveProgressLoading(false)
                             }
                             is AddCardState.Loading -> {
-                                // Show loading
+                                binding.loadingOverlay.isVisible = false
+                                renderSaveProgressLoading(true)
                             }
-                            is AddCardState.Success -> {
-                                showAppSuccess(getString(com.example.flashcardapp.R.string.add_card_save_success))
+                            is AddCardState.CardQueued -> {
+                                binding.loadingOverlay.isVisible = false
+                                renderSaveProgressLoading(false)
                                 binding.etFront.text?.clear()
                                 binding.etBack.text?.clear()
                                 
@@ -166,14 +152,26 @@ class AddCardFragment : Fragment() {
                                 binding.layoutAudioEmpty.visibility = View.VISIBLE
                                 binding.layoutAudioSelected.visibility = View.GONE
                                 selectedAudioUri = null
-                                
-                                val shouldFinish = view?.getTag(com.example.flashcardapp.R.id.nav_host_fragment_add_deck) as? Boolean ?: false
-                                if (shouldFinish) {
-                                    requireActivity().finish()
-                                }
+                                viewModel.resetState()
+                            }
+                            is AddCardState.AllSaved -> {
+                                binding.loadingOverlay.isVisible = false
+                                renderSaveProgressLoading(false, forceComplete = true)
+                                binding.etFront.text?.clear()
+                                binding.etBack.text?.clear()
+                                binding.layoutImageEmpty.visibility = View.VISIBLE
+                                binding.ivSelectedImage.visibility = View.GONE
+                                binding.ivSelectedImage.setImageURI(null)
+                                selectedImageUri = null
+                                binding.layoutAudioEmpty.visibility = View.VISIBLE
+                                binding.layoutAudioSelected.visibility = View.GONE
+                                selectedAudioUri = null
+                                requireActivity().finish()
                                 viewModel.resetState()
                             }
                             is AddCardState.Error -> {
+                                binding.loadingOverlay.isVisible = false
+                                renderSaveProgressLoading(false)
                                 showAppError(state.message)
                             }
                         }
@@ -184,16 +182,21 @@ class AddCardFragment : Fragment() {
                 launch {
                     viewModel.uploadState.collect { state ->
                         when (state) {
-                            is UploadState.Idle -> {}
+                            is UploadState.Idle -> {
+                                binding.imageUploadOverlay.isVisible = false
+                            }
                             is UploadState.Loading -> {
-                                showAppWarning(getString(com.example.flashcardapp.R.string.add_card_uploading_image))
+                                binding.imageUploadOverlay.isVisible = true
+                                binding.ivSelectedImage.alpha = 0.55f
                             }
                             is UploadState.Success -> {
-                                showAppSuccess(getString(com.example.flashcardapp.R.string.add_card_upload_image_success))
-                                // TODO: state.url là link cloud, b có thể lưu url này vào để truyền cùng submitCard.
+                                binding.imageUploadOverlay.isVisible = false
+                                binding.ivSelectedImage.alpha = 1f
                                 viewModel.resetUploadState()
                             }
                             is UploadState.Error -> {
+                                binding.imageUploadOverlay.isVisible = false
+                                binding.ivSelectedImage.alpha = 1f
                                 showAppError(state.message)
                                 viewModel.resetUploadState()
                             }
@@ -202,5 +205,51 @@ class AddCardFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun renderSaveProgressLoading(isLoading: Boolean, forceComplete: Boolean = false) {
+        if (!isLoading) {
+            saveProgressJob?.cancel()
+            if (forceComplete) {
+                binding.saveProgressBar.progress = 100
+            } else {
+                binding.saveProgressBar.progress = 1
+            }
+            binding.btnSave.isEnabled = true
+            binding.btnAddAnother.isEnabled = true
+            binding.btnSave.text = defaultSaveText
+            binding.saveProgressBar.isVisible = false
+            return
+        }
+
+        binding.btnSave.isEnabled = false
+        binding.btnAddAnother.isEnabled = false
+        binding.btnSave.text = ""
+        binding.saveProgressBar.isVisible = true
+        binding.saveProgressBar.progress = 1
+
+        saveProgressJob?.cancel()
+        saveProgressJob = viewLifecycleOwner.lifecycleScope.launch {
+            var value = 1
+            while (value < 99) {
+                delay(55)
+                value += if (value < 40) 5 else if (value < 75) 3 else 2
+                if (value > 99) value = 99
+                binding.saveProgressBar.progress = value
+            }
+        }
+    }
+
+    private fun createTempFileFromUri(uri: Uri): File? {
+        return runCatching {
+            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
+            val file = File(requireContext().cacheDir, "temp_img_${System.currentTimeMillis()}.jpg")
+            inputStream.use { input ->
+                file.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            file
+        }.getOrNull()
     }
 }

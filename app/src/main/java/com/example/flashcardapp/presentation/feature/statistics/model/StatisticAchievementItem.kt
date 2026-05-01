@@ -11,6 +11,6 @@ data class StatisticAchievementItem(
     val introduction: String,
     val condition: String,
     @field:DrawableRes val iconResId: Int,
-    val isUnlocked: Boolean
+    val isUnlocked: Boolean,
+    val progressPercent: Int = 0
 ) : Serializable
-

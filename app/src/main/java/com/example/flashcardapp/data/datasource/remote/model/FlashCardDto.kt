@@ -9,7 +9,14 @@ data class FlashCardDto(
     @SerializedName("definition") val answer: String,
     @SerializedName("imageUrl") val imageUrl: String? = null,
     @SerializedName("deckId") val deckId: String,
-    @SerializedName("repetition") val repetition: Int = 0
+    @SerializedName("interval") val interval: Int? = null,
+    @SerializedName("repetition") val repetition: Int? = null,
+    @SerializedName("easeFactor") val easeFactor: Double? = null,
+    @SerializedName("nextReviewDate") val nextReviewDate: String? = null,
+    @SerializedName("isDeleted") val isDeleted: Boolean? = null,
+    @SerializedName("deleted") val deleted: Boolean? = null,
+    @SerializedName("createdAt") val createdAt: String? = null,
+    @SerializedName("updatedAt") val updatedAt: String? = null
 ) {
     fun toDomain(): FlashCard {
         return FlashCard(
@@ -17,8 +24,7 @@ data class FlashCardDto(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
-            deckId = deckId,
-            repetition = repetition
+            deckId = deckId
         )
     }
 }
@@ -30,6 +36,6 @@ fun FlashCard.toDto(): FlashCardDto {
         answer = answer,
         imageUrl = imageUrl,
         deckId = deckId,
-        repetition = repetition
+        isDeleted = false
     )
 }

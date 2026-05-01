@@ -1,69 +1,98 @@
 package com.example.flashcardapp.data.repository
 
-import com.example.flashcardapp.core.utils.NetworkErrorHandler
-import com.example.flashcardapp.core.utils.UserMessageMapper
 import com.example.flashcardapp.data.datasource.remote.api.StatisticsApiService
-import com.example.flashcardapp.data.datasource.remote.model.statistics.DailyActivityDto
-import com.example.flashcardapp.data.datasource.remote.model.statistics.PageResponseDto
-import com.example.flashcardapp.data.datasource.remote.model.statistics.StatisticsApiResponse
-import com.example.flashcardapp.data.datasource.remote.model.statistics.StatisticsSummaryDto
-import com.example.flashcardapp.data.datasource.remote.model.statistics.StudyLogItemDto
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.Response
+import com.example.flashcardapp.data.datasource.remote.model.statistics.AchievementDto
+import com.example.flashcardapp.data.datasource.remote.model.statistics.ChartPointDto
+import com.example.flashcardapp.data.datasource.remote.model.statistics.DashboardDataDto
+import com.example.flashcardapp.data.datasource.remote.model.statistics.RangeSummaryDto
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class StatisticsRepository(
-    private val statisticsApiService: StatisticsApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val apiService: StatisticsApiService
 ) {
 
-    suspend fun getSummary(deckId: String? = null): Result<StatisticsSummaryDto> = withContext(ioDispatcher) {
-        executeRequest { statisticsApiService.getSummary(deckId) }
+    suspend fun getDashboard(days: Int): Result<DashboardDataDto> {
+        return runCatching {
+            val response = apiService.getDashboard(days = days)
+            if (response.isSuccess() && response.data != null) {
+                response.data
+            } else {
+                throw IllegalStateException(response.message ?: "Không tải được dữ liệu thống kê")
+            }
+        }
     }
 
-    suspend fun getActivityChart(days: Int = 30): Result<List<DailyActivityDto>> = withContext(ioDispatcher) {
-        val normalizedDays = days.coerceIn(1, 365)
-        executeRequest { statisticsApiService.getActivityChart(normalizedDays) }
-            .map { it.sortedBy { item -> item.date } }
+    suspend fun getAchievements(featuredLimit: Int = 4): Result<List<AchievementDto>> {
+        return runCatching {
+            val response = apiService.getAchievements(featuredLimit = featuredLimit, includeLocked = true)
+            if (!response.isSuccess() || response.data == null) {
+                throw IllegalStateException(response.message ?: "Không tải được thành tích")
+            }
+            if (response.data.items.isNotEmpty()) response.data.items else response.data.featured
+        }
     }
 
-    suspend fun getHistory(page: Int = 0, size: Int = 20): Result<PageResponseDto<StudyLogItemDto>> = withContext(ioDispatcher) {
-        val normalizedPage = page.coerceAtLeast(0)
-        val normalizedSize = size.coerceIn(1, 100)
-        executeRequest { statisticsApiService.getHistory(normalizedPage, normalizedSize) }
+    suspend fun getDeckStatistics(): Result<List<com.example.flashcardapp.data.datasource.remote.model.statistics.DeckStatisticsItemDto>> {
+        return runCatching {
+            val response = apiService.getDeckStatistics(page = 0, size = 20, includeEmpty = true)
+            if (!response.isSuccess() || response.data == null) {
+                throw IllegalStateException(response.message ?: "Không tải được tiến độ bộ thẻ")
+            }
+            response.data.content
+        }
     }
 
-    private suspend fun <T> executeRequest(
-        apiCall: suspend () -> Response<StatisticsApiResponse<T>>
-    ): Result<T> {
-        return try {
-            val response = apiCall()
-
-            if (!response.isSuccessful) {
-                val errorBody = response.errorBody()?.string()
-                val message = UserMessageMapper.extractReadableMessage(errorBody)
-                    ?: UserMessageMapper.extractReadableMessage(response.message())
-                    ?: "Yêu cầu thống kê thất bại (mã ${response.code()})."
-                return Result.failure(IllegalStateException(message))
+    suspend fun getRangeSummary(days: Int): Result<RangeSummaryDto> {
+        return runCatching {
+            val response = apiService.getRangeSummary(days = days)
+            if (!response.isSuccess() || response.data == null) {
+                throw IllegalStateException(response.message ?: "Không tải được hoạt động học tập")
             }
+            response.data
+        }
+    }
 
-            val body = response.body()
-            if (body == null) {
-                return Result.failure(IllegalStateException("Phản hồi rỗng từ máy chủ thống kê."))
+    fun mapChart(range: String, chart: List<ChartPointDto>): Pair<List<String>, List<Int>> {
+        return when (range) {
+            "day" -> {
+                if (chart.isEmpty()) {
+                    val labels = (1..24).map { it.toString() }
+                    return labels to List(labels.size) { 0 }
+                }
+                val labels = chart.indices.map { "${it + 1}" }
+                labels to chart.map { it.count }
             }
-
-            if (!body.success) {
-                val message = UserMessageMapper.extractReadableMessage(body.message)
-                    ?: "Không thể tải dữ liệu thống kê."
-                return Result.failure(IllegalStateException(message))
+            "month" -> {
+                if (chart.isEmpty()) {
+                    val labels = (1..30).map { it.toString().padStart(2, '0') }
+                    return labels to List(labels.size) { 0 }
+                }
+                chart.map { it.date.takeLast(2) } to chart.map { it.count }
             }
-
-            val data = body.data
-                ?: return Result.failure(IllegalStateException("Dữ liệu thống kê đang trống."))
-            Result.success(data)
-        } catch (throwable: Throwable) {
-            Result.failure(IllegalStateException(NetworkErrorHandler.getErrorMessage(throwable)))
+            else -> {
+                if (chart.isEmpty()) {
+                    val labels = listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN")
+                    return labels to List(labels.size) { 0 }
+                }
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
+                val labels = chart.map {
+                    val date = runCatching { LocalDate.parse(it.date, formatter) }.getOrNull()
+                    when (date?.dayOfWeek) {
+                        DayOfWeek.MONDAY -> "T2"
+                        DayOfWeek.TUESDAY -> "T3"
+                        DayOfWeek.WEDNESDAY -> "T4"
+                        DayOfWeek.THURSDAY -> "T5"
+                        DayOfWeek.FRIDAY -> "T6"
+                        DayOfWeek.SATURDAY -> "T7"
+                        DayOfWeek.SUNDAY -> "CN"
+                        else -> it.date.takeLast(2)
+                    }
+                }
+                labels to chart.map { it.count }
+            }
         }
     }
 }

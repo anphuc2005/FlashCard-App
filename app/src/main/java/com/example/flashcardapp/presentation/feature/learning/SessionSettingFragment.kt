@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentSessionSettingBinding
 import kotlinx.coroutines.launch
@@ -67,6 +68,7 @@ class SessionSettingFragment : Fragment() {
         }
         binding.btnStart.setOnClickListener {
             val state = viewModel.uiState.value
+            preloadDeckCardImages()
             Log.d(
                 TAG,
                 "Start session clicked: deckId=${state.deckId}, mode=${state.settings.mode}, order=${state.settings.order}, filter=${state.settings.filter}, cardLimit=${state.settings.cardLimit}, timeLimit=${state.settings.timeLimitMinutes}"
@@ -77,6 +79,22 @@ class SessionSettingFragment : Fragment() {
                     findNavController().navigate(R.id.action_sessionSettingFragment_to_learningCardsFragment)
                 }
             }
+        }
+    }
+
+    private fun preloadDeckCardImages() {
+        val imageUrls = viewModel.uiState.value.cards
+            .mapNotNull { it.imageUrl?.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+
+        if (imageUrls.isEmpty()) return
+
+        Log.d(TAG, "preloadDeckCardImages: count=${imageUrls.size}")
+        imageUrls.forEach { url ->
+            Glide.with(this)
+                .load(url)
+                .preload()
         }
     }
 

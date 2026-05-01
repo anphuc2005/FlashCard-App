@@ -1,6 +1,7 @@
 package com.example.flashcardapp.presentation.feature.editDeck
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +41,7 @@ class EditDeckFragment : Fragment() {
 
     private var deckId: String? = null
     private lateinit var editDeckCardAdapter: EditDeckCardAdapter
+    private var selectedThemeColor: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +116,7 @@ class EditDeckFragment : Fragment() {
         binding.switchPublic.setOnCheckedChangeListener { _, isChecked ->
             updateSwitchTint(isChecked)
         }
+        setupColorPicker()
 
         binding.btnSave.setOnClickListener {
             val deckName = binding.etDeckName.text.toString().trim()
@@ -126,7 +129,7 @@ class EditDeckFragment : Fragment() {
             }
 
             deckId?.let { id ->
-                viewModel.updateDeck(id, deckName, description, isPublic)
+                viewModel.updateDeck(id, deckName, description, isPublic, selectedThemeColor)
             }
         }
     }
@@ -144,6 +147,7 @@ class EditDeckFragment : Fragment() {
                                 binding.switchPublic.isChecked = state.deck.isPublic
                                 println("Deck is public: ${state.deck.isPublic} ${state.deck.name}")
                                 updateSwitchTint(state.deck.isPublic)
+                                applyIconColor(state.deck.themeColor)
                                 binding.tvCardCountLabel.text = "Số lượng thẻ (${state.deck.cardCount})"
                             }
                             is EditDeckState.UpdateSuccess -> {
@@ -180,6 +184,21 @@ class EditDeckFragment : Fragment() {
         )
         binding.switchPublic.thumbTintList = ColorStateList.valueOf(thumbColor)
         binding.switchPublic.trackTintList = ColorStateList.valueOf(trackColor)
+    }
+
+    private fun setupColorPicker() {
+        binding.colorBlue.setOnClickListener { applyIconColor("#247BDF") }
+        binding.colorGreen.setOnClickListener { applyIconColor("#10B981") }
+        binding.colorPurple.setOnClickListener { applyIconColor("#6366F1") }
+        binding.colorOrange.setOnClickListener { applyIconColor("#F97316") }
+        binding.colorRed.setOnClickListener { applyIconColor("#F43F5E") }
+    }
+
+    private fun applyIconColor(rawColor: String?) {
+        val safeColor = rawColor?.takeIf { it.isNotBlank() } ?: "#247BDF"
+        val parsed = runCatching { Color.parseColor(safeColor) }.getOrElse { Color.parseColor("#247BDF") }
+        selectedThemeColor = safeColor
+        binding.ivDeckIcon.backgroundTintList = ColorStateList.valueOf(parsed)
     }
 
     override fun onDestroyView() {

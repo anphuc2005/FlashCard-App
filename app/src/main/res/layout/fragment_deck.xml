@@ -121,46 +121,21 @@
         android:layout_marginTop="15dp"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/decksRecycler"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingTop="12dp"
-        android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/tv_title"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_deck"/>
-
-    <LinearLayout
-        android:id="@+id/skeletonDecks"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/home_shortcut_margin_top"
-        android:orientation="vertical"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <View
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/decksRecycler"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_deck_item_height"
-            android:layout_marginBottom="@dimen/skeleton_deck_item_spacing"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_deck_item_height"
-            android:layout_marginBottom="@dimen/skeleton_deck_item_spacing"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_deck_item_height"
-            android:background="@drawable/bg_skeleton_blur" />
-    </LinearLayout>
-
+            android:layout_height="match_parent"
+            android:paddingTop="12dp"
+            android:clipToPadding="false"
+            tools:listitem="@layout/item_deck"/>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

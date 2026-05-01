@@ -22,6 +22,7 @@ import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
 import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
 import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardsBulkUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.DeleteFlashCardUseCase
 import com.example.flashcardapp.domain.usecase.flashcard.UpdateFlashCardUseCase
 import com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase
@@ -114,6 +115,10 @@ class AppContainer(private val applicationContext: Context) {
 
         val addFlashCardUseCase: AddFlashCardUseCase by lazy {
             AddFlashCardUseCase(flashCardRepository)
+        }
+
+        val addFlashCardsBulkUseCase: AddFlashCardsBulkUseCase by lazy {
+            AddFlashCardsBulkUseCase(flashCardRepository)
         }
 
         val updateFlashCardUseCase: UpdateFlashCardUseCase by lazy {

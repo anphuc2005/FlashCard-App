@@ -16,15 +16,12 @@ import androidx.navigation.fragment.findNavController
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentAddDeskBinding
-import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
 class AddDeckFragment : Fragment() {
     private lateinit var binding: FragmentAddDeskBinding
-
-    private var loadingDialog: LoadingDialogFragment? = null
 
     private val viewModel: AddDeckViewModel by viewModels {
         val container = (requireActivity().application as FlashcardApp).container
@@ -84,20 +81,12 @@ class AddDeckFragment : Fragment() {
                         when (state) {
                             is AddDeckState.Idle -> {
                                 renderLoading(false)
-                                loadingDialog?.dismiss()
-                                loadingDialog = null
                             }
                             is AddDeckState.Loading -> {
                                 renderLoading(true)
-                                if (loadingDialog == null || loadingDialog?.isVisible == false) {
-                                    loadingDialog = LoadingDialogFragment.newInstance("Đang thêm bộ thẻ...")
-                                    loadingDialog?.show(childFragmentManager, "LoadingDialog")
-                                }
                             }
                             is AddDeckState.Success -> {
                                 renderLoading(false)
-                                loadingDialog?.dismiss()
-                                loadingDialog = null
                                 val bundle = bundleOf("DECK_ID" to state.deck.id)
                                 findNavController().navigate(
                                     R.id.action_addDeckFragment_to_addCardFragment, 

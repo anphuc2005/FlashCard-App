@@ -10,25 +10,36 @@ import com.example.flashcardapp.domain.model.Deck
 
 class DeckAdapter(
     private val onItemClick: (Deck) -> Unit,
-    private val onItemEdit: (Deck) -> Unit
+    private val onItemEdit: (Deck) -> Unit,
+    private val onItemLongClick: (Deck) -> Unit
 ) : ListAdapter<Deck, DeckAdapter.DeckViewHolder>(DeckDiffCallback()) {
+
+    private val selectedDeckIds = mutableSetOf<String>()
+
+    fun setSelectedDeckIds(ids: Set<String>) {
+        selectedDeckIds.clear()
+        selectedDeckIds.addAll(ids)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeckViewHolder {
         val binding = ItemDeckBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DeckViewHolder(binding, onItemClick, onItemEdit)
+        return DeckViewHolder(binding, onItemClick, onItemEdit, onItemLongClick)
     }
 
     override fun onBindViewHolder(holder: DeckViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        holder.bind(item, selectedDeckIds.contains(item.id))
     }
 
     class DeckViewHolder(
         private val binding: ItemDeckBinding,
         private val onItemClick: (Deck) -> Unit,
-        private val onItemEdit: (Deck) -> Unit
+        private val onItemEdit: (Deck) -> Unit,
+        private val onItemLongClick: (Deck) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Deck) {
+        fun bind(item: Deck, isSelected: Boolean) {
             binding.apply {
                 // Set deck title
                 deckTitle.text = item.name
@@ -46,6 +57,10 @@ class DeckAdapter(
                 root.setOnClickListener {
                     onItemClick(item)
                 }
+                root.setOnLongClickListener {
+                    onItemLongClick(item)
+                    true
+                }
 
 
                 ctaLearn.setOnClickListener {
@@ -54,6 +69,16 @@ class DeckAdapter(
 
                 editBtn.setOnClickListener {
                     onItemEdit(item)
+                }
+
+                if (isSelected) {
+                    root.strokeColor = 0xFFE53935.toInt()
+                    root.strokeWidth = 3
+                    root.alpha = 0.92f
+                } else {
+                    root.strokeColor = 0x00000000
+                    root.strokeWidth = 0
+                    root.alpha = 1f
                 }
             }
         }

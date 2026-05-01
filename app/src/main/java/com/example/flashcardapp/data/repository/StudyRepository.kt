@@ -38,6 +38,7 @@ class StudyRepository(
                             id = card.id,
                             question = card.question,
                             answer = card.answer,
+                            imageUrl = card.imageUrl,
                             deckId = deckId,
                             isSynced = true
                         )

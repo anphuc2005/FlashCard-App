@@ -8,7 +8,7 @@
     tools:context=".presentation.feature.statistics.StatisticFragment">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/contentScroll"
+        android:id="@+id/contentContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -252,7 +252,12 @@
                 app:strokeColor="?attr/iconBlueBackground"
                 app:strokeWidth="1dp">
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
                 <LinearLayout
+                    android:id="@+id/weeklyContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -346,6 +351,15 @@
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
+
+                <View
+                    android:id="@+id/weeklyBlurPlaceholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="14dp"
+                    android:background="@drawable/bg_learning_visual_placeholder"
+                    android:visibility="gone" />
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -423,75 +437,4 @@
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <LinearLayout
-        android:id="@+id/skeletonStatistic"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:paddingHorizontal="@dimen/statistics_content_padding_horizontal"
-        android:paddingTop="@dimen/statistics_screen_padding_vertical"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <View
-            android:layout_width="@dimen/skeleton_stat_title_width"
-            android:layout_height="@dimen/skeleton_stat_title_height"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="@dimen/skeleton_stat_subtitle_width"
-            android:layout_height="@dimen/skeleton_stat_subtitle_height"
-            android:layout_marginTop="@dimen/learning_space_md"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_stat_quick_card_height"
-            android:layout_marginTop="@dimen/home_start_button_margin_top"
-            android:orientation="horizontal">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginEnd="@dimen/learning_space_md"
-                android:background="@drawable/bg_skeleton_blur" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/learning_space_md"
-                android:background="@drawable/bg_skeleton_blur" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_stat_chart_height"
-            android:layout_marginTop="@dimen/home_section_title_margin_top"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="@dimen/skeleton_stat_section_width"
-            android:layout_height="@dimen/skeleton_stat_section_height"
-            android:layout_marginTop="@dimen/home_section_title_margin_top"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_stat_list_item_height"
-            android:layout_marginTop="@dimen/home_progress_margin_top"
-            android:background="@drawable/bg_skeleton_blur" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/skeleton_stat_list_item_height"
-            android:layout_marginTop="@dimen/home_progress_margin_top"
-            android:background="@drawable/bg_skeleton_blur" />
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView></androidx.constraintlayout.widget.ConstraintLayout>

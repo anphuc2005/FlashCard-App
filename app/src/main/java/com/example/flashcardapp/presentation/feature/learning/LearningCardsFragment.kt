@@ -138,6 +138,9 @@ class LearningCardsFragment : Fragment() {
 
         val pageCount = cards.size
         val safeIndex = state.currentIndex.coerceIn(0, (pageCount - 1).coerceAtLeast(0))
+        val hasCards = pageCount > 0
+        binding.tvProgressValue.isVisible = hasCards
+        binding.progressBar.isVisible = hasCards
         binding.tvProgressValue.text = if (pageCount == 0) {
             getString(R.string.learning_progress_empty)
         } else {
@@ -211,7 +214,6 @@ class LearningCardsFragment : Fragment() {
     }
 
     private fun updateBottomAction(isBackFace: Boolean, enabled: Boolean) {
-        binding.hintButton.isVisible = !isBackFace
         binding.ratingSection.isInvisible = !isBackFace
         val canRate = isBackFace && enabled
         val alpha = if (canRate) 1f else 0.5f

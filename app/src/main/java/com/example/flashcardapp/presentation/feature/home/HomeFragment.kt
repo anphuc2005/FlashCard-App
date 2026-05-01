@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +32,7 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.Reminde
 import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
 
 class HomeFragment : Fragment() {
 
@@ -71,6 +71,7 @@ class HomeFragment : Fragment() {
 
         setupAdapters()
         binding.tvProgressPercent.text = getString(R.string.home_progress_format, 0)
+        binding.progressBar.setProgress(0f)
         observeUiState()
         setupListeners()
         renderCachedAvatar()
@@ -141,6 +142,7 @@ class HomeFragment : Fragment() {
                                 com.example.flashcardapp.R.string.home_progress_format,
                                 state.userProgress
                             )
+                            progressBar.setProgress(state.userProgressRaw)
                         }
                     } ?: run {
                         binding.apply {
@@ -149,6 +151,7 @@ class HomeFragment : Fragment() {
                                 com.example.flashcardapp.R.string.home_progress_format,
                                 0
                             )
+                            progressBar.setProgress(0f)
                         }
                     }
 
@@ -162,7 +165,11 @@ class HomeFragment : Fragment() {
 
                     // Handle loading state
                     binding.btnStart.isEnabled = !state.isLoading && state.activeDeck != null
-                    renderLoadingState(state.isLoading)
+                    val contentAlpha = if (state.isLoading) 0.55f else 1f
+                    binding.tvCourseTitle.alpha = contentAlpha
+                    binding.progressBar.alpha = contentAlpha
+                    binding.rvShortcuts.alpha = contentAlpha
+                    binding.rvDeckRecently.alpha = contentAlpha
 
                     // Handle error state
                     state.error?.let { error ->
@@ -315,18 +322,6 @@ class HomeFragment : Fragment() {
                 .placeholder(R.drawable.user)
                 .error(R.drawable.user)
                 .into(binding.imgAvatar)
-        }
-    }
-
-    private fun renderLoadingState(isLoading: Boolean) {
-        binding.contentContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
-        binding.skeletonContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
-        if (isLoading && binding.skeletonContainer.animation == null) {
-            binding.skeletonContainer.startAnimation(
-                AnimationUtils.loadAnimation(requireContext(), R.anim.skeleton_pulse)
-            )
-        } else if (!isLoading) {
-            binding.skeletonContainer.clearAnimation()
         }
     }
 

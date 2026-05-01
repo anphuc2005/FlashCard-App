@@ -2,6 +2,7 @@ package com.example.flashcardapp.presentation.feature.learning.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.Gravity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -82,8 +83,13 @@ class LearningSessionPagerAdapter(
             binding.backQuestionText.text = card.question
             binding.answerText.text = card.answer
             if (card.imageUrl.isNullOrBlank()) {
-                binding.cardImage.setImageResource(R.drawable.test)
+                Glide.with(binding.root).clear(binding.cardImage)
+                binding.cardImage.setImageDrawable(null)
+                binding.cardImage.isVisible = false
+                setAnswerLayoutForTextOnly()
             } else {
+                binding.cardImage.isVisible = true
+                setAnswerLayoutForImage()
                 Glide.with(binding.root)
                     .load(card.imageUrl)
                     .placeholder(R.drawable.test)
@@ -97,6 +103,20 @@ class LearningSessionPagerAdapter(
         fun renderFlipState(isFlipped: Boolean) {
             binding.frontFace.isVisible = !isFlipped
             binding.backFace.isVisible = isFlipped
+        }
+
+        private fun setAnswerLayoutForTextOnly() {
+            val guideParams = binding.answerImageBottomGuide.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+            guideParams.guidePercent = 0f
+            binding.answerImageBottomGuide.layoutParams = guideParams
+            binding.answerContent.gravity = Gravity.CENTER
+        }
+
+        private fun setAnswerLayoutForImage() {
+            val guideParams = binding.answerImageBottomGuide.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+            guideParams.guidePercent = 0.42f
+            binding.answerImageBottomGuide.layoutParams = guideParams
+            binding.answerContent.gravity = Gravity.CENTER_HORIZONTAL
         }
     }
 

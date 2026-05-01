@@ -5,13 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.flashcardapp.data.repository.StatisticsRepository
 
 class StatisticViewModelFactory(
-    private val statisticsRepository: StatisticsRepository
+    private val repository: StatisticsRepository
 ) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(StatisticViewModel::class.java)) {
-            return StatisticViewModel(statisticsRepository) as T
+            @Suppress("UNCHECKED_CAST")
+            return StatisticViewModel(repository) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
