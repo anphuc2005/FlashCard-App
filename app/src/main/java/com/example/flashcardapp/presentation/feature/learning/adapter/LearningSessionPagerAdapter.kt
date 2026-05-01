@@ -13,7 +13,8 @@ import com.example.flashcardapp.databinding.ItemLearningSessionPageBinding
 import com.example.flashcardapp.domain.model.FlashCard
 
 class LearningSessionPagerAdapter(
-    private val onCardTapped: (position: Int) -> Unit
+    private val onCardTapped: (position: Int) -> Unit,
+    private val onSpeakTapped: (text: String) -> Unit
 ) : ListAdapter<FlashCard, LearningSessionPagerAdapter.CardViewHolder>(DiffCallback) {
 
     private val flippedPositions = mutableSetOf<Int>()
@@ -82,6 +83,12 @@ class LearningSessionPagerAdapter(
             binding.questionText.text = card.question
             binding.backQuestionText.text = card.question
             binding.answerText.text = card.answer
+            binding.btnSpeakAnswer.isEnabled = card.answer.isNotBlank()
+            binding.btnSpeakAnswer.setOnClickListener {
+                if (card.answer.isNotBlank()) {
+                    onSpeakTapped(card.answer)
+                }
+            }
             if (card.imageUrl.isNullOrBlank()) {
                 Glide.with(binding.root).clear(binding.cardImage)
                 binding.cardImage.setImageDrawable(null)

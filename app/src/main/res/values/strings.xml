@@ -191,6 +191,10 @@
     <string name="learning_answer_label">Trả lời</string>
     <string name="learning_card_badge_review">ÔN TẬP</string>
     <string name="learning_card_badge_new">MỚI</string>
+    <string name="learning_tts_read_answer">Đọc nội dung mặt sau</string>
+    <string name="learning_tts_initializing">Đang khởi tạo giọng đọc...</string>
+    <string name="learning_tts_unavailable">Không thể sử dụng tính năng đọc văn bản lúc này</string>
+    <string name="learning_tts_not_supported">Thiết bị chưa hỗ trợ ngôn ngữ giọng đọc hiện tại</string>
     <string name="learning_feedback_title">Bạn thấy thế nào?</string>
     <string name="learning_rating_again">Lại</string>
     <string name="learning_rating_hard">Khó</string>
@@ -237,6 +241,7 @@
     <string name="discover_search_hint">Tìm kiếm bài học, chủ đề...</string>
     <string name="discover_popular_categories">Chủ đề phổ biến</string>
     <string name="discover_all">Tất cả</string>
+    <string name="discover_collapse">Thu gọn</string>
     <string name="discover_featured_lessons">Bài học nổi bật</string>
     <string name="discover_see_more">Xem thêm</string>
     <string name="loading_default_message">Đang xử lý...</string>

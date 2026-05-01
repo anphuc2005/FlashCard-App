@@ -39,7 +39,8 @@ class DiscoverViewModel(
     val cloneSuccess: SharedFlow<String> = _cloneSuccess.asSharedFlow()
 
     private var allCourses: List<Deck> = emptyList()
-    private var selectedCategoryId: String? = null
+    private val _selectedCategoryId = MutableStateFlow<String?>(null)
+    val selectedCategoryId: StateFlow<String?> = _selectedCategoryId.asStateFlow()
     private var searchQuery: String = ""
 
     init {
@@ -79,7 +80,7 @@ class DiscoverViewModel(
     }
 
     fun filterCoursesByCategory(categoryId: String?) {
-        selectedCategoryId = categoryId
+        _selectedCategoryId.value = categoryId
         applyFilters()
     }
 
@@ -107,7 +108,7 @@ class DiscoverViewModel(
     }
 
     private fun applyFilters() {
-        val categoryFiltered = selectedCategoryId?.let { categoryId ->
+        val categoryFiltered = _selectedCategoryId.value?.let { categoryId ->
             allCourses.filter { it.categoryId == categoryId }
         } ?: allCourses
 

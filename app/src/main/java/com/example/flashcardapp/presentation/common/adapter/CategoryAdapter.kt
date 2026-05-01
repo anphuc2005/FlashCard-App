@@ -1,6 +1,7 @@
 package com.example.flashcardapp.presentation.common.adapter
 
 import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -16,10 +17,24 @@ class CategoryAdapter(
     private val onItemClick: (Category) -> Unit
 ) : ListAdapter<Category, CategoryAdapter.CategoryViewHolder>(CategoryDiffCallback()) {
 
+    private var selectedCategoryId: String? = null
+
+    fun setSelectedCategoryId(categoryId: String?) {
+        val previous = selectedCategoryId
+        if (previous == categoryId) return
+        selectedCategoryId = categoryId
+
+        val previousIndex = currentList.indexOfFirst { it.id == previous }
+        if (previousIndex != -1) notifyItemChanged(previousIndex)
+
+        val currentIndex = currentList.indexOfFirst { it.id == categoryId }
+        if (currentIndex != -1) notifyItemChanged(currentIndex)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemShortcutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         val density = parent.context.resources.displayMetrics.density
-        val marginHorizontalPx = (4 * density).toInt()
+        val marginHorizontalPx = (5 * density).toInt()
         val params = RecyclerView.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -32,7 +47,8 @@ class CategoryAdapter(
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        holder.bind(item, item.id == selectedCategoryId)
     }
 
     class CategoryViewHolder(
@@ -40,17 +56,37 @@ class CategoryAdapter(
         private val onItemClick: (Category) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Category) {
+        fun bind(item: Category, isSelected: Boolean) {
             binding.tvTitle.text = item.name
             val (iconRes, bgColorRes, tintColorRes) = getCategoryVisuals(item.name)
+            val context = binding.root.context
             binding.imgIcon.setImageResource(iconRes)
             binding.imgIcon.setColorFilter(
-                ContextCompat.getColor(binding.root.context, tintColorRes),
+                ContextCompat.getColor(context, tintColorRes),
                 PorterDuff.Mode.SRC_IN
             )
             binding.cardIcon.setCardBackgroundColor(
-                ContextCompat.getColor(binding.root.context, bgColorRes)
+                ContextCompat.getColor(context, bgColorRes)
             )
+
+            val selectedStrokeColor = ContextCompat.getColor(context, tintColorRes)
+            val selectedStrokeWidthPx = (2 * context.resources.displayMetrics.density).toInt()
+            binding.cardIcon.strokeColor = selectedStrokeColor
+            binding.cardIcon.strokeWidth = if (isSelected) selectedStrokeWidthPx else 0
+
+            binding.root.alpha = if (isSelected) 1f else 0.76f
+            binding.tvTitle.alpha = if (isSelected) 1f else 0.85f
+            binding.tvTitle.setTypeface(
+                binding.tvTitle.typeface,
+                if (isSelected) Typeface.BOLD else Typeface.NORMAL
+            )
+            binding.root.scaleX = if (isSelected) 1.03f else 1f
+            binding.root.scaleY = if (isSelected) 1.03f else 1f
+            binding.root.contentDescription = if (isSelected) {
+                "${item.name}, đã chọn"
+            } else {
+                item.name
+            }
             binding.root.setOnClickListener { onItemClick(item) }
         }
 
