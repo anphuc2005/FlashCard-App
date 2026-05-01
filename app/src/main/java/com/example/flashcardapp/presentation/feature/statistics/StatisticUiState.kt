@@ -4,12 +4,16 @@ import com.example.flashcardapp.data.datasource.remote.model.statistics.DailyAct
 import com.example.flashcardapp.data.datasource.remote.model.statistics.StatisticsSummaryDto
 import com.example.flashcardapp.data.datasource.remote.model.statistics.StudyLogItemDto
 import com.example.flashcardapp.domain.model.statistics.DeckStatistics
+import com.example.flashcardapp.domain.model.statistics.StatisticsOverview
+import com.example.flashcardapp.domain.model.statistics.TimeStatistics
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
 
 data class StatisticUiState(
     val isLoading: Boolean = false,
     val isInitialized: Boolean = false,
     val summary: StatisticsSummaryDto? = null,
+    val overview: StatisticsOverview? = null,
+    val timeStatistics: TimeStatistics? = null,
     val chartData: List<DailyActivityDto> = emptyList(),
     val deckStatistics: List<DeckStatistics> = emptyList(),
     val achievements: List<StatisticAchievementItem> = emptyList(),

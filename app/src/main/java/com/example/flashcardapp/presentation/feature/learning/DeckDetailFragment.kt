@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -129,15 +128,7 @@ class DeckDetailFragment : Fragment() {
     }
 
     private fun renderLoadingState(isLoading: Boolean) {
-        binding.scroll.visibility = if (isLoading) View.GONE else View.VISIBLE
-        binding.skeletonDeckDetail.visibility = if (isLoading) View.VISIBLE else View.GONE
-        if (isLoading && binding.skeletonDeckDetail.animation == null) {
-            binding.skeletonDeckDetail.startAnimation(
-                AnimationUtils.loadAnimation(requireContext(), R.anim.skeleton_pulse)
-            )
-        } else if (!isLoading) {
-            binding.skeletonDeckDetail.clearAnimation()
-        }
+        binding.scroll.visibility = View.VISIBLE
     }
 
     private class LearningTabSelectedListener(

@@ -273,4 +273,26 @@
     <string name="logout_confirm_message">Bạn có chắc chắn muốn đăng xuất?</string>
     <string name="logout_confirm_action">Đăng xuất</string>
     <string name="logout_confirm_cancel">Hủy</string>
+    <string name="edit_card_title">Sửa thẻ</string>
+    <string name="edit_card_delete">Xóa thẻ</string>
+    <string name="edit_card_update_success">Đã cập nhật thẻ thành công</string>
+    <string name="edit_deck_title">Sửa bộ thẻ</string>
+    <string name="edit_deck_name_required">Tên bộ thẻ không được để trống</string>
+    <string name="edit_deck_update_success">Đã cập nhật thành công!</string>
+    <string name="edit_deck_card_count">Số lượng thẻ (%1$d)</string>
+    <string name="deck_card_count">%1$d thẻ</string>
+    <string name="deck_last_studied">Học lần cuối: %1$s</string>
+    <string name="deck_never_studied">Chưa từng học</string>
+    <string name="deck_just_now">Vừa xong</string>
+    <string name="deck_minutes_ago">%1$d phút trước</string>
+    <string name="deck_hours_ago">%1$d giờ trước</string>
+    <string name="deck_days_ago">%1$d ngày trước</string>
+    <string name="deck_months_ago">%1$d tháng trước</string>
+    <string name="course_card_count_en">%1$d cards</string>
+    <string name="deck_bulk_delete_hint">Nhấn giữ một bộ thẻ để chọn và xóa hàng loạt.</string>
+    <string name="deck_bulk_delete_title">Xóa %1$d bộ thẻ?</string>
+    <string name="deck_bulk_delete_message">Bạn có chắc muốn xóa hàng loạt %1$d bộ thẻ đã chọn không?</string>
+    <string name="deck_bulk_delete_success">Đã gửi yêu cầu xóa %1$d bộ thẻ</string>
+    <string name="reset_password_loading">Đang đặt lại mật khẩu...</string>
+    <string name="color_blue_hex">#247BDF</string>
 </resources>

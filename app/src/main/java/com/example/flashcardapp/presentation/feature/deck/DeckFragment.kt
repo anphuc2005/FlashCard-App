@@ -169,7 +169,7 @@ class DeckFragment : Fragment() {
                 if (clampedDx < 0) {
                     val radius = 15 * density
 
-                    paint.color = Color.parseColor("#F37E33")
+                    paint.color = ContextCompat.getColor(requireContext(), R.color.deck_swipe_delete_bg)
                     val background = RectF(
                         itemView.right.toFloat() - buttonWidth - margin,
                         itemView.top.toFloat() + margin,
@@ -212,7 +212,7 @@ class DeckFragment : Fragment() {
 
         binding.filterButton.setOnClickListener {
             if (selectedDeckIds.isEmpty()) {
-                showAppWarning("Nhấn giữ một bộ thẻ để chọn và xóa hàng loạt.")
+                showAppWarning(getString(R.string.deck_bulk_delete_hint))
             } else {
                 showBulkDeleteConfirmDialog()
             }
@@ -239,15 +239,17 @@ class DeckFragment : Fragment() {
             return
         }
         binding.filterButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
-        binding.filterButton.setBackgroundColor(Color.parseColor("#E53935"))
+        binding.filterButton.setBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.deck_bulk_delete_active_bg)
+        )
         binding.filterButton.iconTint = ContextCompat.getColorStateList(requireContext(), android.R.color.white)
     }
 
     private fun showBulkDeleteConfirmDialog() {
         val count = selectedDeckIds.size
         val dialog = AppConfirmDialog.newInstance(
-            title = "Xóa $count bộ thẻ?",
-            message = "Bạn có chắc muốn xóa hàng loạt $count bộ thẻ đã chọn không?",
+            title = getString(R.string.deck_bulk_delete_title, count),
+            message = getString(R.string.deck_bulk_delete_message, count),
             confirmText = getString(R.string.delete_confirm_action),
             cancelText = getString(R.string.delete_confirm_cancel),
             iconRes = R.drawable.ic_delete,
@@ -258,7 +260,7 @@ class DeckFragment : Fragment() {
                 val idsToDelete = selectedDeckIds.toList()
                 idsToDelete.forEach { deckViewModel.deleteDeck(it) }
                 clearSelection()
-                showAppSuccess("Đã gửi yêu cầu xóa $count bộ thẻ")
+                showAppSuccess(getString(R.string.deck_bulk_delete_success, count))
             }
         }
         dialog.show(childFragmentManager, "delete_bulk_deck_confirm")

@@ -101,7 +101,7 @@ class EditDeckFragment : Fragment() {
 
         binding.rvCards.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCards.adapter = editDeckCardAdapter
-        binding.tvTitle.text = "Sửa bộ thẻ"
+        binding.tvTitle.text = getString(R.string.edit_deck_title)
     }
 
     private fun setupListeners() {
@@ -124,7 +124,7 @@ class EditDeckFragment : Fragment() {
             val isPublic = binding.switchPublic.isChecked
 
             if (deckName.isEmpty()) {
-                showAppWarning("Tên bộ thẻ không được để trống")
+                showAppWarning(getString(R.string.edit_deck_name_required))
                 return@setOnClickListener
             }
 
@@ -148,10 +148,11 @@ class EditDeckFragment : Fragment() {
                                 println("Deck is public: ${state.deck.isPublic} ${state.deck.name}")
                                 updateSwitchTint(state.deck.isPublic)
                                 applyIconColor(state.deck.themeColor)
-                                binding.tvCardCountLabel.text = "Số lượng thẻ (${state.deck.cardCount})"
+                                binding.tvCardCountLabel.text =
+                                    getString(R.string.edit_deck_card_count, state.deck.cardCount)
                             }
                             is EditDeckState.UpdateSuccess -> {
-                                showAppSuccess("Đã cập nhật thành công!")
+                                showAppSuccess(getString(R.string.edit_deck_update_success))
                                 requireActivity().finish()
                             }
                             is EditDeckState.Error -> {
@@ -165,7 +166,8 @@ class EditDeckFragment : Fragment() {
                     viewModel.cardsState.collect { cards ->
                         editDeckCardAdapter.submitList(cards)
                         if (cards.isNotEmpty()) {
-                            binding.tvCardCountLabel.text = "Số lượng thẻ (${cards.size})"
+                            binding.tvCardCountLabel.text =
+                                getString(R.string.edit_deck_card_count, cards.size)
                         }
                     }
                 }
@@ -187,7 +189,7 @@ class EditDeckFragment : Fragment() {
     }
 
     private fun setupColorPicker() {
-        binding.colorBlue.setOnClickListener { applyIconColor("#247BDF") }
+        binding.colorBlue.setOnClickListener { applyIconColor(getString(R.string.color_blue_hex)) }
         binding.colorGreen.setOnClickListener { applyIconColor("#10B981") }
         binding.colorPurple.setOnClickListener { applyIconColor("#6366F1") }
         binding.colorOrange.setOnClickListener { applyIconColor("#F97316") }
@@ -195,8 +197,9 @@ class EditDeckFragment : Fragment() {
     }
 
     private fun applyIconColor(rawColor: String?) {
-        val safeColor = rawColor?.takeIf { it.isNotBlank() } ?: "#247BDF"
-        val parsed = runCatching { Color.parseColor(safeColor) }.getOrElse { Color.parseColor("#247BDF") }
+        val fallbackColor = getString(R.string.color_blue_hex)
+        val safeColor = rawColor?.takeIf { it.isNotBlank() } ?: fallbackColor
+        val parsed = runCatching { Color.parseColor(safeColor) }.getOrElse { Color.parseColor(fallbackColor) }
         selectedThemeColor = safeColor
         binding.ivDeckIcon.backgroundTintList = ColorStateList.valueOf(parsed)
     }

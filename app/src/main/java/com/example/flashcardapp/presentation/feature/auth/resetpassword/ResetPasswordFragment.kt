@@ -5,7 +5,6 @@ import com.example.flashcardapp.presentation.feature.auth.AuthViewModelFactory
 import com.example.flashcardapp.presentation.feature.auth.PasswordToggleConfigurator
 import com.example.flashcardapp.presentation.feature.auth.otp.OtpVerificationFragment
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -92,7 +91,7 @@ class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password) {
                             AuthOperationState.Loading -> {
                                 renderLoading(true)
                                 if (loadingDialog == null || loadingDialog?.isVisible == false) {
-                                    loadingDialog = LoadingDialogFragment.newInstance("Đang đặt lại mật khẩu...")
+                                    loadingDialog = LoadingDialogFragment.newInstance(getString(R.string.reset_password_loading))
                                     loadingDialog?.show(childFragmentManager, "LoadingDialog")
                                 }
                             }
@@ -123,7 +122,7 @@ class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password) {
     }
 
     private fun renderStrength(strength: PasswordStrength) {
-        val inactiveColor = Color.parseColor("#E5E9F1")
+        val inactiveColor = ContextCompat.getColor(requireContext(), R.color.password_strength_inactive)
         val activeColorRes = when (strength) {
             PasswordStrength.EMPTY -> R.color.md_icon_gray
             PasswordStrength.WEAK -> R.color.md_icon_red

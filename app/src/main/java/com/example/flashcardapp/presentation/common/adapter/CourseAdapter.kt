@@ -42,12 +42,11 @@ class CourseAdapter(
         private val onSaveClick: (Deck) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        @SuppressLint("SetTextI18n")
         fun bind(item: Deck, categoryMap: Map<String, String>) {
             binding.apply {
                 courseTitle.text = item.name
                 val totalCards = item.cardCount
-                courseMeta.text = "$totalCards cards"
+                courseMeta.text = root.context.getString(R.string.course_card_count_en, totalCards)
                 
                 // Lấy tên Category thực tế, nếu không có giữ lại ID hoặc mặc định là DECK
                 val categoryName = categoryMap[item.categoryId] ?: "DECK"

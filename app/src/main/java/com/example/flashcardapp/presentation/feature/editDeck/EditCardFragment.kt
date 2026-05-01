@@ -46,7 +46,7 @@ class EditCardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.headerTitle.text = "Sửa thẻ"
+        binding.headerTitle.text = getString(R.string.edit_card_title)
 
         arguments?.let {
             cardId = it.getString("CARD_ID") ?: ""
@@ -89,7 +89,7 @@ class EditCardFragment : Fragment() {
             }
             dialog.show(childFragmentManager, "delete_card_confirm")
         }
-        binding.btnAddAnother.text = "Xóa thẻ"
+        binding.btnAddAnother.text = getString(R.string.edit_card_delete)
     }
 
     private fun observeData() {
@@ -100,7 +100,7 @@ class EditCardFragment : Fragment() {
                         is EditCardState.Idle -> Unit
                         is EditCardState.Loading -> Unit
                         is EditCardState.Success -> {
-                            showAppSuccess("Đã cập nhật thẻ thành công")
+                            showAppSuccess(getString(R.string.edit_card_update_success))
                             viewModel.resetState()
                             findNavController().popBackStack()
                         }

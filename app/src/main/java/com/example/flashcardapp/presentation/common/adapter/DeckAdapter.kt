@@ -1,10 +1,12 @@
 package com.example.flashcardapp.presentation.common.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ItemDeckBinding
 import com.example.flashcardapp.domain.model.Deck
 
@@ -45,13 +47,11 @@ class DeckAdapter(
                 deckTitle.text = item.name
 
                 // Set stats: cards count only
-                @Suppress("SetTextI18n")
-                stats.text = "${item.cardCount} thẻ"
+                stats.text = root.context.getString(R.string.deck_card_count, item.cardCount)
 
                 // Set last studied text using real date
-                val lastStudiedText = formatTimeAgo(item.updatedAt)
-                @Suppress("SetTextI18n")
-                lastStudied.text = "Học lần cuối: $lastStudiedText"
+                val lastStudiedText = formatTimeAgo(root.context, item.updatedAt)
+                lastStudied.text = root.context.getString(R.string.deck_last_studied, lastStudiedText)
 
                 // Click listeners
                 root.setOnClickListener {
@@ -95,8 +95,8 @@ class DeckAdapter(
     }
 
     companion object {
-        private fun formatTimeAgo(timestampString: String?): String {
-            if (timestampString == null) return "Chưa từng học"
+        private fun formatTimeAgo(context: Context, timestampString: String?): String {
+            if (timestampString == null) return context.getString(R.string.deck_never_studied)
             
             var timeMillis: Long? = timestampString.toLongOrNull()
 
@@ -122,25 +122,25 @@ class DeckAdapter(
                 }
             }
             
-            if (timeMillis == null) return "Chưa từng học"
+            if (timeMillis == null) return context.getString(R.string.deck_never_studied)
             
             val now = System.currentTimeMillis()
             val diff = now - timeMillis
             
-            if (diff < 0) return "Vừa xong"
+            if (diff < 0) return context.getString(R.string.deck_just_now)
             
             val minutes = diff / (60 * 1000)
-            if (minutes < 1) return "Vừa xong"
+            if (minutes < 1) return context.getString(R.string.deck_just_now)
             
             val hours = minutes / 60
-            if (hours < 1) return "$minutes phút trước"
+            if (hours < 1) return context.getString(R.string.deck_minutes_ago, minutes)
             
             val days = hours / 24
-            if (days < 1) return "$hours giờ trước"
+            if (days < 1) return context.getString(R.string.deck_hours_ago, hours)
             
-            if (days < 30) return "$days ngày trước"
+            if (days < 30) return context.getString(R.string.deck_days_ago, days)
             
-            return "${days / 30} tháng trước"
+            return context.getString(R.string.deck_months_ago, days / 30)
         }
     }
 }
