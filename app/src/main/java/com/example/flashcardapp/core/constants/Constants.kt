@@ -4,7 +4,6 @@ object Constants {
     const val BASE_URL = "https://api.tolalinhne.site/api/v1/"
 //    const val BASE_URL = "http://10.0.2.2:8080/api/v1/"
     const val DATABASE_NAME = "flashcard_database"
-    const val DECK_TABLE = "deck_table"
     const val FLASHCARD_TABLE = "flashcard_table"
     const val CHAT_MESSAGE_TABLE = "chat_message_table"
     const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
@@ -15,4 +14,3 @@ object Constants {
     const val DECK_NAME_KEY = "deck_name"
     const val FLASHCARD_ID_KEY = "flashcard_id"
 }
-

@@ -3,12 +3,14 @@ package com.example.flashcardapp.presentation.feature.deck
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.core.utils.MockDeckData
-import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.data.repository.DeckRepository
+import com.example.flashcardapp.domain.model.Deck
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.Normalizer
+import java.util.Locale
 
 sealed class DeckUiState {
     object Loading : DeckUiState()
@@ -17,7 +19,9 @@ sealed class DeckUiState {
     object Empty : DeckUiState()
 }
 
-class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
+class DeckViewModel(
+    private val deckRepository: DeckRepository?
+) : ViewModel() {
 
     private val _deckUiState = MutableStateFlow<DeckUiState>(DeckUiState.Loading)
     val deckUiState: StateFlow<DeckUiState> = _deckUiState.asStateFlow()
@@ -28,62 +32,38 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
     private val _cloneState = MutableStateFlow<Result<Deck>?>(null)
     val cloneState: StateFlow<Result<Deck>?> = _cloneState.asStateFlow()
 
+    private var allDecks: List<Deck> = emptyList()
+    private var currentSearchQuery: String = ""
+
     init {
-        // If repository is null, use mock data for testing
         if (deckRepository == null) {
             loadMockData()
         } else {
-            observeLocalDecks()
             syncDecksFromApi()
         }
     }
 
-    /**
-     * Load mock data for UI testing - temporary
-     */
     private fun loadMockData() {
-        val mockDecks = MockDeckData.getMockDecks()
-
-        _deckUiState.value = DeckUiState.Success(mockDecks)
-    }
-
-    private fun observeLocalDecks() {
-        viewModelScope.launch {
-            if (deckRepository == null) return@launch
-            
-            deckRepository.getAllDecksWithCardCountFromDb().collect { aggregations ->
-                val decks = aggregations.map { agg ->
-                    val entity = agg.deck
-                    Deck(
-                        id = entity.id,
-                        name = entity.name,
-                        description = entity.description,
-                        createdAt = entity.createdAt,
-                        updatedAt = entity.updatedAt,
-                        customCardCount = agg.cardCount
-                    )
-                }
-                
-                if (decks.isEmpty()) {
-                    _deckUiState.value = DeckUiState.Empty
-                } else {
-                    _deckUiState.value = DeckUiState.Success(decks)
-                }
-            }
-        }
+        allDecks = MockDeckData.getMockDecks()
+        publishFilteredDecks()
     }
 
     fun syncDecksFromApi() {
         viewModelScope.launch {
             if (deckRepository == null) return@launch
 
-            try {
-                // The repository fetches from API and inserts into Room DB.
-                // Our observeLocalDecks() will automatically pick up the changes.
-                deckRepository.getAllDecksFromApi()
-            } catch (exception: Exception) {
-                // Optionally handle sync error without breaking local state
-            }
+            _deckUiState.value = DeckUiState.Loading
+
+            deckRepository.getAllDecksFromApi()
+                .onSuccess { decks ->
+                    allDecks = decks
+                    publishFilteredDecks()
+                }
+                .onFailure { error ->
+                    _deckUiState.value = DeckUiState.Error(
+                        error.message ?: "Có lỗi xảy ra khi tải danh sách bộ thẻ"
+                    )
+                }
         }
     }
 
@@ -95,9 +75,11 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
                     name = name,
                     description = description,
                     createdAt = System.currentTimeMillis().toString(),
-                    updatedAt = System.currentTimeMillis().toString()
+                    updatedAt = System.currentTimeMillis().toString(),
+                    isPublic = true
                 )
-                deckRepository.createDeck(newDeck, isPublic = true)
+                deckRepository.createDeck(newDeck)
+                syncDecksFromApi()
             }
         }
     }
@@ -106,39 +88,62 @@ class DeckViewModel(private val deckRepository: DeckRepository?) : ViewModel() {
         viewModelScope.launch {
             if (deckRepository != null) {
                 deckRepository.deleteDeck(deckId)
-                // Flow from Room will automatically emit new list, no need to manually refresh
+                syncDecksFromApi()
             }
         }
     }
 
     fun updateDeckLastStudied(deck: Deck) {
-        viewModelScope.launch {
-            if (deckRepository != null) {
-                val updatedDeck = deck.copy(updatedAt = System.currentTimeMillis().toString())
-                deckRepository.updateDeckLocal(updatedDeck)
-            }
-        }
+        val now = System.currentTimeMillis().toString()
+        allDecks = allDecks.map {
+            if (it.id == deck.id) it.copy(updatedAt = now) else it
+        }.sortedByDescending { it.updatedAt ?: "" }
+
+        publishFilteredDecks()
+    }
+
+    fun updateSearchQuery(query: String) {
+        currentSearchQuery = query
+        publishFilteredDecks()
     }
 
     fun exploreDecks() {
         viewModelScope.launch {
             if (deckRepository == null) return@launch
-            try {
-                _exploreState.value = deckRepository.exploreDecks()
-            } catch (e: Exception) {
-                _exploreState.value = Result.failure(e)
-            }
+            _exploreState.value = runCatching { deckRepository.exploreDecks() }
+                .getOrElse { Result.failure(it) }
         }
     }
 
     fun cloneDeck(deckId: String) {
         viewModelScope.launch {
             if (deckRepository == null) return@launch
-            try {
-                _cloneState.value = deckRepository.cloneDeck(deckId)
-            } catch (e: Exception) {
-                _cloneState.value = Result.failure(e)
+            _cloneState.value = runCatching { deckRepository.cloneDeck(deckId) }
+                .getOrElse { Result.failure(it) }
+        }
+    }
+
+    private fun publishFilteredDecks() {
+        val normalizedQuery = normalizeForSearch(currentSearchQuery)
+        val filteredDecks = if (normalizedQuery.isBlank()) {
+            allDecks
+        } else {
+            allDecks.filter { deck ->
+                val normalizedName = normalizeForSearch(deck.name)
+                val normalizedDescription = normalizeForSearch(deck.description.orEmpty())
+                normalizedName.contains(normalizedQuery) || normalizedDescription.contains(normalizedQuery)
             }
         }
+
+        _deckUiState.value = if (filteredDecks.isEmpty()) {
+            DeckUiState.Empty
+        } else {
+            DeckUiState.Success(filteredDecks)
+        }
+    }
+
+    private fun normalizeForSearch(raw: String): String {
+        val normalized = Normalizer.normalize(raw.lowercase(Locale.getDefault()), Normalizer.Form.NFD)
+        return normalized.replace("\\p{M}+".toRegex(), "").trim()
     }
 }

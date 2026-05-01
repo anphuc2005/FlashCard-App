@@ -2,11 +2,9 @@ package com.example.flashcardapp.presentation.common.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ItemDeckBinding
 import com.example.flashcardapp.domain.model.Deck
 
@@ -35,18 +33,9 @@ class DeckAdapter(
                 // Set deck title
                 deckTitle.text = item.name
 
-                // Set stats: cards count and studied cards (mock: 50% studied)
-                val studiedCards = if (item.cardCount > 0) item.cardCount / 2 else 0
+                // Set stats: cards count only
                 @Suppress("SetTextI18n")
-                stats.text = "${item.cardCount} thẻ · Đã học $studiedCards"
-
-                // Set progress percentage (mock data)
-                val progressPercent = if (item.cardCount > 0) (studiedCards * 100) / item.cardCount else 0
-                @Suppress("SetTextI18n")
-                root.findViewById<android.widget.TextView>(R.id.progressPercent)?.text = "$progressPercent%"
-
-                // Set progress bar progress - convert to Float
-                progressBar.setProgress(progressPercent.toFloat())
+                stats.text = "${item.cardCount} thẻ"
 
                 // Set last studied text using real date
                 val lastStudiedText = formatTimeAgo(item.updatedAt)
@@ -85,6 +74,18 @@ class DeckAdapter(
             if (timestampString == null) return "Chưa từng học"
             
             var timeMillis: Long? = timestampString.toLongOrNull()
+
+            if (timeMillis == null) {
+                timeMillis = runCatching {
+                    java.time.Instant.parse(timestampString).toEpochMilli()
+                }.getOrNull()
+            }
+
+            if (timeMillis == null) {
+                timeMillis = runCatching {
+                    java.time.OffsetDateTime.parse(timestampString).toInstant().toEpochMilli()
+                }.getOrNull()
+            }
             
             if (timeMillis == null) {
                 try {
@@ -118,4 +119,3 @@ class DeckAdapter(
         }
     }
 }
-

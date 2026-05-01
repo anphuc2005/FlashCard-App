@@ -44,16 +44,30 @@ class ChatAIFragment : Fragment() {
     }
 
     private fun setupViewModel() {
+        val container = (requireActivity().application as FlashcardApp).container
         val useCases = ChatModule.provideChatUseCases(requireContext())
-        val exploreDecksUseCase = (requireActivity().application as FlashcardApp).container.exploreDecksUseCase
+        val exploreDecksUseCase = container.exploreDecksUseCase
+        val addDeckUseCase = container.addDeckUseCase
+        val addFlashCardUseCase = container.addFlashCardUseCase
+        val getAllCategoriesUseCase = container.getAllCategoriesUseCase
+
         viewModel = ViewModelProvider(
             this,
-            ChatAIViewModelFactory(useCases, exploreDecksUseCase)
+            ChatAIViewModelFactory(
+                useCases = useCases,
+                exploreDecksUseCase = exploreDecksUseCase,
+                addDeckUseCase = addDeckUseCase,
+                addFlashCardUseCase = addFlashCardUseCase,
+                getAllCategoriesUseCase = getAllCategoriesUseCase
+            )
         )[ChatAIViewModel::class.java]
     }
 
     private fun setupRecyclerView() {
-        adapter = ChatMessageAdapter()
+        adapter = ChatMessageAdapter(
+            onConfirmDeckCreation = { viewModel.confirmPendingDeckCreationFromUi() },
+            onCancelDeckCreation = { viewModel.cancelPendingDeckCreationFromUi() }
+        )
 
         binding.recyclerViewChat.apply {
             layoutManager = LinearLayoutManager(context).apply { stackFromEnd = true }
@@ -102,6 +116,12 @@ class ChatAIFragment : Fragment() {
                         if (error != null) {
                             showError(error)
                         }
+                    }
+                }
+
+                launch {
+                    viewModel.pendingDeckDraftMessageId.collectLatest { pendingMessageId ->
+                        adapter.setPendingDeckDraftMessageId(pendingMessageId)
                     }
                 }
             }

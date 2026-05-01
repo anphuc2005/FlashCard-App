@@ -1,9 +1,12 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -20,10 +23,13 @@ import com.example.flashcardapp.databinding.ItemLearningRatingCardBinding
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.feature.learning.adapter.LearningSessionPagerAdapter
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 private const val SECONDS_PER_MINUTE = 60L
 private const val FLIP_HALF_DURATION = 110L
 private const val FLIP_CAMERA_DISTANCE = 9000f
+private const val TTS_UTTERANCE_ID = "learning_cards_answer_tts"
+private const val TAG = "LearningCardsFragment"
 
 class LearningCardsFragment : Fragment() {
 
@@ -33,9 +39,14 @@ class LearningCardsFragment : Fragment() {
     private val viewModel: FlashCardViewModel by activityViewModels()
     private lateinit var pagerAdapter: LearningSessionPagerAdapter
     private var isFlipAnimating = false
+    private var textToSpeech: TextToSpeech? = null
+    private var isTtsReady = false
+    private var pendingSpeechText: String? = null
+    private var activeSpeechLocale: Locale? = null
 
     private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
+            stopSpeaking()
             viewModel.setCurrentIndex(position)
         }
     }
@@ -51,20 +62,30 @@ class LearningCardsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initTextToSpeech()
         setupPager()
         setupRatingCards()
         setupClickListeners()
         observeViewModel()
     }
 
+    override fun onStop() {
+        stopSpeaking()
+        super.onStop()
+    }
+
     override fun onDestroyView() {
+        releaseTextToSpeech()
         binding.viewPagerCards.unregisterOnPageChangeCallback(pageChangeCallback)
         _binding = null
         super.onDestroyView()
     }
 
     private fun setupPager() {
-        pagerAdapter = LearningSessionPagerAdapter(::onCardTapped)
+        pagerAdapter = LearningSessionPagerAdapter(
+            onCardTapped = ::onCardTapped,
+            onSpeakTapped = ::onSpeakAnswerRequested
+        )
         binding.viewPagerCards.apply {
             adapter = pagerAdapter
             offscreenPageLimit = 1
@@ -164,6 +185,7 @@ class LearningCardsFragment : Fragment() {
 
     private fun onCardTapped(position: Int) {
         if (isFlipAnimating || position != binding.viewPagerCards.currentItem) return
+        stopSpeaking()
         val holder = findCurrentCardView() ?: return
         animateFlip(holder, position)
     }
@@ -202,12 +224,100 @@ class LearningCardsFragment : Fragment() {
         val position = binding.viewPagerCards.currentItem
         if (!pagerAdapter.isPositionFlipped(position)) return
         if (isFlipAnimating) return
+        stopSpeaking()
         val completed = viewModel.rateCurrentCard(rating)
         pagerAdapter.resetFlipState(position)
         if (!completed) {
             val nextPosition = viewModel.uiState.value.currentIndex
             binding.viewPagerCards.setCurrentItem(nextPosition, true)
         }
+    }
+
+    private fun initTextToSpeech() {
+        if (textToSpeech != null) return
+        textToSpeech = TextToSpeech(requireContext().applicationContext) { status ->
+            if (status != TextToSpeech.SUCCESS) {
+                isTtsReady = false
+                Log.e(TAG, "initTextToSpeech failed with status=$status")
+                showToast(R.string.learning_tts_unavailable)
+                return@TextToSpeech
+            }
+
+            isTtsReady = true
+            pendingSpeechText?.let { pending ->
+                pendingSpeechText = null
+                speakTextInternal(pending)
+            }
+        }
+    }
+
+    private fun onSpeakAnswerRequested(text: String) {
+        val normalized = text.trim()
+        if (normalized.isBlank()) {
+            showToast(R.string.learning_no_answer)
+            return
+        }
+        if (!isTtsReady) {
+            pendingSpeechText = normalized
+            showToast(R.string.learning_tts_initializing)
+            initTextToSpeech()
+            return
+        }
+        speakTextInternal(normalized)
+    }
+
+    private fun speakTextInternal(text: String) {
+        val ttsEngine = textToSpeech ?: run {
+            initTextToSpeech()
+            pendingSpeechText = text
+            return
+        }
+        if (!applyDetectedLanguage(ttsEngine, text)) {
+            showToast(R.string.learning_tts_not_supported)
+            return
+        }
+        val result = ttsEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null, TTS_UTTERANCE_ID)
+        if (result == TextToSpeech.ERROR) {
+            Log.e(TAG, "speakText failed to queue text")
+            showToast(R.string.learning_tts_unavailable)
+        }
+    }
+
+    private fun applyDetectedLanguage(ttsEngine: TextToSpeech, text: String): Boolean {
+        val targetLocale = TtsLanguageResolver.resolveBestSupportedLocale(
+            tts = ttsEngine,
+            text = text,
+            defaultLocale = Locale.getDefault()
+        )
+        if (activeSpeechLocale == targetLocale) return true
+
+        val setResult = ttsEngine.setLanguage(targetLocale)
+        val supported = TtsLanguageResolver.isLanguageResultSupported(setResult)
+        if (!supported) {
+            Log.w(TAG, "applyDetectedLanguage failed: locale=$targetLocale, result=$setResult")
+            return false
+        }
+        activeSpeechLocale = targetLocale
+        Log.d(TAG, "TTS locale selected: $targetLocale")
+        return true
+    }
+
+    private fun stopSpeaking() {
+        textToSpeech?.stop()
+    }
+
+    private fun releaseTextToSpeech() {
+        stopSpeaking()
+        textToSpeech?.shutdown()
+        textToSpeech = null
+        isTtsReady = false
+        pendingSpeechText = null
+        activeSpeechLocale = null
+    }
+
+    private fun showToast(messageRes: Int) {
+        if (!isAdded) return
+        Toast.makeText(requireContext(), messageRes, Toast.LENGTH_SHORT).show()
     }
 
     private fun updateBottomAction(isBackFace: Boolean, enabled: Boolean) {

@@ -120,6 +120,8 @@
     <string name="ai_avatar">AI Avatar</string>
     <string name="retry">Thử lại</string>
     <string name="delete">Xóa</string>
+    <string name="ai_confirm_create_deck">Xác nhận tạo</string>
+    <string name="ai_cancel_create_deck">Hủy</string>
     <string name="error_message">Error: %s</string>
     <string name="reminder_notification_title">Đến giờ học rồi</string>
     <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
@@ -186,6 +188,10 @@
     <string name="learning_question_label">Câu hỏi</string>
     <string name="learning_hint_question">Gợi ý cho bạn?</string>
     <string name="learning_answer_label">Trả lời</string>
+    <string name="learning_tts_read_answer">Đọc nội dung mặt sau</string>
+    <string name="learning_tts_initializing">Đang khởi tạo giọng đọc...</string>
+    <string name="learning_tts_unavailable">Không thể sử dụng tính năng đọc văn bản lúc này</string>
+    <string name="learning_tts_not_supported">Thiết bị chưa hỗ trợ ngôn ngữ giọng đọc hiện tại</string>
     <string name="learning_feedback_title">Bạn thấy thế nào?</string>
     <string name="learning_rating_again">Lại</string>
     <string name="learning_rating_hard">Khó</string>
@@ -232,6 +238,7 @@
     <string name="discover_search_hint">Tìm kiếm bài học, chủ đề...</string>
     <string name="discover_popular_categories">Chủ đề phổ biến</string>
     <string name="discover_all">Tất cả</string>
+    <string name="discover_collapse">Thu gọn</string>
     <string name="discover_featured_lessons">Bài học nổi bật</string>
     <string name="discover_see_more">Xem thêm</string>
     <string name="loading_default_message">Đang xử lý...</string>
@@ -245,4 +252,3 @@
     <string name="logout_confirm_action">Đăng xuất</string>
     <string name="logout_confirm_cancel">Hủy</string>
 </resources>
-

@@ -12,12 +12,15 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
+import com.example.flashcardapp.core.utils.textChangesFlow
 import com.example.flashcardapp.databinding.FragmentDeckBinding
 import com.example.flashcardapp.presentation.common.adapter.DeckAdapter
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
@@ -26,13 +29,20 @@ import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DeckFragment : Fragment() {
 
     private lateinit var binding: FragmentDeckBinding
     private val deckViewModel: DeckViewModel by viewModels {
-        DeckViewModelFactory((requireActivity().application as FlashcardApp).container.deckRepository)
+        val container = (requireActivity().application as FlashcardApp).container
+        DeckViewModelFactory(
+            deckRepository = container.deckRepository
+        )
     }
     private lateinit var deckAdapter: DeckAdapter
 
@@ -47,6 +57,7 @@ class DeckFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        observeSearchInput()
         lifecycleScope.launch {
             deckViewModel.deckUiState.collect { uiState ->
                 handleUiState(uiState)
@@ -178,6 +189,21 @@ class DeckFragment : Fragment() {
         }
     }
 
+    @OptIn(FlowPreview::class)
+    private fun observeSearchInput() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                binding.searchInput.textChangesFlow()
+                    .map { it.trim() }
+                    .debounce(300)
+                    .distinctUntilChanged()
+                    .collect { query ->
+                        deckViewModel.updateSearchQuery(query)
+                    }
+            }
+        }
+    }
+
     private fun handleUiState(uiState: DeckUiState) {
         when (uiState) {
             is DeckUiState.Loading -> showLoading()
@@ -209,6 +235,6 @@ class DeckFragment : Fragment() {
     }
 
     private fun showEmpty() {
-        showAppWarning("Chưa có bộ thẻ nào để hiển thị.")
+        deckAdapter.submitList(emptyList())
     }
 }

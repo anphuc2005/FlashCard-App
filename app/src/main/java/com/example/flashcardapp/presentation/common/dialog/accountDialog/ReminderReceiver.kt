@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.RequiresPermission
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
+import com.example.flashcardapp.data.datasource.local.session.StudyStreakStore
 
 /** Receives alarm events and shows reminder notification when enabled. */
 class ReminderReceiver : BroadcastReceiver() {
@@ -17,7 +17,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val hour = intent.getIntExtra(EXTRA_HOUR, 8)
         val minute = intent.getIntExtra(EXTRA_MINUTE, 0)
 
-        if (studyEnabled) {
+        if (studyEnabled && !StudyStreakStore.hasStudiedToday(context)) {
             ReminderNotificationHelper.showStudyReminder(context)
         }
 

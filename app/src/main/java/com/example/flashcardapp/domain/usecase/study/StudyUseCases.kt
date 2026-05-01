@@ -4,5 +4,7 @@ data class StudyUseCases(
     val getSessionCards: GetStudySessionCardsUseCase,
     val getReviewedCardIds: GetReviewedCardIdsUseCase,
     val saveReview: SaveStudyReviewUseCase,
-    val syncReviews: SyncStudyReviewsUseCase
+    val syncReviews: SyncStudyReviewsUseCase,
+    val getCurrentStreak: GetCurrentStudyStreakUseCase,
+    val hasStudiedToday: HasStudiedTodayUseCase
 )

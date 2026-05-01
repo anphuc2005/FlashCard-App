@@ -13,7 +13,7 @@ class ProgressBar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var progress = 85f // 0-100
+    private var progress = 0f // 0-100
     private val cornerRadius = 24f
 
     private lateinit var trackPaint: Paint
@@ -70,4 +70,3 @@ class ProgressBar @JvmOverloads constructor(
 
     fun getProgress() = progress
 }
-

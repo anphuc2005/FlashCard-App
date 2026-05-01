@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.Normalizer
+import java.util.Locale
 
 class DiscoverViewModel(
     private val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase,
@@ -37,6 +39,9 @@ class DiscoverViewModel(
     val cloneSuccess: SharedFlow<String> = _cloneSuccess.asSharedFlow()
 
     private var allCourses: List<Deck> = emptyList()
+    private val _selectedCategoryId = MutableStateFlow<String?>(null)
+    val selectedCategoryId: StateFlow<String?> = _selectedCategoryId.asStateFlow()
+    private var searchQuery: String = ""
 
     init {
         loadData()
@@ -61,7 +66,7 @@ class DiscoverViewModel(
                 if (deckResult.isSuccess) {
                     val fetchedDecks = deckResult.getOrNull() ?: emptyList()
                     allCourses = fetchedDecks
-                    _courses.value = fetchedDecks
+                    applyFilters()
                 } else {
                     _error.value = deckResult.exceptionOrNull()?.message
                 }
@@ -75,11 +80,13 @@ class DiscoverViewModel(
     }
 
     fun filterCoursesByCategory(categoryId: String?) {
-        if (categoryId == null) {
-            _courses.value = allCourses
-        } else {
-            _courses.value = allCourses.filter { it.categoryId == categoryId }
-        }
+        _selectedCategoryId.value = categoryId
+        applyFilters()
+    }
+
+    fun updateSearchQuery(query: String) {
+        searchQuery = query
+        applyFilters()
     }
 
     fun cloneDeck(deckId: String) {
@@ -98,5 +105,29 @@ class DiscoverViewModel(
                 _isLoading.value = false
             }
         }
+    }
+
+    private fun applyFilters() {
+        val categoryFiltered = _selectedCategoryId.value?.let { categoryId ->
+            allCourses.filter { it.categoryId == categoryId }
+        } ?: allCourses
+
+        val normalizedQuery = normalizeForSearch(searchQuery)
+        val searched = if (normalizedQuery.isBlank()) {
+            categoryFiltered
+        } else {
+            categoryFiltered.filter { deck ->
+                val normalizedName = normalizeForSearch(deck.name)
+                val normalizedDescription = normalizeForSearch(deck.description.orEmpty())
+                normalizedName.contains(normalizedQuery) || normalizedDescription.contains(normalizedQuery)
+            }
+        }
+
+        _courses.value = searched
+    }
+
+    private fun normalizeForSearch(raw: String): String {
+        val normalized = Normalizer.normalize(raw.lowercase(Locale.getDefault()), Normalizer.Form.NFD)
+        return normalized.replace("\\p{M}+".toRegex(), "").trim()
     }
 }

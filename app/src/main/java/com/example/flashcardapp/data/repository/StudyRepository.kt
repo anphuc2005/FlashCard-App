@@ -1,8 +1,11 @@
 package com.example.flashcardapp.data.repository
 
 import android.content.Context
+import com.example.flashcardapp.data.datasource.local.dao.FlashCardDao
 import com.example.flashcardapp.data.datasource.local.dao.StudyReviewDao
+import com.example.flashcardapp.data.datasource.local.entity.FlashCardEntity
 import com.example.flashcardapp.data.datasource.local.entity.toEntity
+import com.example.flashcardapp.data.datasource.local.session.StudyStreakStore
 import com.example.flashcardapp.data.datasource.remote.api.StudyApiService
 import com.example.flashcardapp.data.datasource.remote.model.toDto
 import com.example.flashcardapp.domain.model.FlashCard
@@ -18,6 +21,7 @@ private const val KEY_LAST_SYNC_TIME = "lastSyncTime"
 class StudyRepository(
     private val studyApiService: StudyApiService,
     private val studyReviewDao: StudyReviewDao,
+    private val flashCardDao: FlashCardDao,
     private val applicationContext: Context
 ) {
 
@@ -26,7 +30,20 @@ class StudyRepository(
             try {
                 val response = studyApiService.getSessionCards(deckId, mode)
                 if (response.isSuccess() && response.data != null) {
-                    Result.success(response.data.map { it.toDomain() })
+                    val normalizedCards = response.data.map { dto ->
+                        dto.toDomain().copy(deckId = deckId)
+                    }
+                    val entities = normalizedCards.map { card ->
+                        FlashCardEntity(
+                            id = card.id,
+                            question = card.question,
+                            answer = card.answer,
+                            deckId = deckId,
+                            isSynced = true
+                        )
+                    }
+                    flashCardDao.insertAllCards(entities)
+                    Result.success(normalizedCards)
                 } else {
                     Result.failure(Exception(response.message ?: "Failed to load study session"))
                 }
@@ -40,6 +57,7 @@ class StudyRepository(
         return withContext(Dispatchers.IO) {
             try {
                 studyReviewDao.insertReview(review.toEntity())
+                StudyStreakStore.recordStudyEvent(applicationContext, review.studiedAt)
                 Result.success(review)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -75,7 +93,8 @@ class StudyRepository(
                 val response = studyApiService.syncReviews(reviews.map { it.toDto() })
 
                 if (response.isSuccess() && response.data != null) {
-                    studyReviewDao.deleteReviews(unsyncedReviews.map { it.id })
+                    val syncedReviews = unsyncedReviews.map { it.copy(isSynced = true) }
+                    studyReviewDao.insertReviews(syncedReviews)
                     saveLastSyncTime(response.data.syncedAt)
                     Result.success(unsyncedReviews.size)
                 } else {
@@ -85,6 +104,14 @@ class StudyRepository(
                 Result.failure(e)
             }
         }
+    }
+
+    fun getCurrentStreak(): Int {
+        return StudyStreakStore.getSnapshot(applicationContext).currentStreak
+    }
+
+    fun hasStudiedToday(): Boolean {
+        return StudyStreakStore.hasStudiedToday(applicationContext)
     }
 
     private fun saveLastSyncTime(syncedAt: String) {

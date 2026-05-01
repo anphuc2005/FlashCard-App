@@ -325,18 +325,31 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
         viewModelScope.launch {
+            val sessionDeckId = state.deckId
+            val reviewDeckId = sessionDeckId ?: currentCard.deckId
             Log.d(
                 TAG,
-                "saveReview started: cardId=${currentCard.id}, deckId=${currentCard.deckId}, mode=${state.settings.mode.syncMode}, grade=${rating.syncValue}"
+                "saveReview started: cardId=${currentCard.id}, cardDeckId=${currentCard.deckId}, sessionDeckId=$sessionDeckId, reviewDeckId=$reviewDeckId, mode=${state.settings.mode.syncMode}, grade=${rating.syncValue}"
             )
-            studyUseCases.saveReview(
+            val saveResult = studyUseCases.saveReview(
                 cardId = currentCard.id,
-                deckId = currentCard.deckId,
+                deckId = reviewDeckId,
                 studyMode = state.settings.mode.syncMode,
                 grade = rating.syncValue
             )
+            saveResult
+                .onSuccess {
+                    Log.d(TAG, "saveReview success: cardId=${currentCard.id}, reviewDeckId=$reviewDeckId")
+                }
+                .onFailure { throwable ->
+                    Log.e(
+                        TAG,
+                        "saveReview failure: cardId=${currentCard.id}, reviewDeckId=$reviewDeckId, message=${throwable.message}",
+                        throwable
+                    )
+                }
             if (isCompleted) {
-                Log.d(TAG, "saveReview completed final card, syncing reviews for deckId=${currentCard.deckId}")
+                Log.d(TAG, "saveReview completed final card, syncing reviews for deckId=$reviewDeckId")
                 studyUseCases.syncReviews()
             }
         }

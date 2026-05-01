@@ -1,14 +1,23 @@
 package com.example.flashcardapp.presentation.feature.home
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.R
 import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.domain.model.Shortcut
-import com.example.flashcardapp.core.utils.MockDeckData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -19,93 +28,192 @@ data class HomeUiState(
     val userStreak: Int = 0,
     val userGreeting: String = "",
     val userAvatarUrl: String? = null,
-    val userProgress: Int = 0
+    val userProgress: Int = 0,
+    val userProgressRaw: Float = 0f
 )
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val appContainer = (application as FlashcardApp).container
+    private val deckRepository = appContainer.deckRepository
+    private val studyUseCases = appContainer.studyUseCases
+
+    private val _uiState = MutableStateFlow(
+        HomeUiState(
+            isLoading = true,
+            shortcuts = buildShortcuts(),
+            userStreak = 0
+        )
+    )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private var cachedDecks: List<Deck> = emptyList()
+    private var lastOpenedDeckId: String? = null
+
     init {
-        loadMockData()
-        initializeShortcuts()
+        syncDecksFromApi()
     }
 
-    private fun loadMockData() {
-        val mockDatas = MockDeckData.getMockDecks()
+    private fun publishDecks(decks: List<Deck>) {
+        val sortedDecks = decks.sortedByDescending { deck ->
+            maxOf(
+                parseTimestampMillis(deck.updatedAt),
+                parseTimestampMillis(deck.createdAt)
+            )
+        }
+        val activeDeck = findActiveDeck(sortedDecks)
+        val progressRaw = calculateProgressPercent(
+            studiedCount = activeDeck?.studiedCount ?: 0,
+            totalCards = activeDeck?.cardCount ?: 0
+        )
+        val currentStreak = studyUseCases.getCurrentStreak()
 
-        _uiState.value = HomeUiState(
+        _uiState.value = _uiState.value.copy(
             isLoading = false,
-            recentDecks = mockDatas,
-            activeDeck = mockDatas.first(),
-            userProgress = 65,
-            userStreak = 12
+            activeDeck = activeDeck,
+            recentDecks = sortedDecks,
+            userStreak = currentStreak,
+            userProgress = formatProgressPercent(progressRaw),
+            userProgressRaw = progressRaw,
+            error = null
         )
     }
 
-    private fun loadHomeData() {
+    private fun syncDecksFromApi() {
         viewModelScope.launch {
-            try {
-                _uiState.value = _uiState.value.copy(isLoading = true)
-
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    activeDeck = null,
-                    recentDecks = emptyList(),
-                    userStreak = 12,
-                    userProgress = 85
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Có lỗi xảy ra"
-                )
-            }
+            deckRepository.getAllDecksFromApi()
+                .onSuccess { decks ->
+                    val baseDecks = decks.map { deck ->
+                        deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
+                    }
+                    val enrichedDecks = enrichDecksWithProgress(baseDecks)
+                    cachedDecks = enrichedDecks
+                    publishDecks(enrichedDecks)
+                }
+                .onFailure { throwable ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = throwable.message ?: "Có lỗi xảy ra"
+                    )
+                }
         }
     }
 
-    private fun initializeShortcuts() {
-        val shortcuts = listOf(
+    private fun buildShortcuts(): List<Shortcut> {
+        return listOf(
             Shortcut(
                 id = "1",
                 title = "Tạo mới",
-                iconResId = com.example.flashcardapp.R.drawable.ic_create,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_blue_background,
+                iconResId = R.drawable.ic_create,
+                backgroundResId = R.color.md_icon_blue_background,
                 action = "CREATE"
             ),
             Shortcut(
                 id = "2",
                 title = "Thông báo",
-                iconResId = com.example.flashcardapp.R.drawable.ic_notif_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_yellow_background,
+                iconResId = R.drawable.ic_notif_shortcut,
+                backgroundResId = R.color.md_icon_yellow_background,
                 action = "NOTIFICATIONS"
             ),
             Shortcut(
                 id = "3",
                 title = "Xuất dữ liệu",
-                iconResId = com.example.flashcardapp.R.drawable.ic_export_data_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_red_background,
+                iconResId = R.drawable.ic_export_data_shortcut,
+                backgroundResId = R.color.md_icon_red_background,
                 action = "EXPORT_DATA"
             ),
             Shortcut(
                 id = "4",
                 title = "Giao diện",
-                iconResId = com.example.flashcardapp.R.drawable.ic_theme_shortcut,
-                backgroundResId = com.example.flashcardapp.R.color.md_icon_purple_background,
+                iconResId = R.drawable.ic_theme_shortcut,
+                backgroundResId = R.color.md_icon_purple_background,
                 action = "CHANGE_THEME"
             )
-
         )
-
-        _uiState.value = _uiState.value.copy(shortcuts = shortcuts)
     }
 
     fun refreshData() {
-        loadHomeData()
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        syncDecksFromApi()
+    }
+
+    fun markDeckAsStudied(deckId: String) {
+        lastOpenedDeckId = deckId
+        cachedDecks.firstOrNull { it.id == deckId }?.let { openedDeck ->
+            val touchedDeck = openedDeck.copy(updatedAt = System.currentTimeMillis().toString())
+            val mergedDecks = cachedDecks.map { deck ->
+                if (deck.id == deckId) touchedDeck else deck
+            }
+            cachedDecks = mergedDecks
+            publishDecks(mergedDecks)
+        }
     }
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    private suspend fun enrichDecksWithProgress(decks: List<Deck>): List<Deck> {
+        return decks.map { deck ->
+            val rawReviewedCount = studyUseCases.getReviewedCardIds(deck.id)
+                .getOrDefault(emptySet())
+                .size
+            val effectiveCardCount = deck.cardCount.coerceAtLeast(0)
+            val normalizedReviewedCount = if (effectiveCardCount > 0) {
+                rawReviewedCount.coerceIn(0, effectiveCardCount)
+            } else {
+                0
+            }
+            deck.copy(
+                customCardCount = effectiveCardCount,
+                customStudiedCount = normalizedReviewedCount
+            )
+        }
+    }
+
+    private fun findActiveDeck(sortedDecks: List<Deck>): Deck? {
+        val inProgressDeck = sortedDecks.firstOrNull { deck ->
+            deck.cardCount > 0 && deck.studiedCount in 1 until deck.cardCount
+        }
+        if (inProgressDeck != null) return inProgressDeck
+        return sortedDecks.firstOrNull { it.id == lastOpenedDeckId } ?: sortedDecks.firstOrNull()
+    }
+
+    private fun calculateProgressPercent(studiedCount: Int, totalCards: Int): Float {
+        if (totalCards <= 0) {
+            return 0f
+        }
+        return ((studiedCount.toFloat() / totalCards.toFloat()) * 100f)
+            .coerceIn(0f, 100f)
+    }
+
+    private fun formatProgressPercent(progressPercent: Float): Int {
+        return progressPercent
+            .roundToInt()
+            .coerceIn(0, 100)
+    }
+
+    private fun parseTimestampMillis(raw: String?): Long {
+        if (raw.isNullOrBlank()) return Long.MIN_VALUE
+
+        raw.toLongOrNull()?.let { return it }
+        runCatching { Instant.parse(raw).toEpochMilli() }.getOrNull()?.let { return it }
+        runCatching { OffsetDateTime.parse(raw).toInstant().toEpochMilli() }
+            .getOrNull()
+            ?.let { return it }
+        runCatching {
+            LocalDateTime.parse(raw, DateTimeFormatter.ISO_DATE_TIME)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+        }.getOrNull()?.let { return it }
+        runCatching {
+            LocalDate.parse(raw, DateTimeFormatter.ISO_DATE)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+        }.getOrNull()?.let { return it }
+
+        return Long.MIN_VALUE
     }
 }

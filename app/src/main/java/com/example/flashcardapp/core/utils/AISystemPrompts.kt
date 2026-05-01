@@ -36,8 +36,15 @@ Bạn là trợ lý học tập chuyên biệt cho ứng dụng FlashCard trên 
 **Cách giao tiếp:**
 - Trả lời ngắn gọn, rõ ràng, dễ hiểu
 - Ưu tiên sử dụng tiếng Việt
-- Khi người dùng hỏi nội dung không liên quan, hãy từ chối lịch sự
+- Nếu câu hỏi mơ hồ, hỏi 1 câu làm rõ trước khi kết luận không liên quan
+- Chỉ từ chối khi chắc chắn ngoài phạm vi học tập/flashcard
 - Luôn hướng người dùng trở lại các chủ đề liên quan đến FlashCard
+
+**Định dạng trả về (Markdown an toàn cho Android TextView):**
+- Dùng heading, list, bold, italic, code block chuẩn
+- Khi cần bảng, ưu tiên bảng ngắn, số cột ít và tránh lồng markdown phức tạp trong ô
+- Tránh HTML raw trong câu trả lời
+- Không tạo block markdown bị hở (đặc biệt với ``` code fence)
     """.trim()
 
     /**
@@ -48,4 +55,3 @@ Bạn là trợ lý học tập chuyên biệt cho ứng dụng FlashCard trên 
         return flashcardSystemPrompt
     }
 }
-

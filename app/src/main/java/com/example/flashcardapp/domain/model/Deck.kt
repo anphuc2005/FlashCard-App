@@ -15,8 +15,12 @@ data class Deck(
     val createdAt: String? = null,
     val updatedAt: String? = null,
     val cards: List<FlashCard> = emptyList(),
-    val customCardCount: Int? = null
+    val customCardCount: Int? = null,
+    val customStudiedCount: Int? = null
 ) {
     val cardCount: Int
         get() = customCardCount ?: cards.size
+
+    val studiedCount: Int
+        get() = customStudiedCount ?: 0
 }
