@@ -32,6 +32,7 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.Reminde
 import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
 
 class HomeFragment : Fragment() {
 
@@ -164,6 +165,11 @@ class HomeFragment : Fragment() {
 
                     // Handle loading state
                     binding.btnStart.isEnabled = !state.isLoading && state.activeDeck != null
+                    val contentAlpha = if (state.isLoading) 0.55f else 1f
+                    binding.tvCourseTitle.alpha = contentAlpha
+                    binding.progressBar.alpha = contentAlpha
+                    binding.rvShortcuts.alpha = contentAlpha
+                    binding.rvDeckRecently.alpha = contentAlpha
 
                     // Handle error state
                     state.error?.let { error ->

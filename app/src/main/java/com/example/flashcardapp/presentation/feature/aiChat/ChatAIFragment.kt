@@ -1,9 +1,17 @@
 package com.example.flashcardapp.presentation.feature.aiChat
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +32,30 @@ class ChatAIFragment : Fragment() {
 
     private lateinit var viewModel: ChatAIViewModel
     private lateinit var adapter: ChatMessageAdapter
+    private val voicePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            launchSpeechToText()
+        } else {
+            showError("Bạn cần cấp quyền micro để dùng nhập bằng giọng nói.")
+        }
+    }
+
+    private val speechToTextLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != Activity.RESULT_OK || result.data == null) return@registerForActivityResult
+        val spokenText = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+            ?.trim()
+            .orEmpty()
+        if (spokenText.isNotEmpty()) {
+            binding.etMessage.setText(spokenText)
+            binding.etMessage.setSelection(spokenText.length)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,6 +122,10 @@ class ChatAIFragment : Fragment() {
 
         binding.btnAttach.setOnClickListener {
         }
+
+        binding.btnMic.setOnClickListener {
+            handleVoiceInputClick()
+        }
     }
 
     private fun observeViewModel() {
@@ -129,7 +165,33 @@ class ChatAIFragment : Fragment() {
     }
 
     private fun showError(error: String) {
-        // TODO: add Snackbar/Toast if needed
+        Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun handleVoiceInputClick() {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            launchSpeechToText()
+        } else {
+            voicePermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    private fun launchSpeechToText() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Nói nội dung bạn muốn gửi")
+        }
+        runCatching {
+            speechToTextLauncher.launch(intent)
+        }.onFailure {
+            showError("Thiết bị chưa hỗ trợ nhập giọng nói.")
+        }
     }
 
     override fun onDestroyView() {

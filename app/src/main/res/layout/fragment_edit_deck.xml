@@ -12,7 +12,7 @@
         android:id="@+id/header"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:background="?attr/componentBackground"
+        android:background="?attr/colorOnBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -49,7 +49,7 @@
             android:layout_marginEnd="16dp"
             android:padding="8dp"
             android:text="Lưu"
-            android:textColor="#2E6BFF"
+            android:textColor="?attr/buttonColor"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -97,9 +97,61 @@
                         android:padding="24dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_2"
-                        app:tint="@color/white"
-                        android:background="#2E6BFF" />
+                        app:tint="@android:color/white"
+                        android:background="?attr/buttonColor" />
                 </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:id="@+id/iconColorPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cardIcon">
+
+                    <View
+                        android:id="@+id/colorBlue"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginHorizontal="6dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:backgroundTint="@color/md_icon_blue" />
+
+                    <View
+                        android:id="@+id/colorGreen"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginHorizontal="6dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:backgroundTint="@color/md_icon_green" />
+
+                    <View
+                        android:id="@+id/colorPurple"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginHorizontal="6dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:backgroundTint="@color/md_icon_purple" />
+
+                    <View
+                        android:id="@+id/colorOrange"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginHorizontal="6dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:backgroundTint="@color/md_icon_orange" />
+
+                    <View
+                        android:id="@+id/colorRed"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginHorizontal="6dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:backgroundTint="@color/md_icon_red" />
+                </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Inputs Section -->
@@ -249,7 +301,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sắp xếp"
-                    android:textColor="#2E6BFF"
+                    android:textColor="?attr/buttonColor"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -277,12 +329,12 @@
                 android:background="@drawable/bg_dash"
                 android:text="Thêm thẻ mới"
                 android:textAllCaps="false"
-                android:textColor="#2E6BFF"
+                android:textColor="?attr/buttonColor"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart"
-                app:iconTint="#2E6BFF" />
+                app:iconTint="?attr/buttonColor" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

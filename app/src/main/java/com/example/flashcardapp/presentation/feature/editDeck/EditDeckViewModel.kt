@@ -81,7 +81,7 @@ class EditDeckViewModel(
         }
     }
 
-    fun updateDeck(id: String, name: String, description: String, isPublic: Boolean) {
+    fun updateDeck(id: String, name: String, description: String, isPublic: Boolean, themeColor: String?) {
         val deck = currentDeck
         if (deck == null) {
             _deckState.value = EditDeckState.Error("Không tìm thấy bộ thẻ để cập nhật")
@@ -90,7 +90,7 @@ class EditDeckViewModel(
 
         viewModelScope.launch {
             _deckState.value = EditDeckState.Loading
-            updateDeckUseCase(id, name, description, isPublic, deck)
+            updateDeckUseCase(id, name, description, isPublic, themeColor, deck)
                 .onSuccess { updatedDeck ->
                     currentDeck = updatedDeck
                     _deckState.value = EditDeckState.UpdateSuccess(updatedDeck)

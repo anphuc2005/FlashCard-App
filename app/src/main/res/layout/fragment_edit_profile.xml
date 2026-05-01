@@ -144,7 +144,7 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilFullName"
-                        style="@style/Widget.Material3.TextInputLayout.FilledBox"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -155,16 +155,18 @@
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:boxStrokeWidth="0dp"
-                        app:startIconDrawable="@drawable/ic_account">
+                        app:boxStrokeWidth="0dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etFullName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_account"
+                            android:drawablePadding="10dp"
                             android:imeOptions="actionDone"
                             android:inputType="textPersonName"
                             android:maxLines="1"
+                            android:paddingVertical="16dp"
                             android:textColor="?attr/textColor"
                             android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -180,7 +182,7 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilEmail"
-                        style="@style/Widget.Material3.TextInputLayout.FilledBox"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -191,17 +193,19 @@
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:boxStrokeWidth="0dp"
-                        app:startIconDrawable="@drawable/ic_otp_mail">
+                        app:boxStrokeWidth="0dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etEmail"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_otp_mail"
+                            android:drawablePadding="10dp"
                             android:enabled="false"
                             android:focusable="false"
                             android:inputType="textEmailAddress"
                             android:maxLines="1"
+                            android:paddingVertical="16dp"
                             android:textColor="?attr/textColor"
                             android:textColorHint="#788196"
                             android:textSize="16sp" />

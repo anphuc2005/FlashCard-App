@@ -2,7 +2,8 @@ package com.example.flashcardapp.presentation.feature.addDeck
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardsBulkUseCase
+import com.example.flashcardapp.domain.model.FlashCard
 import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,12 +14,13 @@ import java.io.File
 sealed class AddCardState {
     object Idle : AddCardState()
     object Loading : AddCardState()
-    object Success : AddCardState()
+    object CardQueued : AddCardState()
+    object AllSaved : AddCardState()
     data class Error(val message: String) : AddCardState()
 }
 
 class AddCardViewModel(
-    private val addFlashCardUseCase: AddFlashCardUseCase,
+    private val addFlashCardsBulkUseCase: AddFlashCardsBulkUseCase,
     private val uploadImageUseCase: UploadImageUseCase
 ) : ViewModel() {
 
@@ -27,6 +29,8 @@ class AddCardViewModel(
 
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
     val uploadState: StateFlow<UploadState> = _uploadState.asStateFlow()
+    private val pendingCards = mutableListOf<FlashCard>()
+    private var currentUploadedImageUrl: String? = null
 
     fun resetState() {
         _uiState.value = AddCardState.Idle
@@ -36,38 +40,57 @@ class AddCardViewModel(
         _uploadState.value = UploadState.Idle
     }
 
-    fun submitCard(question: String, answer: String, deckId: String, imageFile: File? = null) {
+    fun addCardToPending(question: String, answer: String, deckId: String) {
         if (question.isBlank() || answer.isBlank()) {
             _uiState.value = AddCardState.Error("Câu hỏi và câu trả lời không được để trống")
             return
         }
 
+        val card = FlashCard(
+            id = java.util.UUID.randomUUID().toString(),
+            question = question,
+            answer = answer,
+            imageUrl = currentUploadedImageUrl,
+            deckId = deckId
+        )
+        pendingCards.add(card)
+        currentUploadedImageUrl = null
+        _uiState.value = AddCardState.CardQueued
+    }
+
+    fun saveAllPendingCards(question: String, answer: String, deckId: String) {
+        val hasCurrentInput = question.isNotBlank() || answer.isNotBlank() || currentUploadedImageUrl != null
+        if (hasCurrentInput) {
+            if (question.isBlank() || answer.isBlank()) {
+                _uiState.value = AddCardState.Error("Câu hỏi và câu trả lời không được để trống")
+                return
+            }
+            pendingCards.add(
+                FlashCard(
+                    id = java.util.UUID.randomUUID().toString(),
+                    question = question,
+                    answer = answer,
+                    imageUrl = currentUploadedImageUrl,
+                    deckId = deckId
+                )
+            )
+            currentUploadedImageUrl = null
+        }
+
+        if (pendingCards.isEmpty()) {
+            _uiState.value = AddCardState.Error("Chưa có thẻ nào để lưu")
+            return
+        }
+
         viewModelScope.launch {
             _uiState.value = AddCardState.Loading
-            
-            var uploadedImageUrl: String? = null
-
-            if (imageFile != null) {
-                _uploadState.value = UploadState.Loading
-                val uploadResult = uploadImageUseCase(imageFile)
-                uploadResult.fold(
-                    onSuccess = { url ->
-                        _uploadState.value = UploadState.Success(url)
-                        uploadedImageUrl = url
-                    },
-                    onFailure = { error ->
-                        _uploadState.value = UploadState.Error(error.message ?: "Lỗi khi upload ảnh")
-                        _uiState.value = AddCardState.Error("Lỗi tải ảnh: ${error.message}")
-                        return@launch
-                    }
-                )
-            }
-            
-            val result = addFlashCardUseCase(question, answer, deckId, uploadedImageUrl)
+            val cardsToSave = pendingCards.toList()
+            val result = addFlashCardsBulkUseCase(cardsToSave)
 
             result.fold(
                 onSuccess = {
-                    _uiState.value = AddCardState.Success
+                    pendingCards.clear()
+                    _uiState.value = AddCardState.AllSaved
                 },
                 onFailure = { error ->
                     _uiState.value = AddCardState.Error(error.message ?: "Có lỗi xảy ra khi thêm thẻ")
@@ -82,6 +105,7 @@ class AddCardViewModel(
             val result = uploadImageUseCase(file)
             result.fold(
                 onSuccess = { url ->
+                    currentUploadedImageUrl = url
                     _uploadState.value = UploadState.Success(url)
                 },
                 onFailure = { error ->

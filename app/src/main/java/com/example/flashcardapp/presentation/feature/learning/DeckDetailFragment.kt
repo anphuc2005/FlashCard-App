@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.view.isVisible
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentDeckDetailBinding
 import com.example.flashcardapp.presentation.common.notification.showAppError
@@ -103,6 +105,7 @@ class DeckDetailFragment : Fragment() {
 
     private fun renderState(state: LearningUiState) {
         val deck = state.deck
+        renderLoadingState(state.isLoading && deck == null)
         Log.d(
             TAG,
             "renderState: deckId=${state.deckId}, loading=${state.isLoading}, cards=${state.cards.size}, preview=${state.previewCards.size}, learned=${state.deckSummary.learnedCards}"
@@ -116,7 +119,25 @@ class DeckDetailFragment : Fragment() {
         binding.statNewCard.statLabel.text = getString(R.string.learning_stat_new)
         binding.statNewCard.statValue.text = state.deckSummary.newCards.toString()
         binding.ctaButton.isEnabled = !state.isLoading && state.cards.isNotEmpty()
+        binding.deckTitle.isVisible = !state.isLoading
+        binding.deckDesc.isVisible = !state.isLoading
+        binding.titlePlaceholder.isVisible = state.isLoading
+        binding.descPlaceholder.isVisible = state.isLoading
+        binding.rvCards.isVisible = !state.isLoading
+        binding.cardsPlaceholderContainer.isVisible = state.isLoading
         cardPreviewAdapter.submitList(state.previewCards)
+    }
+
+    private fun renderLoadingState(isLoading: Boolean) {
+        binding.scroll.visibility = if (isLoading) View.GONE else View.VISIBLE
+        binding.skeletonDeckDetail.visibility = if (isLoading) View.VISIBLE else View.GONE
+        if (isLoading && binding.skeletonDeckDetail.animation == null) {
+            binding.skeletonDeckDetail.startAnimation(
+                AnimationUtils.loadAnimation(requireContext(), R.anim.skeleton_pulse)
+            )
+        } else if (!isLoading) {
+            binding.skeletonDeckDetail.clearAnimation()
+        }
     }
 
     private class LearningTabSelectedListener(

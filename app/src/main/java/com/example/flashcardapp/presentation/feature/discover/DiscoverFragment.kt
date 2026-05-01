@@ -19,7 +19,6 @@ import com.example.flashcardapp.databinding.FragmentDiscoverBinding
 import com.example.flashcardapp.presentation.common.adapter.CategoryAdapter
 import com.example.flashcardapp.presentation.common.adapter.CourseAdapter
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
-import com.example.flashcardapp.presentation.common.dialog.authDialog.LoadingDialogFragment
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
 
 private const val COLLAPSED_CATEGORY_COUNT = 5
 
@@ -44,8 +44,6 @@ class DiscoverFragment : Fragment() {
     private var allCategories: List<Category> = emptyList()
     private var isCategoriesExpanded: Boolean = false
     private var isCategoryScrollEnabled: Boolean = false
-
-    private var loadingDialog: LoadingDialogFragment? = null
 
     private val viewModel: DiscoverViewModel by viewModels {
         val appContainer = (requireActivity().application as FlashcardApp).container
@@ -167,15 +165,12 @@ class DiscoverFragment : Fragment() {
                 }
                 launch {
                     viewModel.isLoading.collectLatest { isLoading ->
-                        if (isLoading) {
-                            if (loadingDialog == null) {
-                                loadingDialog = LoadingDialogFragment.newInstance("Đang tải dữ liệu...")
-                                loadingDialog?.show(childFragmentManager, "LoadingDialog")
-                            }
-                        } else {
-                            loadingDialog?.dismiss()
-                            loadingDialog = null
-                        }
+                        val alpha = if (isLoading) 0.55f else 1f
+                        binding.rvCategories.alpha = alpha
+                        binding.rvCourses.alpha = alpha
+                        binding.searchContainer.alpha = alpha
+                        binding.btnSeeAllCategories.isEnabled = !isLoading
+                        binding.btnSeeAllCourses.isEnabled = !isLoading
                     }
                 }
                 launch {

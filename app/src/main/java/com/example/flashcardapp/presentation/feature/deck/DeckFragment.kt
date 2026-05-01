@@ -29,6 +29,7 @@ import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import androidx.core.view.isVisible
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -45,6 +46,8 @@ class DeckFragment : Fragment() {
         )
     }
     private lateinit var deckAdapter: DeckAdapter
+    private var shouldRefreshOnResume = false
+    private val selectedDeckIds = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,11 +67,26 @@ class DeckFragment : Fragment() {
             }
         }
         setupClickListeners()
+        binding.swipeRefresh.setOnRefreshListener {
+            deckViewModel.syncDecksFromApi()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (shouldRefreshOnResume) {
+            deckViewModel.syncDecksFromApi()
+            shouldRefreshOnResume = false
+        }
     }
 
     private fun setupRecyclerView() {
         deckAdapter = DeckAdapter(
             onItemClick = { deck ->
+                if (selectedDeckIds.isNotEmpty()) {
+                    toggleDeckSelection(deck.id)
+                    return@DeckAdapter
+                }
                 deckViewModel.updateDeckLastStudied(deck)
                 val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
                     putExtra("DECK_ID", deck.id)
@@ -76,11 +94,18 @@ class DeckFragment : Fragment() {
                 startActivity(intent)
             },
             onItemEdit = { deck ->
+                if (selectedDeckIds.isNotEmpty()) {
+                    toggleDeckSelection(deck.id)
+                    return@DeckAdapter
+                }
                 val intent = Intent(requireContext(), AddDeckContainerActivity::class.java).apply {
                     putExtra("DECK_ID", deck.id)
                     putExtra("IS_EDIT_MODE", true)
                 }
                 startActivity(intent)
+            },
+            onItemLongClick = { deck ->
+                toggleDeckSelection(deck.id)
             }
         )
 
@@ -181,12 +206,62 @@ class DeckFragment : Fragment() {
             val intent = Intent(requireContext(), AddDeckContainerActivity::class.java).apply {
                 putExtra("IS_EDIT_MODE", false)
             }
+            shouldRefreshOnResume = true
             startActivity(intent)
         }
 
         binding.filterButton.setOnClickListener {
-            showAppWarning("Tính năng lọc bộ thẻ sẽ sớm được cập nhật.")
+            if (selectedDeckIds.isEmpty()) {
+                showAppWarning("Nhấn giữ một bộ thẻ để chọn và xóa hàng loạt.")
+            } else {
+                showBulkDeleteConfirmDialog()
+            }
         }
+    }
+
+    private fun toggleDeckSelection(deckId: String) {
+        if (selectedDeckIds.contains(deckId)) selectedDeckIds.remove(deckId) else selectedDeckIds.add(deckId)
+        deckAdapter.setSelectedDeckIds(selectedDeckIds)
+        updateSelectionUi()
+    }
+
+    private fun clearSelection() {
+        selectedDeckIds.clear()
+        deckAdapter.setSelectedDeckIds(emptySet())
+        updateSelectionUi()
+    }
+
+    private fun updateSelectionUi() {
+        if (selectedDeckIds.isEmpty()) {
+            binding.filterButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_filter)
+            binding.filterButton.setBackgroundColor(Color.TRANSPARENT)
+            binding.filterButton.iconTint = null
+            return
+        }
+        binding.filterButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+        binding.filterButton.setBackgroundColor(Color.parseColor("#E53935"))
+        binding.filterButton.iconTint = ContextCompat.getColorStateList(requireContext(), android.R.color.white)
+    }
+
+    private fun showBulkDeleteConfirmDialog() {
+        val count = selectedDeckIds.size
+        val dialog = AppConfirmDialog.newInstance(
+            title = "Xóa $count bộ thẻ?",
+            message = "Bạn có chắc muốn xóa hàng loạt $count bộ thẻ đã chọn không?",
+            confirmText = getString(R.string.delete_confirm_action),
+            cancelText = getString(R.string.delete_confirm_cancel),
+            iconRes = R.drawable.ic_delete,
+            destructive = true
+        )
+        dialog.listener = object : AppConfirmDialog.Listener {
+            override fun onConfirm() {
+                val idsToDelete = selectedDeckIds.toList()
+                idsToDelete.forEach { deckViewModel.deleteDeck(it) }
+                clearSelection()
+                showAppSuccess("Đã gửi yêu cầu xóa $count bộ thẻ")
+            }
+        }
+        dialog.show(childFragmentManager, "delete_bulk_deck_confirm")
     }
 
     @OptIn(FlowPreview::class)
@@ -223,11 +298,17 @@ class DeckFragment : Fragment() {
     }
 
     private fun showLoading() {
-        binding.decksRecycler.visibility = View.GONE
+        binding.searchContainer.alpha = 0.6f
+        binding.decksRecycler.alpha = 0.6f
+        binding.btnAddDesk.isEnabled = false
+        binding.swipeRefresh.isRefreshing = true
     }
 
     private fun hideLoading() {
-        binding.decksRecycler.visibility = View.VISIBLE
+        binding.searchContainer.alpha = 1f
+        binding.decksRecycler.alpha = 1f
+        binding.btnAddDesk.isEnabled = true
+        binding.swipeRefresh.isRefreshing = false
     }
 
     private fun showError(message: String) {

@@ -8,6 +8,7 @@
     tools:context=".presentation.feature.statistics.StatisticFragment">
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -251,7 +252,12 @@
                 app:strokeColor="?attr/iconBlueBackground"
                 app:strokeWidth="1dp">
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
                 <LinearLayout
+                    android:id="@+id/weeklyContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -345,6 +351,15 @@
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
+
+                <View
+                    android:id="@+id/weeklyBlurPlaceholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="14dp"
+                    android:background="@drawable/bg_learning_visual_placeholder"
+                    android:visibility="gone" />
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -422,5 +437,4 @@
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView></androidx.constraintlayout.widget.ConstraintLayout>

@@ -55,5 +55,6 @@ object RetrofitClient {
     val profileApiService: ProfileApiService = retrofit.create(ProfileApiService::class.java)
     val uploadApiService: UploadApiService = retrofit.create(UploadApiService::class.java)
     val studyApiService: StudyApiService = retrofit.create(StudyApiService::class.java)
+    val statisticsApiService: StatisticsApiService = retrofit.create(StatisticsApiService::class.java)
     val groqApiService: GroqApiService = groqRetrofit.create(GroqApiService::class.java)
 }

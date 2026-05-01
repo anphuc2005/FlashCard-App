@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentSessionSettingBinding
 import kotlinx.coroutines.launch
@@ -54,6 +55,8 @@ class SessionSettingFragment : Fragment() {
         binding.cardOrdered.setOnClickListener { selectOrder(LearningCardOrder.ORDERED) }
         binding.rbTimeAttack.setOnClickListener { selectTimeAttackMode() }
         binding.cardTimeAttack.setOnClickListener { selectTimeAttackMode() }
+        binding.rbSpacedRepetition.setOnClickListener { selectSpacedRepetitionMode() }
+        binding.cardSpacedRepetition.setOnClickListener { selectSpacedRepetitionMode() }
         binding.chipAll.setOnClickListener { viewModel.setFilter(LearningCardFilter.ALL) }
         binding.chipNew.setOnClickListener { viewModel.setFilter(LearningCardFilter.NEW) }
         binding.chipReview.setOnClickListener { viewModel.setFilter(LearningCardFilter.REVIEW) }
@@ -65,6 +68,7 @@ class SessionSettingFragment : Fragment() {
         }
         binding.btnStart.setOnClickListener {
             val state = viewModel.uiState.value
+            preloadDeckCardImages()
             Log.d(
                 TAG,
                 "Start session clicked: deckId=${state.deckId}, mode=${state.settings.mode}, order=${state.settings.order}, filter=${state.settings.filter}, cardLimit=${state.settings.cardLimit}, timeLimit=${state.settings.timeLimitMinutes}"
@@ -75,6 +79,22 @@ class SessionSettingFragment : Fragment() {
                     findNavController().navigate(R.id.action_sessionSettingFragment_to_learningCardsFragment)
                 }
             }
+        }
+    }
+
+    private fun preloadDeckCardImages() {
+        val imageUrls = viewModel.uiState.value.cards
+            .mapNotNull { it.imageUrl?.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+
+        if (imageUrls.isEmpty()) return
+
+        Log.d(TAG, "preloadDeckCardImages: count=${imageUrls.size}")
+        imageUrls.forEach { url ->
+            Glide.with(this)
+                .load(url)
+                .preload()
         }
     }
 
@@ -112,6 +132,7 @@ class SessionSettingFragment : Fragment() {
         binding.rbOrdered.isChecked = state.settings.order == LearningCardOrder.ORDERED &&
             state.settings.mode == LearningStudyMode.SEQUENTIAL
         binding.rbTimeAttack.isChecked = state.settings.mode == LearningStudyMode.TIME_ATTACK
+        binding.rbSpacedRepetition.isChecked = state.settings.mode == LearningStudyMode.SPACED_REPETITION
         binding.chipAll.isChecked = state.settings.filter == LearningCardFilter.ALL
         binding.chipNew.isChecked = state.settings.filter == LearningCardFilter.NEW
         binding.chipReview.isChecked = state.settings.filter == LearningCardFilter.REVIEW
@@ -130,6 +151,11 @@ class SessionSettingFragment : Fragment() {
     private fun selectTimeAttackMode() {
         Log.d(TAG, "selectTimeAttackMode")
         viewModel.setStudyMode(LearningStudyMode.TIME_ATTACK)
+    }
+
+    private fun selectSpacedRepetitionMode() {
+        Log.d(TAG, "selectSpacedRepetitionMode")
+        viewModel.setStudyMode(LearningStudyMode.SPACED_REPETITION)
     }
 
     private fun renderTimeAttackOptions(isEnabled: Boolean) {

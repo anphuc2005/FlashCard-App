@@ -132,8 +132,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.formState.collect { state ->
-                        binding.layoutEmail.error = state.emailError
-                        binding.layoutPassword.error = state.passwordError
+                        binding.inputEmail.error = state.emailError
+                        binding.inputPassword.error = state.passwordError
                     }
                 }
 

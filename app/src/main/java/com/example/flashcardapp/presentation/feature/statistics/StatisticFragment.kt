@@ -23,6 +23,7 @@ import com.example.flashcardapp.presentation.feature.statistics.model.StatisticA
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import androidx.core.view.isVisible
 
 class StatisticFragment : Fragment() {
 
@@ -30,7 +31,10 @@ class StatisticFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val statisticFormatter = StatisticFormatter()
-    private val viewModel: StatisticViewModel by viewModels()
+    private val viewModel: StatisticViewModel by viewModels {
+        val container = (requireActivity().application as FlashcardApp).container
+        StatisticViewModelFactory(container.statisticsRepository)
+    }
     private lateinit var achievementAdapter: StatisticAchievementAdapter
     private lateinit var deckStatisticsAdapter: DeckStatisticsAdapter
     private var allAchievements: List<StatisticAchievementItem> = emptyList()
@@ -103,6 +107,8 @@ class StatisticFragment : Fragment() {
     }
 
     private fun renderLoading() {
+        binding.weeklyBlurPlaceholder.isVisible = true
+        binding.weeklyContent.alpha = 0.35f
         binding.btnWeeklyDetail.isEnabled = false
         binding.btnAchievementDetail.isEnabled = false
         binding.tvStreak.text = "--"
@@ -111,12 +117,15 @@ class StatisticFragment : Fragment() {
         binding.weeklyTime.text = getString(R.string.stat_placeholder_time)
         binding.weeklyNewCards.text = getString(R.string.stat_placeholder_cards)
         binding.weeklyChart.setData(emptyList(), highlight = -1)
-        allAchievements = emptyList()
-        achievementAdapter.submitList(emptyList())
-        deckStatisticsAdapter.submitList(emptyList())
+        if (allAchievements.isEmpty()) {
+            allAchievements = viewModel.uiState.value.allAchievements
+        }
+        achievementAdapter.submitList(viewModel.uiState.value.achievements)
     }
 
     private fun renderSuccess(state: StatisticUiState) {
+        binding.weeklyBlurPlaceholder.isVisible = false
+        binding.weeklyContent.alpha = 1f
         val overview = state.overview ?: return
         val timeStatistics = state.timeStatistics ?: return
 
@@ -155,6 +164,8 @@ class StatisticFragment : Fragment() {
     }
 
     private fun renderError(message: String) {
+        binding.weeklyBlurPlaceholder.isVisible = false
+        binding.weeklyContent.alpha = 1f
         binding.btnWeeklyDetail.isEnabled = true
         binding.btnAchievementDetail.isEnabled = false
         binding.tvStreak.text = "0"

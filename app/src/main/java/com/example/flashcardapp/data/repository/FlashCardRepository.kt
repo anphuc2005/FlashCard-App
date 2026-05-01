@@ -13,6 +13,28 @@ class FlashCardRepository(
     private val cardApiService: CardApiService,
     private val flashCardDao: FlashCardDao
 ) {
+    suspend fun addCardsBulk(cards: List<FlashCard>) = withContext(Dispatchers.IO) {
+        if (cards.isEmpty()) return@withContext
+
+        val requestList = cards.map { it.toDto() }
+        val response = cardApiService.addCard(requestList)
+        if (!response.isSuccess()) {
+            throw Exception("Failed to sync cards to server: ${response.message}")
+        }
+
+        val entities = cards.map {
+            FlashCardEntity(
+                id = it.id,
+                question = it.question,
+                answer = it.answer,
+                imageUrl = it.imageUrl,
+                deckId = it.deckId,
+                isSynced = true
+            )
+        }
+        flashCardDao.insertAllCards(entities)
+    }
+
     // Lấy thẻ từ local database theo Deck ID
     fun getCardsByDeckIdFromDb(deckId: String): Flow<List<FlashCardEntity>> {
         return flashCardDao.getCardsByDeckId(deckId)
@@ -21,7 +43,7 @@ class FlashCardRepository(
     // Lấy thẻ từ API theo Deck ID
     suspend fun getCardsByDeckIdFromApi(deckId: String): List<FlashCard>  {
         val response = cardApiService.getCardOfDeck(deckId)
-        if (response.status == 200 && response.data != null) {
+        if (response.isSuccess() && response.data != null) {
             val listCards = response.data.map { it.toDomain() }
             
             // Xoá và lưu đè lại vào bộ nhớ Local (tuỳ chọn)
@@ -32,6 +54,7 @@ class FlashCardRepository(
                         id = it.id,
                         question = it.question,
                         answer = it.answer,
+                        imageUrl = it.imageUrl,
                         deckId = it.deckId,
                         isSynced = true
                     )
@@ -55,6 +78,7 @@ class FlashCardRepository(
             id = card.id,
             question = card.question,
             answer = card.answer,
+            imageUrl = card.imageUrl,
             deckId = card.deckId,
             isSynced = false // Mặc định là chưa đồng bộ
         )
@@ -71,6 +95,7 @@ class FlashCardRepository(
                     id = it.id, 
                     question = it.question, 
                     answer = it.answer, 
+                    imageUrl = it.imageUrl,
                     deckId = it.deckId
                 ).toDto()
             }
@@ -78,7 +103,7 @@ class FlashCardRepository(
             // Gọi API đưa List này lên server
             val response = cardApiService.addCard(requestList)
             
-            if (response.status == 200 || response.status == 201) {
+            if (response.isSuccess()) {
                 // Đánh dấu tüm các thẻ này thành đã đồng bộ
                 val syncedCards = unsyncedCards.map { it.copy(isSynced = true) }
                 flashCardDao.insertAllCards(syncedCards)
@@ -97,11 +122,12 @@ class FlashCardRepository(
         try {
             // Update to remote first
             val response = cardApiService.updateCard(card.id, card.toDto())
-            if (response.status == 200 || response.status == 201) {
+            if (response.isSuccess()) {
                 val cardEntity = FlashCardEntity(
                     id = card.id,
                     question = card.question,
                     answer = card.answer,
+                    imageUrl = card.imageUrl,
                     deckId = card.deckId
                 )
                 flashCardDao.updateCard(cardEntity)
@@ -116,12 +142,16 @@ class FlashCardRepository(
     // Xóa thẻ
     suspend fun deleteCard(card: FlashCard) {
         try {
-            val response = cardApiService.deleteCard(card.id)
-            if (response.status == 200) {
+            val response = cardApiService.updateCard(
+                card.id,
+                card.toDto().copy(isDeleted = true)
+            )
+            if (response.isSuccess()) {
                 val cardEntity = FlashCardEntity(
                     id = card.id,
                     question = card.question,
                     answer = card.answer,
+                    imageUrl = card.imageUrl,
                     deckId = card.deckId
                 )
                 flashCardDao.deleteCard(cardEntity)

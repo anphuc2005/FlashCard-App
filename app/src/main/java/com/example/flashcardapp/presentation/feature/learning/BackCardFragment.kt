@@ -140,6 +140,11 @@ class BackCardFragment : Fragment() {
         binding.progressBar.setProgress(state.progressPercent)
         binding.cardTitle.text = card?.question ?: getString(R.string.learning_no_cards)
         binding.cardDesc.text = card?.answer ?: getString(R.string.learning_no_answer)
+        binding.tagAnswer.text = when {
+            card == null -> getString(R.string.learning_answer_label)
+            card.repetition > 0 -> getString(R.string.learning_card_badge_review)
+            else -> getString(R.string.learning_card_badge_new)
+        }
         binding.btnSpeakAnswer.isEnabled = !card?.answer.isNullOrBlank()
         renderTimer(state.timeRemainingSeconds)
         loadCardImage(card?.imageUrl)

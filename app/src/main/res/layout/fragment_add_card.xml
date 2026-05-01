@@ -13,7 +13,7 @@
         android:layout_height="56dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="14dp"
-        android:background="#FFFFFF"
+        android:background="?attr/colorOnBackground"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -194,6 +194,26 @@
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
                             android:visibility="gone" />
+
+                        <FrameLayout
+                            android:id="@+id/imageUploadOverlay"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="#66000000"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:visibility="gone"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent">
+
+                            <ProgressBar
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center"
+                                android:indeterminate="true" />
+                        </FrameLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -235,7 +255,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:text="Âm thanh"
-                                android:textColor="#4A5668"
+                                android:textColor="?attr/subTitleColor"
                                 android:textSize="13sp"/>
                         </LinearLayout>
 
@@ -255,7 +275,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_play"
-                                app:tint="#2E6BFF"/>
+                                app:tint="?attr/buttonColor"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -263,7 +283,7 @@
                                 android:layout_marginTop="4dp"
                                 android:text="Đã chọn"
                                 android:textStyle="bold"
-                                android:textColor="#2E6BFF"
+                                android:textColor="?attr/buttonColor"
                                 android:textSize="13sp"/>
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -283,60 +303,29 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilTag"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#FFFFFF"
+                app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeWidth="0dp">
+                app:boxStrokeColor="@color/auth_input_stroke_selector"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/etTag"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:hint="Ví dụ: Từ vựng, IELTS..."
+                    android:background="@null"
                     android:textColor="?attr/textColor"
                     android:textColorHint="?attr/subTitleColor"
                     android:paddingHorizontal="12dp"
                     android:textSize="15sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Note -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Ghi chú"
-                android:textColor="?attr/textColor"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:layout_marginBottom="6dp"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilNote"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:boxBackgroundColor="#FFFFFF"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeWidth="0dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etNote"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="top|start"
-                    android:hint="Thêm ghi chú phụ (không bắt buộc)"
-                    android:paddingHorizontal="12dp"
-                    android:textSize="15sp"
-                    android:textColor="?attr/textColor"
-                    android:textColorHint="?attr/subTitleColor"/>
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
@@ -349,7 +338,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="#F6F8FB"
+        android:background="?attr/colorOnBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -360,24 +349,66 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="Tiếp tục: Thêm thẻ tiếp theo"
-            android:textColor="#2E6BFF"
+            android:textColor="?attr/buttonColor"
             android:textStyle="bold"
             android:textSize="14sp"
             android:paddingVertical="10dp"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSave"
-            style="@style/Widget.MaterialComponents.Button"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginTop="6dp"
-            android:text="Hoàn tất - lưu bộ thẻ"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:backgroundTint="#2E6BFF"
-            android:textColor="#FFFFFF"
-            app:cornerRadius="14dp"/>
+            android:layout_marginTop="6dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Hoàn tất - lưu bộ thẻ"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:backgroundTint="?attr/buttonColor"
+                android:textColor="@android:color/white"
+                app:cornerRadius="14dp"/>
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/saveProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="14dp"
+                android:visibility="gone"
+                app:indicatorColor="?attr/buttonColor"
+                app:trackColor="?attr/iconBlueBackground"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="12dp" />
+        </FrameLayout>
+
+        <!-- Deprecated container kept for binding stability -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/saveProgressContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:backgroundTint="?attr/buttonColor"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:visibility="gone">
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/colorOnBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
