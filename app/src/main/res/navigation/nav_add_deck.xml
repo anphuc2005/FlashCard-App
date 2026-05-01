@@ -27,6 +27,9 @@
         android:label="Chỉnh Sửa Bộ Thẻ"
         tools:layout="@layout/fragment_edit_deck">
         <action
+            android:id="@+id/action_editDeckFragment_to_addCardFragment"
+            app:destination="@id/addCardFragment" />
+        <action
             android:id="@+id/action_editDeckFragment_to_editCardFragment"
             app:destination="@id/editCardFragment" />
     </fragment>

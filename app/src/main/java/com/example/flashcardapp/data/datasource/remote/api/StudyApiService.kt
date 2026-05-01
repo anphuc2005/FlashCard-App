@@ -19,4 +19,5 @@ interface StudyApiService {
 
     @POST("study/sync")
     suspend fun syncReviews(@Body reviews: List<StudyReviewDto>): ApiResponse<StudySyncResponseDto>
+
 }

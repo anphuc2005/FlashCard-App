@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -72,13 +73,19 @@ class EditDeckFragment : Fragment() {
     private fun setupViews() {
         editDeckCardAdapter = EditDeckCardAdapter(
             onEditClick = { card ->
-                val bundle = Bundle().apply {
-                    putString("CARD_ID", card.id)
-                    putString("QUESTION", card.question)
-                    putString("ANSWER", card.answer)
-                    putString("DECK_ID", card.deckId)
+                val targetDeckId = card.deckId.ifBlank { deckId.orEmpty() }
+                if (card.id.isBlank() || targetDeckId.isBlank()) {
+                    showAppError(getString(R.string.edit_card_missing_arguments))
+                } else {
+                    val bundle = Bundle().apply {
+                        putString("CARD_ID", card.id)
+                        putString("QUESTION", card.question)
+                        putString("ANSWER", card.answer)
+                        putString("IMAGE_URL", card.imageUrl)
+                        putString("DECK_ID", targetDeckId)
+                    }
+                    findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle)
                 }
-                findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle)
             },
             onDeleteClick = { card ->
                 val dialog = AppConfirmDialog.newInstance(
@@ -110,7 +117,16 @@ class EditDeckFragment : Fragment() {
         }
 
         binding.btnAddCard.setOnClickListener {
-            findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment)
+            val targetDeckId = deckId
+            if (targetDeckId.isNullOrBlank()) {
+                showAppError(getString(R.string.edit_deck_missing_id))
+                return@setOnClickListener
+            }
+
+            findNavController().navigate(
+                R.id.action_editDeckFragment_to_addCardFragment,
+                bundleOf("DECK_ID" to targetDeckId)
+            )
         }
 
         binding.switchPublic.setOnCheckedChangeListener { _, isChecked ->

@@ -276,8 +276,10 @@
     <string name="edit_card_title">Sửa thẻ</string>
     <string name="edit_card_delete">Xóa thẻ</string>
     <string name="edit_card_update_success">Đã cập nhật thẻ thành công</string>
+    <string name="edit_card_missing_arguments">Không thể tải dữ liệu thẻ để chỉnh sửa.</string>
     <string name="edit_deck_title">Sửa bộ thẻ</string>
     <string name="edit_deck_name_required">Tên bộ thẻ không được để trống</string>
+    <string name="edit_deck_missing_id">Không tìm thấy bộ thẻ để thêm thẻ mới.</string>
     <string name="edit_deck_update_success">Đã cập nhật thành công!</string>
     <string name="edit_deck_card_count">Số lượng thẻ (%1$d)</string>
     <string name="deck_card_count">%1$d thẻ</string>
