@@ -1,12 +1,16 @@
 package com.example.flashcardapp.presentation.feature.home
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,7 +37,6 @@ import com.example.flashcardapp.presentation.feature.learning.EXTRA_STUDY_MODE
 import com.example.flashcardapp.presentation.common.adapter.RecentDeckAdapter
 import com.example.flashcardapp.presentation.common.adapter.ShortcutAdapter
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
 import com.example.flashcardapp.presentation.common.notification.showAppError
@@ -41,6 +44,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import androidx.core.view.isVisible
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderDialog
 
 class HomeFragment : Fragment() {
 
@@ -57,14 +61,21 @@ class HomeFragment : Fragment() {
     private var notifStudy = true
     private var notifNewDeck = false
     private var notifAchievement = true
-    private var exportFormat = ExportDataDialog.ExportFormat.CSV
 
     private var reminderHour = 8
     private var reminderMinute = 0
     private var reminderEnabled = true
+    private var pendingNotificationAction: (() -> Unit)? = null
     private var avatarLoadJob: Job? = null
     private var skipNextResumeHomeRefresh = true
     private var skipNextResumeAvatarRefresh = true
+
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            pendingNotificationAction?.invoke()
+        }
+        pendingNotificationAction = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -236,11 +247,22 @@ class HomeFragment : Fragment() {
     private fun handleShortcutClick(action: String?) {
         when (action) {
             "CREATE" -> navigateToCreateDeck()
-            "NOTIFICATIONS" -> showNotifications()
-            "EXPORT_DATA" -> showExportDataDialog()
+            "NOTIFICATIONS" -> ensureNotificationPermission { showNotifications() }
+            "REMINDER" -> ensureNotificationPermission { showReminderDialog() }
             "CHANGE_THEME" -> showChangeThemeDialog()
             else -> {}
         }
+    }
+
+    private fun ensureNotificationPermission(onGranted: () -> Unit) {
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            onGranted()
+            return
+        }
+
+        pendingNotificationAction = onGranted
+        notificationPermissionLauncher.launch(permission)
     }
 
     private fun showError(@Suppress("UNUSED_PARAMETER") error: String) {
@@ -352,14 +374,31 @@ class HomeFragment : Fragment() {
         dialog.show(childFragmentManager, "NotificationDialog")
     }
     
-    private fun showExportDataDialog(){
-        val dialog = ExportDataDialog.newInstance(exportFormat)
-        dialog.listener = object : ExportDataDialog.Listener {
-            override fun onExport(format: ExportDataDialog.ExportFormat) {
-                exportFormat = format
+    private fun showReminderDialog(){
+        val dialog = ReminderDialog.newInstance(reminderHour, reminderMinute, reminderEnabled)
+        dialog.listener = object : ReminderDialog.Listener {
+            override fun onReminderSaved(
+                hour: Int,
+                minute: Int,
+                enabled: Boolean
+            ) {
+                reminderHour = hour
+                reminderMinute = minute
+                reminderEnabled = enabled
+                ReminderScheduler.schedule(
+                    requireContext(),
+                    reminderHour,
+                    reminderMinute,
+                    reminderEnabled,
+                    notifStudy
+                )
+            }
+
+            override fun onReminderHistory() {
+
             }
         }
-        dialog.show(childFragmentManager, "ExportDataDialog")
+        dialog.show(childFragmentManager, "ReminderDialog")
     }
 
     private fun showChangeThemeDialog(){

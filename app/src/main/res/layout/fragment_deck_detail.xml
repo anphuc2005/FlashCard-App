@@ -44,7 +44,7 @@
                 android:textSize="@dimen/learning_toolbar_text_size"
                 android:textStyle="bold" />
 
-            <ImageButton
+            <View
                 android:id="@+id/btnMenu"
                 android:layout_width="@dimen/learning_icon_button_large_size"
                 android:layout_height="match_parent"

@@ -131,10 +131,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             ),
             Shortcut(
                 id = "3",
-                title = "Xuất dữ liệu",
-                iconResId = R.drawable.ic_export_data_shortcut,
+                title = "Nhắc nhở",
+                iconResId = R.drawable.ic_time,
                 backgroundResId = R.color.md_icon_red_background,
-                action = "EXPORT_DATA"
+                action = "REMINDER"
             ),
             Shortcut(
                 id = "4",
