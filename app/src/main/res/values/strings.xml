@@ -209,6 +209,7 @@
     <string name="learning_result_correct">Chính xác</string>
     <string name="learning_result_incorrect">Sai sót</string>
     <string name="learning_result_time">Thời gian</string>
+    <string name="learning_result_done">Hoàn thành</string>
     <string name="learning_result_score_format">%1$d/%2$d</string>
     <string name="learning_result_time_format">%1$02d:%2$02d</string>
     <string name="app_notification_success_title">Thành công</string>

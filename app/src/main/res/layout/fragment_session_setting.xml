@@ -55,7 +55,7 @@
         android:overScrollMode="never"
         android:paddingHorizontal="@dimen/learning_screen_padding_horizontal"
         android:paddingTop="@dimen/learning_screen_padding_large"
-        android:paddingBottom="@dimen/learning_settings_content_bottom_padding"
+        android:paddingBottom="@dimen/learning_space_lg"
         app:layout_constraintBottom_toTopOf="@+id/btnStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
