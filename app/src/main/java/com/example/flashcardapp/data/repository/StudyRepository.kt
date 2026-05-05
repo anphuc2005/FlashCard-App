@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.Instant
 
 private const val STUDY_SYNC_PREFS = "study_sync_prefs"
 private const val KEY_LAST_SYNC_TIME = "lastSyncTime"
@@ -33,23 +34,19 @@ class StudyRepository(
                     val normalizedCards = response.data.map { dto ->
                         dto.toDomain().copy(deckId = deckId)
                     }
-                    val entities = normalizedCards.map { card ->
-                        FlashCardEntity(
-                            id = card.id,
-                            question = card.question,
-                            answer = card.answer,
-                            imageUrl = card.imageUrl,
-                            deckId = deckId,
-                            isSynced = true
-                        )
-                    }
+                    val entities = normalizedCards.map { it.toEntity(isSynced = true) }
                     flashCardDao.insertAllCards(entities)
                     Result.success(normalizedCards)
                 } else {
                     Result.failure(Exception(response.message ?: "Failed to load study session"))
                 }
             } catch (e: Exception) {
-                Result.failure(e)
+                val cachedCards = flashCardDao.getCardsSnapshotByDeckId(deckId).map { it.toDomain() }
+                if (cachedCards.isNotEmpty()) {
+                    Result.success(buildOfflineSession(cachedCards, mode))
+                } else {
+                    Result.failure(e)
+                }
             }
         }
     }
@@ -121,5 +118,61 @@ class StudyRepository(
             .edit()
             .putString(KEY_LAST_SYNC_TIME, syncedAt)
             .apply()
+    }
+
+    private fun buildOfflineSession(cards: List<FlashCard>, mode: String): List<FlashCard> {
+        return when (mode) {
+            "SEQUENTIAL" -> cards.sortedBy { it.id }
+            "RANDOM", "TIME_ATTACK" -> cards.shuffled()
+            "SPACED_REPETITION" -> {
+                val now = Instant.now()
+                val reviewCards = cards
+                    .filter { it.repetition > 0 && isDueForReview(it.nextReviewDate, now) }
+                val newCards = cards
+                    .filter { it.repetition == 0 }
+                    .take(DEFAULT_DAILY_NEW_CARD_LIMIT)
+                reviewCards + newCards
+            }
+            else -> cards
+        }
+    }
+
+    private fun isDueForReview(nextReviewDate: String?, now: Instant): Boolean {
+        if (nextReviewDate.isNullOrBlank()) return true
+        val parsed = runCatching { Instant.parse(nextReviewDate) }.getOrNull() ?: return true
+        return !parsed.isAfter(now)
+    }
+
+    private fun FlashCard.toEntity(isSynced: Boolean): FlashCardEntity {
+        return FlashCardEntity(
+            id = id,
+            question = question,
+            answer = answer,
+            imageUrl = imageUrl,
+            deckId = deckId,
+            interval = interval,
+            repetition = repetition,
+            easeFactor = easeFactor,
+            nextReviewDate = nextReviewDate,
+            isSynced = isSynced
+        )
+    }
+
+    private fun FlashCardEntity.toDomain(): FlashCard {
+        return FlashCard(
+            id = id,
+            question = question,
+            answer = answer,
+            imageUrl = imageUrl,
+            deckId = deckId,
+            interval = interval,
+            repetition = repetition,
+            easeFactor = easeFactor,
+            nextReviewDate = nextReviewDate
+        )
+    }
+
+    private companion object {
+        const val DEFAULT_DAILY_NEW_CARD_LIMIT = 20
     }
 }

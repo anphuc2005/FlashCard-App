@@ -29,6 +29,10 @@ class FlashCardRepository(
                 answer = it.answer,
                 imageUrl = it.imageUrl,
                 deckId = it.deckId,
+                interval = it.interval,
+                repetition = it.repetition,
+                easeFactor = it.easeFactor,
+                nextReviewDate = it.nextReviewDate,
                 isSynced = true
             )
         }
@@ -56,6 +60,10 @@ class FlashCardRepository(
                         answer = it.answer,
                         imageUrl = it.imageUrl,
                         deckId = it.deckId,
+                        interval = it.interval,
+                        repetition = it.repetition,
+                        easeFactor = it.easeFactor,
+                        nextReviewDate = it.nextReviewDate,
                         isSynced = true
                     )
                 }
@@ -80,6 +88,10 @@ class FlashCardRepository(
             answer = card.answer,
             imageUrl = card.imageUrl,
             deckId = card.deckId,
+            interval = card.interval,
+            repetition = card.repetition,
+            easeFactor = card.easeFactor,
+            nextReviewDate = card.nextReviewDate,
             isSynced = false // Mặc định là chưa đồng bộ
         )
         // Lưu tạm vào Local để cập nhật giao diện (Offline-first)
@@ -96,7 +108,11 @@ class FlashCardRepository(
                     question = it.question, 
                     answer = it.answer, 
                     imageUrl = it.imageUrl,
-                    deckId = it.deckId
+                    deckId = it.deckId,
+                    interval = it.interval,
+                    repetition = it.repetition,
+                    easeFactor = it.easeFactor,
+                    nextReviewDate = it.nextReviewDate
                 ).toDto()
             }
 
@@ -128,7 +144,11 @@ class FlashCardRepository(
                     question = card.question,
                     answer = card.answer,
                     imageUrl = card.imageUrl,
-                    deckId = card.deckId
+                    deckId = card.deckId,
+                    interval = card.interval,
+                    repetition = card.repetition,
+                    easeFactor = card.easeFactor,
+                    nextReviewDate = card.nextReviewDate
                 )
                 flashCardDao.updateCard(cardEntity)
             } else {
@@ -152,7 +172,11 @@ class FlashCardRepository(
                     question = card.question,
                     answer = card.answer,
                     imageUrl = card.imageUrl,
-                    deckId = card.deckId
+                    deckId = card.deckId,
+                    interval = card.interval,
+                    repetition = card.repetition,
+                    easeFactor = card.easeFactor,
+                    nextReviewDate = card.nextReviewDate
                 )
                 flashCardDao.deleteCard(cardEntity)
             } else {

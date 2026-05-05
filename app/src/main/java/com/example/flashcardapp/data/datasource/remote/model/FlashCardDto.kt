@@ -24,7 +24,11 @@ data class FlashCardDto(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
-            deckId = deckId
+            deckId = deckId,
+            interval = interval ?: 0,
+            repetition = repetition ?: 0,
+            easeFactor = easeFactor ?: 2.5,
+            nextReviewDate = nextReviewDate
         )
     }
 }
@@ -36,6 +40,10 @@ fun FlashCard.toDto(): FlashCardDto {
         answer = answer,
         imageUrl = imageUrl,
         deckId = deckId,
+        interval = interval,
+        repetition = repetition,
+        easeFactor = easeFactor,
+        nextReviewDate = nextReviewDate,
         isDeleted = false
     )
 }

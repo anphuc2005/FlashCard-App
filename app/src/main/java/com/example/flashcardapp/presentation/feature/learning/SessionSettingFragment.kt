@@ -55,11 +55,8 @@ class SessionSettingFragment : Fragment() {
         binding.cardOrdered.setOnClickListener { selectOrder(LearningCardOrder.ORDERED) }
         binding.rbTimeAttack.setOnClickListener { selectTimeAttackMode() }
         binding.cardTimeAttack.setOnClickListener { selectTimeAttackMode() }
-        binding.rbSpacedRepetition.setOnClickListener { selectSpacedRepetitionMode() }
-        binding.cardSpacedRepetition.setOnClickListener { selectSpacedRepetitionMode() }
         binding.chipAll.setOnClickListener { viewModel.setFilter(LearningCardFilter.ALL) }
         binding.chipNew.setOnClickListener { viewModel.setFilter(LearningCardFilter.NEW) }
-        binding.chipReview.setOnClickListener { viewModel.setFilter(LearningCardFilter.REVIEW) }
         binding.chipTimeOneMinute.setOnClickListener { viewModel.setTimeLimitMinutes(1) }
         binding.chipTimeThreeMinutes.setOnClickListener { viewModel.setTimeLimitMinutes(3) }
         binding.chipTimeFiveMinutes.setOnClickListener { viewModel.setTimeLimitMinutes(5) }
@@ -132,10 +129,8 @@ class SessionSettingFragment : Fragment() {
         binding.rbOrdered.isChecked = state.settings.order == LearningCardOrder.ORDERED &&
             state.settings.mode == LearningStudyMode.SEQUENTIAL
         binding.rbTimeAttack.isChecked = state.settings.mode == LearningStudyMode.TIME_ATTACK
-        binding.rbSpacedRepetition.isChecked = state.settings.mode == LearningStudyMode.SPACED_REPETITION
         binding.chipAll.isChecked = state.settings.filter == LearningCardFilter.ALL
         binding.chipNew.isChecked = state.settings.filter == LearningCardFilter.NEW
-        binding.chipReview.isChecked = state.settings.filter == LearningCardFilter.REVIEW
         binding.chipTimeOneMinute.isChecked = state.settings.timeLimitMinutes == 1
         binding.chipTimeThreeMinutes.isChecked = state.settings.timeLimitMinutes == 3
         binding.chipTimeFiveMinutes.isChecked = state.settings.timeLimitMinutes == 5
@@ -151,11 +146,6 @@ class SessionSettingFragment : Fragment() {
     private fun selectTimeAttackMode() {
         Log.d(TAG, "selectTimeAttackMode")
         viewModel.setStudyMode(LearningStudyMode.TIME_ATTACK)
-    }
-
-    private fun selectSpacedRepetitionMode() {
-        Log.d(TAG, "selectSpacedRepetitionMode")
-        viewModel.setStudyMode(LearningStudyMode.SPACED_REPETITION)
     }
 
     private fun renderTimeAttackOptions(isEnabled: Boolean) {

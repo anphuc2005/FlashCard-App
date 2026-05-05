@@ -22,7 +22,6 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 
 private const val TAB_NEW = 1
-private const val TAB_REVIEW = 2
 private const val TAG = "DeckDetailFragment"
 
 class DeckDetailFragment : Fragment() {
@@ -137,7 +136,6 @@ class DeckDetailFragment : Fragment() {
         override fun onTabSelected(tab: TabLayout.Tab?) {
             val filter = when (tab?.position) {
                 TAB_NEW -> LearningCardFilter.NEW
-                TAB_REVIEW -> LearningCardFilter.REVIEW
                 else -> LearningCardFilter.ALL
             }
             Log.d(TAG, "Tab selected: position=${tab?.position}, filter=$filter")
