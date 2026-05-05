@@ -79,6 +79,7 @@
                 app:boxCornerRadiusTopEnd="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusTopStart="@dimen/auth_input_corner_radius"
                 app:boxStrokeColor="@color/auth_login_input_stroke_selector"
+                app:boxStrokeErrorColor="@color/md_icon_red"
                 app:boxStrokeWidth="@dimen/auth_input_stroke_width"
                 app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width_focused">
 
@@ -117,10 +118,12 @@
                 app:boxCornerRadiusTopEnd="@dimen/auth_input_corner_radius"
                 app:boxCornerRadiusTopStart="@dimen/auth_input_corner_radius"
                 app:boxStrokeColor="@color/auth_login_input_stroke_selector"
+                app:boxStrokeErrorColor="@color/md_icon_red"
                 app:boxStrokeWidth="@dimen/auth_input_stroke_width"
                 app:boxStrokeWidthFocused="@dimen/auth_input_stroke_width_focused"
                 app:endIconMode="password_toggle"
-                app:endIconTint="@color/auth_input_hint">
+                app:endIconTint="@color/auth_login_end_icon_tint_selector"
+                app:errorIconDrawable="@null">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputPassword"

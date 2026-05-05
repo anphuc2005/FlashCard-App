@@ -13,7 +13,7 @@ import com.example.flashcardapp.data.datasource.local.entity.StudyReviewEntity
 
 @Database(
     entities = [FlashCardEntity::class, ChatMessageEntity::class, StudyReviewEntity::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class FlashCardDatabase : RoomDatabase() {

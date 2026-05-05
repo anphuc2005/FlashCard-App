@@ -13,6 +13,7 @@ data class StudyReviewEntity(
     val studyMode: String,
     val grade: Int,
     val studiedAt: String,
+    val durationSeconds: Int? = null,
     val isSynced: Boolean = false
 ) {
     fun toDomain(): StudyReview {
@@ -23,6 +24,7 @@ data class StudyReviewEntity(
             studyMode = studyMode,
             grade = grade,
             studiedAt = studiedAt,
+            durationSeconds = durationSeconds,
             isSynced = isSynced
         )
     }
@@ -36,6 +38,7 @@ fun StudyReview.toEntity(): StudyReviewEntity {
         studyMode = studyMode,
         grade = grade,
         studiedAt = studiedAt,
+        durationSeconds = durationSeconds,
         isSynced = isSynced
     )
 }

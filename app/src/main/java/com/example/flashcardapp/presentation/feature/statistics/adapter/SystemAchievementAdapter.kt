@@ -43,8 +43,28 @@ class SystemAchievementAdapter :
             } else {
                 MaterialColors.getColor(binding.root, R.attr.subTitleColor)
             }
+            binding.root.strokeColor = if (item.isUnlocked) {
+                MaterialColors.getColor(binding.root, R.attr.iconGreenBackground)
+            } else {
+                MaterialColors.getColor(binding.root, R.attr.iconBlueBackground)
+            }
+            binding.achievementIconContainer.setCardBackgroundColor(
+                if (item.isUnlocked) {
+                    MaterialColors.getColor(binding.root, R.attr.iconGreenBackground)
+                } else {
+                    MaterialColors.getColor(binding.root, R.attr.iconBlueBackground)
+                }
+            )
             binding.achievementStatus.setTextColor(statusColor)
             binding.root.alpha = if (item.isUnlocked) 1f else 0.75f
+            if (item.isUnlocked) {
+                binding.achievementIcon.animate().cancel()
+                binding.achievementIcon.rotation = -8f
+                binding.achievementIcon.animate().rotation(0f).setDuration(180L).start()
+            } else {
+                binding.achievementIcon.animate().cancel()
+                binding.achievementIcon.rotation = 0f
+            }
         }
     }
 }

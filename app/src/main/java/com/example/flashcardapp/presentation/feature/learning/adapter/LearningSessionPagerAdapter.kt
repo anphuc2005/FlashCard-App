@@ -83,6 +83,12 @@ class LearningSessionPagerAdapter(
             binding.questionText.text = card.question
             binding.backQuestionText.text = card.question
             binding.answerText.text = card.answer
+            val badgeText = binding.root.context.getString(
+                if (card.repetition > 0) R.string.learning_card_badge_review
+                else R.string.learning_card_badge_new
+            )
+            binding.frontBadge.text = badgeText
+            binding.backBadge.text = badgeText
             binding.btnSpeakAnswer.isEnabled = card.answer.isNotBlank()
             binding.btnSpeakAnswer.setOnClickListener {
                 if (card.answer.isNotBlank()) {

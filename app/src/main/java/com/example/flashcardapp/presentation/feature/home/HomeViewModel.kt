@@ -34,9 +34,14 @@ data class HomeUiState(
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
+    private companion object {
+        val HOME_PROGRESS_MODES = listOf("RANDOM", "SEQUENTIAL")
+    }
+
     private val appContainer = (application as FlashcardApp).container
     private val deckRepository = appContainer.deckRepository
     private val studyUseCases = appContainer.studyUseCases
+    private val studyRepository = appContainer.studyRepository
 
     private val _uiState = MutableStateFlow(
         HomeUiState(
@@ -62,10 +67,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
         val activeDeck = findActiveDeck(sortedDecks)
-        val progressRaw = calculateProgressPercent(
-            studiedCount = activeDeck?.studiedCount ?: 0,
-            totalCards = activeDeck?.cardCount ?: 0
-        )
+        val progressRaw = activeDeck?.let { deck ->
+            if (deck.cardCount > 0) {
+                calculateProgressPercent(
+                    studiedCount = deck.studiedCount,
+                    totalCards = deck.cardCount
+                )
+            } else {
+                0f
+            }
+        } ?: 0f
         val currentStreak = studyUseCases.getCurrentStreak()
 
         _uiState.value = _uiState.value.copy(
@@ -154,20 +165,42 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private suspend fun enrichDecksWithProgress(decks: List<Deck>): List<Deck> {
-        return decks.map { deck ->
-            val rawReviewedCount = studyUseCases.getReviewedCardIds(deck.id)
-                .getOrDefault(emptySet())
-                .size
-            val effectiveCardCount = deck.cardCount.coerceAtLeast(0)
-            val normalizedReviewedCount = if (effectiveCardCount > 0) {
-                rawReviewedCount.coerceIn(0, effectiveCardCount)
-            } else {
-                0
+        val progressMap = HOME_PROGRESS_MODES
+            .map { mode ->
+                studyRepository.getDeckProgressMap(
+                    deckIds = decks.map { it.id },
+                    mode = mode
+                )
             }
-            deck.copy(
-                customCardCount = effectiveCardCount,
-                customStudiedCount = normalizedReviewedCount
-            )
+            .fold(emptyMap<String, com.example.flashcardapp.domain.model.study.StudyDeckProgress>()) { acc, map ->
+                acc + map.filterKeys { it !in acc }
+            }
+
+        return decks.map { deck ->
+            val progress = progressMap[deck.id]
+            if (progress != null) {
+                deck.copy(
+                    customCardCount = progress.totalCards.coerceAtLeast(0),
+                    customStudiedCount = progress.studiedCards.coerceIn(
+                        0,
+                        progress.totalCards.coerceAtLeast(0)
+                    )
+                )
+            } else {
+                val rawReviewedCount = studyUseCases.getReviewedCardIds(deck.id)
+                    .getOrDefault(emptySet())
+                    .size
+                val effectiveCardCount = deck.cardCount.coerceAtLeast(0)
+                val normalizedReviewedCount = if (effectiveCardCount > 0) {
+                    rawReviewedCount.coerceIn(0, effectiveCardCount)
+                } else {
+                    0
+                }
+                deck.copy(
+                    customCardCount = effectiveCardCount,
+                    customStudiedCount = normalizedReviewedCount
+                )
+            }
         }
     }
 

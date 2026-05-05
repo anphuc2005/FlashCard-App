@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -189,8 +188,23 @@ class LearningCardsFragment : Fragment() {
     private fun onCardTapped(position: Int) {
         if (isFlipAnimating || position != binding.viewPagerCards.currentItem) return
         stopSpeaking()
+        if (pagerAdapter.isPositionFlipped(position)) {
+            advanceFromBackFace()
+            return
+        }
         val holder = findCurrentCardView() ?: return
         animateFlip(holder, position)
+    }
+
+    private fun advanceFromBackFace() {
+        val position = binding.viewPagerCards.currentItem
+        if (!pagerAdapter.isPositionFlipped(position) || isFlipAnimating) return
+        val completed = viewModel.rateCurrentCard(LearningRating.GOOD)
+        pagerAdapter.resetFlipState(position)
+        if (!completed) {
+            val nextPosition = viewModel.uiState.value.currentIndex
+            binding.viewPagerCards.setCurrentItem(nextPosition, true)
+        }
     }
 
     private fun findCurrentCardView(): View? {
@@ -324,7 +338,7 @@ class LearningCardsFragment : Fragment() {
     }
 
     private fun updateBottomAction(isBackFace: Boolean, enabled: Boolean) {
-        binding.ratingSection.isInvisible = !isBackFace
+        binding.ratingSection.visibility = View.GONE
         val canRate = isBackFace && enabled
         val alpha = if (canRate) 1f else 0.5f
         binding.cardAgain.root.isEnabled = canRate

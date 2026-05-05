@@ -56,13 +56,17 @@
                     tools:text="What is the capital of France?" />
 
                 <TextView
+                    android:id="@+id/frontBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/learning_space_xl"
-                    android:text="@string/learning_question_label"
+                    android:background="@drawable/bg_tag_blue"
+                    android:paddingHorizontal="@dimen/learning_top_bar_margin"
+                    android:paddingVertical="@dimen/learning_space_xs"
+                    android:text="@string/learning_card_badge_new"
                     android:textAllCaps="true"
-                    android:textColor="@color/learning_text_soft"
-                    android:textSize="@dimen/learning_body_text_size"
+                    android:textColor="@color/learning_primary"
+                    android:textSize="@dimen/learning_label_text_size"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -105,12 +109,13 @@
                     app:layout_constraintTop_toBottomOf="@id/answerImageBottomGuide">
 
                     <TextView
+                        android:id="@+id/backBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_tag_blue"
                         android:paddingHorizontal="@dimen/learning_top_bar_margin"
                         android:paddingVertical="@dimen/learning_space_xs"
-                        android:text="@string/learning_answer_label"
+                        android:text="@string/learning_card_badge_new"
                         android:textAllCaps="true"
                         android:textColor="@color/learning_primary"
                         android:textSize="@dimen/learning_label_text_size"

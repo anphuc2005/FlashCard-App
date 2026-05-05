@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -17,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentBackCardBinding
-import com.example.flashcardapp.databinding.ItemLearningRatingCardBinding
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -72,47 +70,7 @@ class BackCardFragment : Fragment() {
     private fun setupClickListeners() {
         binding.btnClose.setOnClickListener { showExitLearningDialog() }
         binding.cardAnswer.setOnClickListener { flipBackToQuestion() }
-        binding.cardAgain.root.setOnClickListener { rateCard(LearningRating.AGAIN) }
-        binding.cardHard.root.setOnClickListener { rateCard(LearningRating.HARD) }
-        binding.cardGood.root.setOnClickListener { rateCard(LearningRating.GOOD) }
-        binding.cardEasy.root.setOnClickListener { rateCard(LearningRating.EASY) }
         binding.btnSpeakAnswer.setOnClickListener { speakCurrentAnswer() }
-        binding.cardAgain.ratingIcon.setImageResource(R.drawable.ic_again)
-        binding.cardHard.ratingIcon.setImageResource(R.drawable.ic_difficult)
-        binding.cardGood.ratingIcon.setImageResource(R.drawable.ic_good)
-        binding.cardEasy.ratingIcon.setImageResource(R.drawable.ic_easy)
-        binding.cardAgain.ratingText.setText(R.string.learning_rating_again)
-        binding.cardHard.ratingText.setText(R.string.learning_rating_hard)
-        binding.cardGood.ratingText.setText(R.string.learning_rating_good)
-        binding.cardEasy.ratingText.setText(R.string.learning_rating_easy)
-        binding.cardAgain.ratingDelay.setText(R.string.learning_rating_again_delay)
-        binding.cardHard.ratingDelay.setText(R.string.learning_rating_hard_delay)
-        binding.cardGood.ratingDelay.setText(R.string.learning_rating_good_delay)
-        binding.cardEasy.ratingDelay.setText(R.string.learning_rating_easy_delay)
-        applyRatingStyle(
-            binding.cardAgain,
-            R.color.learning_again_bg,
-            R.color.learning_again_stroke,
-            R.color.learning_again_text
-        )
-        applyRatingStyle(
-            binding.cardHard,
-            R.color.learning_hard_bg,
-            R.color.learning_hard_stroke,
-            R.color.learning_hard_text
-        )
-        applyRatingStyle(
-            binding.cardGood,
-            R.color.learning_good_bg,
-            R.color.learning_good_stroke,
-            R.color.learning_good_text
-        )
-        applyRatingStyle(
-            binding.cardEasy,
-            R.color.learning_easy_bg,
-            R.color.learning_easy_stroke,
-            R.color.learning_easy_text
-        )
     }
 
     private fun observeViewModel() {
@@ -279,21 +237,6 @@ class BackCardFragment : Fragment() {
     private fun showToast(messageRes: Int) {
         if (!isAdded) return
         Toast.makeText(requireContext(), messageRes, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun applyRatingStyle(
-        binding: ItemLearningRatingCardBinding,
-        backgroundColor: Int,
-        strokeColor: Int,
-        textColor: Int
-    ) {
-        val context = requireContext()
-        val resolvedTextColor = ContextCompat.getColor(context, textColor)
-        binding.root.setCardBackgroundColor(ContextCompat.getColor(context, backgroundColor))
-        binding.root.strokeColor = ContextCompat.getColor(context, strokeColor)
-        binding.ratingText.setTextColor(resolvedTextColor)
-        binding.ratingDelay.setTextColor(resolvedTextColor)
-        binding.ratingIcon.setColorFilter(resolvedTextColor)
     }
 
     private fun loadCardImage(imageUrl: String?) {

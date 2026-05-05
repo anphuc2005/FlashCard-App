@@ -6,5 +6,8 @@ data class FlashCard(
     val answer: String,
     val imageUrl: String? = null,
     val deckId: String,
-    val repetition: Int = 0
+    val interval: Int = 0,
+    val repetition: Int = 0,
+    val easeFactor: Double = 2.5,
+    val nextReviewDate: String? = null
 )

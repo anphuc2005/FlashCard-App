@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ItemAchievementBinding
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
+import com.google.android.material.color.MaterialColors
 
 class StatisticAchievementAdapter :
     ListAdapter<StatisticAchievementItem, StatisticAchievementAdapter.AchievementViewHolder>(StatisticAchievementDiffCallback()) {
@@ -37,7 +39,41 @@ class StatisticAchievementAdapter :
             binding.achievementTitle.text = item.title
             binding.achievementDesc.text = item.description
             binding.achievementIcon.setImageResource(item.iconResId)
-            binding.root.alpha = 1f
+            val isUnlocked = item.isUnlocked
+            val strokeColor = if (isUnlocked) {
+                MaterialColors.getColor(binding.root, R.attr.iconGreenBackground)
+            } else {
+                MaterialColors.getColor(binding.root, R.attr.iconBlueBackground)
+            }
+            val iconBgColor = if (isUnlocked) {
+                MaterialColors.getColor(binding.root, R.attr.iconGreenBackground)
+            } else {
+                MaterialColors.getColor(binding.root, R.attr.iconBlueBackground)
+            }
+            binding.root.strokeColor = strokeColor
+            binding.achievementIconContainer.setCardBackgroundColor(iconBgColor)
+            binding.achievementTitle.setTextColor(
+                if (isUnlocked) {
+                    MaterialColors.getColor(binding.root, R.attr.iconGreen)
+                } else {
+                    MaterialColors.getColor(binding.root, R.attr.textColor)
+                }
+            )
+            binding.root.alpha = if (isUnlocked) 1f else 0.78f
+            if (isUnlocked) {
+                binding.achievementIcon.animate().cancel()
+                binding.achievementIcon.scaleX = 0.92f
+                binding.achievementIcon.scaleY = 0.92f
+                binding.achievementIcon.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(180L)
+                    .start()
+            } else {
+                binding.achievementIcon.animate().cancel()
+                binding.achievementIcon.scaleX = 1f
+                binding.achievementIcon.scaleY = 1f
+            }
             binding.root.setOnClickListener(null)
         }
     }
@@ -54,4 +90,3 @@ class StatisticAchievementAdapter :
         ): Boolean = oldItem == newItem
     }
 }
-

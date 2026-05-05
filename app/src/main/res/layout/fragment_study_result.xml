@@ -109,27 +109,11 @@
             android:layout_marginTop="@dimen/learning_space_md"
             android:alignmentMode="alignBounds"
             android:columnCount="2"
-            android:rowCount="2"
+            android:rowCount="1"
             android:useDefaultMargins="true">
 
             <include
                 android:id="@+id/cardStudiedResult"
-                layout="@layout/item_learning_result_card"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/learning_feedback_card_height"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1" />
-
-            <include
-                android:id="@+id/cardCorrectResult"
-                layout="@layout/item_learning_result_card"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/learning_feedback_card_height"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1" />
-
-            <include
-                android:id="@+id/cardIncorrectResult"
                 layout="@layout/item_learning_result_card"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/learning_feedback_card_height"
@@ -155,7 +139,7 @@
         android:layout_marginTop="@dimen/learning_space_sm"
         android:layout_marginBottom="@dimen/learning_space_lg"
         android:backgroundTint="?attr/buttonColor"
-        android:text="@string/learning_start"
+        android:text="@string/learning_result_done"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/learning_toolbar_text_size"

@@ -10,9 +10,11 @@ import com.google.android.gms.common.api.ApiException
 import androidx.activity.result.contract.ActivityResultContracts
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -132,8 +134,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.formState.collect { state ->
-                        binding.inputEmail.error = state.emailError
-                        binding.inputPassword.error = state.passwordError
+                        binding.layoutEmail.error = state.emailError
+                        binding.layoutPassword.error = state.passwordError
+                        val endIconTintColor = if (state.passwordError != null) {
+                            ContextCompat.getColor(requireContext(), R.color.md_icon_red)
+                        } else {
+                            ContextCompat.getColor(requireContext(), R.color.auth_input_hint)
+                        }
+                        binding.layoutPassword.setEndIconTintList(ColorStateList.valueOf(endIconTintColor))
                     }
                 }
 

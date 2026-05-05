@@ -11,7 +11,7 @@ typealias StatisticsRangeSummaryResponseDto = ApiResponse<RangeSummaryDto>
 data class DashboardDataDto(
     @SerializedName("summary") val summary: SummaryDto? = null,
     @SerializedName("rangeSummary") val rangeSummary: RangeSummaryDto? = null,
-    @SerializedName("chart") val chart: List<ChartPointDto>? = null,
+    @SerializedName(value = "chart", alternate = ["weeklyChart", "activityChart", "studyChart"]) val chart: List<ChartPointDto>? = null,
     @SerializedName("achievements") val achievements: AchievementsDataDto? = null,
     @SerializedName("deckStatistics") val deckStatistics: List<DeckStatisticsItemDto>? = null
 )
@@ -35,8 +35,8 @@ data class RangeSummaryDto(
 )
 
 data class ChartPointDto(
-    @SerializedName("date") val date: String,
-    @SerializedName("count") val count: Int
+    @SerializedName(value = "date", alternate = ["day", "label", "x"]) val date: String,
+    @SerializedName(value = "count", alternate = ["value", "studied", "totalStudied", "y"]) val count: Int
 )
 
 data class AchievementsDataDto(
