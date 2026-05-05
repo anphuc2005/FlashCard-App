@@ -3,6 +3,7 @@ package com.example.flashcardapp.data.repository
 import com.example.flashcardapp.data.datasource.remote.api.DeckApiService
 import com.example.flashcardapp.data.datasource.remote.model.toDto
 import com.example.flashcardapp.domain.model.Deck
+import com.example.flashcardapp.domain.model.DeckExplorePage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -49,6 +50,30 @@ class DeckRepository(
                 val response = deckApiService.exploreDecks()
                 if (response.isSuccess() && response.data != null) {
                     Result.success(enrichDecksWithCardCount(response.data.map { it.toDomain() }))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun exploreDecksPaged(
+        page: Int = 0,
+        size: Int = 5,
+        query: String? = null
+    ): Result<DeckExplorePage> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.exploreDecksPaged(
+                    page = page,
+                    size = size.coerceIn(1, 50),
+                    query = query?.takeIf { it.isNotBlank() }
+                )
+                if (response.isSuccess() && response.data != null) {
+                    val decks = enrichDecksWithCardCount(response.data.content.map { it.toDomain() })
+                    Result.success(response.data.toDomain(decks))
                 } else {
                     Result.failure(Exception(response.message ?: "Unknown error"))
                 }

@@ -2,6 +2,7 @@ package com.example.flashcardapp.data.datasource.remote.api
 
 import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
 import com.example.flashcardapp.data.datasource.remote.model.DeckCardCountDto
+import com.example.flashcardapp.data.datasource.remote.model.DeckExplorePageDto
 import com.example.flashcardapp.data.datasource.remote.model.DeckDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -9,6 +10,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface DeckApiService {
 
@@ -23,6 +25,13 @@ interface DeckApiService {
 
     @GET("decks/explore")
     suspend fun exploreDecks(): ApiResponse<List<DeckDto>>
+
+    @GET("decks/explore/paged")
+    suspend fun exploreDecksPaged(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 5,
+        @Query("query") query: String? = null
+    ): ApiResponse<DeckExplorePageDto>
 
     @POST("decks")
     suspend fun createDeck(@Body deck: DeckDto): ApiResponse<DeckDto>

@@ -245,6 +245,10 @@
     <string name="discover_collapse">Thu gọn</string>
     <string name="discover_featured_lessons">Bài học nổi bật</string>
     <string name="discover_see_more">Xem thêm</string>
+    <string name="discover_view_all">Xem toàn bộ</string>
+    <string name="discover_view_less">Thu gọn</string>
+    <string name="discover_page_indicator">%1$d/%2$d</string>
+    <string name="discover_next_page">Trang sau</string>
     <string name="loading_default_message">Đang xử lý...</string>
     <string name="deck_search_hint">Tìm kiếm bộ thẻ...</string>
     <string name="discover_save_deck_title">Lưu bộ thẻ?</string>

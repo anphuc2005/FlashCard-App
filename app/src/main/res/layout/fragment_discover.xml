@@ -169,13 +169,44 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/btnSeeAllCourses"
+        <LinearLayout
+            android:id="@+id/layoutCoursePagination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/discover_see_more"
-            android:textColor="?attr/buttonColor"
-            android:textSize="13sp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnPrevCoursePage"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/common_back"
+                android:padding="6dp"
+                android:src="@drawable/ic_back"
+                app:tint="?attr/buttonColor" />
+
+            <TextView
+                android:id="@+id/tvCoursePageIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:textColor="?attr/buttonColor"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="1/5" />
+
+            <ImageButton
+                android:id="@+id/btnNextCoursePage"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/discover_next_page"
+                android:padding="6dp"
+                android:rotation="180"
+                android:src="@drawable/ic_back"
+                app:tint="?attr/buttonColor" />
+        </LinearLayout>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
