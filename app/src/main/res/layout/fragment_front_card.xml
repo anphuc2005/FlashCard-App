@@ -95,7 +95,7 @@
         android:backgroundTint="@color/learning_surface"
         app:cardCornerRadius="@dimen/learning_card_radius_figma"
         app:cardElevation="@dimen/learning_zero"
-        app:layout_constraintBottom_toTopOf="@id/flipArea"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar"
@@ -148,37 +148,5 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <LinearLayout
-        android:id="@+id/flipArea"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/learning_space_lg"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardFront">
-
-        <TextView
-            android:id="@+id/tapToFlip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_front_card_flipCard"
-            android:textColor="@color/learning_text_muted"
-            android:textSize="@dimen/learning_answer_text_size"
-            android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnFlip"
-            android:layout_width="@dimen/learning_icon_button_large_size"
-            android:layout_height="@dimen/learning_icon_button_large_size"
-            android:layout_marginTop="@dimen/learning_space_md"
-            android:background="@drawable/bg_learning_flip_button"
-            android:padding="@dimen/learning_card_padding"
-            android:src="@drawable/ic_flip"
-            app:tint="@color/learning_primary" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

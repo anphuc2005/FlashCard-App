@@ -1,6 +1,7 @@
 package com.example.flashcardapp.data.datasource.remote.api
 
 import com.example.flashcardapp.core.constants.Constants
+import com.example.flashcardapp.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.Interceptor
@@ -13,7 +14,11 @@ object RetrofitClient {
     var tokenProvider: (() -> String?)? = null
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BASIC
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
     }
 
     private val authInterceptor = Interceptor { chain ->

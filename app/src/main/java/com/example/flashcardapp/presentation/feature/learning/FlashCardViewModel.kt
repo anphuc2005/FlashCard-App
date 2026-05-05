@@ -17,9 +17,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.Instant
 import kotlin.math.min
 
 private const val DEFAULT_LEARNING_CARD_LIMIT = 20
+private const val DEFAULT_DAILY_NEW_CARD_LIMIT = 20
 private const val MIN_CARD_LIMIT = 1
 private const val SECONDS_PER_MINUTE = 60L
 private const val TAG = "LearningViewModel"
@@ -34,6 +36,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
     val uiState: StateFlow<LearningUiState> = _uiState.asStateFlow()
 
     private var sessionStartedAt: Long = 0L
+    private var currentCardPresentedAtMillis: Long = 0L
     private var timerJob: Job? = null
 
     fun loadDeck(deckId: String) {
@@ -320,6 +323,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 cardIds = sessionCards.map { it.id },
                 currentIndex = initialIndex.coerceIn(0, sessionCards.lastIndex)
             )
+            currentCardPresentedAtMillis = System.currentTimeMillis()
             startTimerIfNeeded()
             onSessionReady(true)
         }
@@ -342,6 +346,10 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             TAG,
             "rateCurrentCard: cardId=${currentCard.id}, rating=$rating, currentIndex=${state.currentIndex}, nextIndex=$nextIndex, sessionSize=${state.sessionCards.size}, completed=$isCompleted"
         )
+        val ratedAtMillis = System.currentTimeMillis()
+        val durationSeconds = ((ratedAtMillis - currentCardPresentedAtMillis) / 1000L)
+            .coerceAtLeast(0L)
+            .toInt()
 
         _uiState.value = if (isCompleted) {
             timerJob?.cancel()
@@ -359,19 +367,21 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 currentIndex = nextIndex
             )
         }
+        currentCardPresentedAtMillis = ratedAtMillis
 
         viewModelScope.launch {
             val sessionDeckId = state.deckId
             val reviewDeckId = sessionDeckId ?: currentCard.deckId
             Log.d(
                 TAG,
-                "saveReview started: cardId=${currentCard.id}, cardDeckId=${currentCard.deckId}, sessionDeckId=$sessionDeckId, reviewDeckId=$reviewDeckId, mode=${state.settings.mode.syncMode}, grade=${rating.syncValue}"
+                "saveReview started: cardId=${currentCard.id}, cardDeckId=${currentCard.deckId}, sessionDeckId=$sessionDeckId, reviewDeckId=$reviewDeckId, mode=${state.settings.mode.syncMode}, grade=${rating.syncValue}, durationSeconds=$durationSeconds"
             )
             val saveResult = studyUseCases.saveReview(
                 cardId = currentCard.id,
                 deckId = reviewDeckId,
                 studyMode = state.settings.mode.syncMode,
-                grade = rating.syncValue
+                grade = rating.syncValue,
+                durationSeconds = durationSeconds
             )
             saveResult
                 .onSuccess {
@@ -400,6 +410,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         val safeIndex = index.coerceIn(0, state.sessionCards.lastIndex)
         if (safeIndex == state.currentIndex) return
         Log.d(TAG, "setCurrentIndex: from=${state.currentIndex}, to=$safeIndex")
+        currentCardPresentedAtMillis = System.currentTimeMillis()
         _uiState.value = state.copy(currentIndex = safeIndex)
     }
 
@@ -414,17 +425,18 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         reviewedCardIds: Set<String>,
         trustReviewCards: Boolean
     ): List<FlashCard> {
+        val hasSrsMetadata = cards.any { it.repetition > 0 || it.nextReviewDate != null }
         return when (filter) {
             LearningCardFilter.ALL -> cards
             LearningCardFilter.NEW -> {
-                if (trustReviewCards) {
+                if (trustReviewCards || hasSrsMetadata) {
                     cards.filter { it.repetition == 0 }
                 } else {
                     cards.filterNot { reviewedCardIds.contains(it.id) }
                 }
             }
-            LearningCardFilter.REVIEW -> if (trustReviewCards) {
-                cards.filter { it.repetition > 0 }
+            LearningCardFilter.REVIEW -> if (trustReviewCards || hasSrsMetadata) {
+                cards.filter { it.repetition > 0 && isDueForReview(it) }
             } else {
                 cards.filter { reviewedCardIds.contains(it.id) }
             }
@@ -480,7 +492,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             LearningStudyMode.RANDOM,
             LearningStudyMode.TIME_ATTACK -> cards.shuffled()
             LearningStudyMode.SEQUENTIAL,
-            LearningStudyMode.SPACED_REPETITION -> cards
+            LearningStudyMode.SPACED_REPETITION -> buildSpacedRepetitionFallback(cards)
         }
         val resumeOrderedCards = applyCardSequenceIfAvailable(orderedCards, forcedCardSequence)
         val sessionCards = if (cardLimit == Int.MAX_VALUE) resumeOrderedCards else resumeOrderedCards.take(cardLimit)
@@ -521,8 +533,21 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 currentIndex = initialIndex.coerceIn(0, sessionCards.lastIndex)
             )
         }
+        currentCardPresentedAtMillis = System.currentTimeMillis()
         startTimerIfNeeded()
         onSessionReady(true)
+    }
+
+    private fun buildSpacedRepetitionFallback(cards: List<FlashCard>): List<FlashCard> {
+        val reviewCards = cards.filter { it.repetition > 0 && isDueForReview(it) }
+        val newCards = cards.filter { it.repetition == 0 }.take(DEFAULT_DAILY_NEW_CARD_LIMIT)
+        return reviewCards + newCards
+    }
+
+    private fun isDueForReview(card: FlashCard): Boolean {
+        val nextReviewDate = card.nextReviewDate ?: return true
+        val parsed = runCatching { Instant.parse(nextReviewDate) }.getOrNull() ?: return true
+        return !parsed.isAfter(Instant.now())
     }
 
     private fun initialTimeRemainingSeconds(settings: LearningSessionSettings): Long? {

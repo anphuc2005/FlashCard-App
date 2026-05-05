@@ -17,12 +17,12 @@ import com.example.flashcardapp.core.utils.chart.WeeklyBarChartView
 import com.example.flashcardapp.databinding.FragmentStatisticBinding
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
-import com.example.flashcardapp.presentation.feature.statistics.adapter.DeckStatisticsAdapter
 import com.example.flashcardapp.presentation.feature.statistics.adapter.StatisticAchievementAdapter
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import androidx.core.view.isVisible
 
 class StatisticFragment : Fragment() {
@@ -36,7 +36,6 @@ class StatisticFragment : Fragment() {
         StatisticViewModelFactory(container.statisticsRepository)
     }
     private lateinit var achievementAdapter: StatisticAchievementAdapter
-    private lateinit var deckStatisticsAdapter: DeckStatisticsAdapter
     private var allAchievements: List<StatisticAchievementItem> = emptyList()
 
     private var avatarLoadJob: Job? = null
@@ -67,12 +66,6 @@ class StatisticFragment : Fragment() {
         binding.rvBadges.apply {
             adapter = achievementAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        }
-
-        deckStatisticsAdapter = DeckStatisticsAdapter(statisticFormatter)
-        binding.rvDeckProgress.apply {
-            adapter = deckStatisticsAdapter
-            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
@@ -143,24 +136,48 @@ class StatisticFragment : Fragment() {
             statisticFormatter.formatNumber(timeStatistics.totalReviewedCards)
         )
 
-        val chartEntries = timeStatistics.labels.zip(timeStatistics.values).map { (label, value) ->
-            WeeklyBarChartView.DayEntry(label = label, value = value.toFloat())
-        }
-
-        val highlightIndex = when {
-            chartEntries.isEmpty() -> -1
-            timeStatistics.range == STAT_RANGE_WEEK -> {
-                (LocalDate.now().dayOfWeek.value - 1).coerceIn(0, chartEntries.lastIndex)
-            }
-            else -> {
-                timeStatistics.values.indexOf(timeStatistics.values.maxOrNull() ?: 0)
-                    .coerceAtLeast(-1)
-            }
-        }
+        val chartEntries = buildChartEntries(timeStatistics)
+        val highlightIndex = resolveHighlightIndex(timeStatistics, chartEntries.size)
         binding.weeklyChart.setData(chartEntries, highlight = highlightIndex)
 
         achievementAdapter.submitList(state.achievements)
-        deckStatisticsAdapter.submitList(state.deckStatistics)
+    }
+
+    private fun buildChartEntries(timeStatistics: com.example.flashcardapp.domain.model.statistics.TimeStatistics): List<WeeklyBarChartView.DayEntry> {
+        val defaultLabels = listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN")
+        val labels = timeStatistics.labels
+        val values = timeStatistics.values
+        if (labels.isEmpty() && values.isEmpty()) {
+            return defaultLabels.map { WeeklyBarChartView.DayEntry(it, 0f) }
+        }
+        val size = maxOf(labels.size, values.size)
+        return (0 until size).map { index ->
+            val label = labels.getOrNull(index) ?: defaultLabels.getOrElse(index) { "${index + 1}" }
+            val value = values.getOrNull(index)?.toFloat() ?: 0f
+            WeeklyBarChartView.DayEntry(label = label, value = value)
+        }
+    }
+
+    private fun resolveHighlightIndex(
+        timeStatistics: com.example.flashcardapp.domain.model.statistics.TimeStatistics,
+        entryCount: Int
+    ): Int {
+        if (entryCount == 0) return -1
+
+        val today = LocalDate.now()
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE
+        val rawDates = timeStatistics.rawDates
+        val todayIndex = rawDates.indexOfFirst { rawDate ->
+            runCatching { LocalDate.parse(rawDate, formatter) }.getOrNull() == today
+        }
+        if (todayIndex >= 0) return todayIndex
+
+        return if (timeStatistics.range == STAT_RANGE_WEEK) {
+            -1
+        } else {
+            timeStatistics.values.indexOf(timeStatistics.values.maxOrNull() ?: 0)
+                .takeIf { it >= 0 } ?: -1
+        }
     }
 
     private fun renderError(message: String) {
@@ -176,7 +193,6 @@ class StatisticFragment : Fragment() {
         binding.weeklyChart.setData(emptyList(), highlight = -1)
         allAchievements = emptyList()
         achievementAdapter.submitList(emptyList())
-        deckStatisticsAdapter.submitList(emptyList())
         val safeMessage = if (message.isBlank()) getString(R.string.stat_error_load) else message
         showAppError(safeMessage)
     }

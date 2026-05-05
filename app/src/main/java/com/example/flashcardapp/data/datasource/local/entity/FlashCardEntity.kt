@@ -15,5 +15,9 @@ data class FlashCardEntity(
     val answer: String,
     val imageUrl: String? = null,
     val deckId: String,
+    val interval: Int = 0,
+    val repetition: Int = 0,
+    val easeFactor: Double = 2.5,
+    val nextReviewDate: String? = null,
     val isSynced: Boolean = true // Thêm trường này để đánh dấu đã đồng bộ với server hay chưa
 )

@@ -7,5 +7,6 @@ data class StudyReview(
     val studyMode: String,
     val grade: Int,
     val studiedAt: String,
+    val durationSeconds: Int? = null,
     val isSynced: Boolean = false
 )

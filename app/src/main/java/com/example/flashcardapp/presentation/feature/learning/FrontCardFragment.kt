@@ -52,7 +52,6 @@ class FrontCardFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.btnClose.setOnClickListener { showExitLearningDialog() }
-        binding.btnFlip.setOnClickListener { navigateToAnswer() }
         binding.cardFront.setOnClickListener { navigateToAnswer() }
     }
 

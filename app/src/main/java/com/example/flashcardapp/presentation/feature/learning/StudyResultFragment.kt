@@ -46,12 +46,8 @@ class StudyResultFragment : Fragment() {
         binding.btnBack.setOnClickListener { finishAndPersistSession() }
         binding.btnContinue.setOnClickListener { finishAndPersistSession() }
         binding.cardStudiedResult.resultIcon.setImageResource(R.drawable.ic_cards)
-        binding.cardCorrectResult.resultIcon.setImageResource(R.drawable.ic_correct)
-        binding.cardIncorrectResult.resultIcon.setImageResource(R.drawable.ic_incorrect)
         binding.cardTimeResult.resultIcon.setImageResource(R.drawable.ic_time)
         binding.cardStudiedResult.resultLabel.setText(R.string.learning_result_studied)
-        binding.cardCorrectResult.resultLabel.setText(R.string.learning_result_correct)
-        binding.cardIncorrectResult.resultLabel.setText(R.string.learning_result_incorrect)
         binding.cardTimeResult.resultLabel.setText(R.string.learning_result_time)
     }
 
@@ -67,16 +63,6 @@ class StudyResultFragment : Fragment() {
 
     private fun renderResult(result: LearningResult) {
         binding.cardStudiedResult.resultValue.text = result.studiedCount.toString()
-        binding.cardCorrectResult.resultValue.text = getString(
-            R.string.learning_result_score_format,
-            result.correctCount,
-            result.studiedCount
-        )
-        binding.cardIncorrectResult.resultValue.text = getString(
-            R.string.learning_result_score_format,
-            result.incorrectCount,
-            result.studiedCount
-        )
         binding.cardTimeResult.resultValue.text = formatElapsedTime(result.elapsedSeconds)
     }
 

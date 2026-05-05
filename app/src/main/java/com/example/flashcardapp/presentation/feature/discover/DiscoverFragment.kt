@@ -23,9 +23,7 @@ import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
 import com.example.flashcardapp.domain.model.Category
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -76,6 +74,12 @@ class DiscoverFragment : Fragment() {
             if (allCategories.size <= getCollapsedCategoryCount()) return@setOnClickListener
             isCategoriesExpanded = !isCategoriesExpanded
             renderCategorySection()
+        }
+        binding.btnPrevCoursePage.setOnClickListener {
+            viewModel.goToPreviousCoursePage()
+        }
+        binding.btnNextCoursePage.setOnClickListener {
+            viewModel.goToNextCoursePage()
         }
     }
 
@@ -128,13 +132,11 @@ class DiscoverFragment : Fragment() {
         }
     }
 
-    @OptIn(FlowPreview::class)
     private fun observeSearchInput() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 binding.searchInput.textChangesFlow()
                     .map { it.trim() }
-                    .debounce(300)
                     .distinctUntilChanged()
                     .collect { query ->
                         viewModel.updateSearchQuery(query)
@@ -165,12 +167,49 @@ class DiscoverFragment : Fragment() {
                 }
                 launch {
                     viewModel.isLoading.collectLatest { isLoading ->
-                        val alpha = if (isLoading) 0.55f else 1f
-                        binding.rvCategories.alpha = alpha
-                        binding.rvCourses.alpha = alpha
-                        binding.searchContainer.alpha = alpha
                         binding.btnSeeAllCategories.isEnabled = !isLoading
-                        binding.btnSeeAllCourses.isEnabled = !isLoading
+                        if (!viewModel.isShowingAllCourses.value) {
+                            binding.btnPrevCoursePage.isEnabled =
+                                viewModel.currentCoursePage.value > 1 && !isLoading
+                            binding.btnNextCoursePage.isEnabled =
+                                viewModel.currentCoursePage.value < viewModel.totalCoursePages.value && !isLoading
+                        }
+                    }
+                }
+                launch {
+                    viewModel.currentCoursePage.collectLatest { currentPage ->
+                        binding.tvCoursePageIndicator.text = getString(
+                            R.string.discover_page_indicator,
+                            currentPage,
+                            viewModel.totalCoursePages.value
+                        )
+                        if (!viewModel.isShowingAllCourses.value) {
+                            binding.btnPrevCoursePage.isEnabled = currentPage > 1 && !viewModel.isLoading.value
+                            binding.btnNextCoursePage.isEnabled =
+                                currentPage < viewModel.totalCoursePages.value && !viewModel.isLoading.value
+                        }
+                    }
+                }
+                launch {
+                    viewModel.totalCoursePages.collectLatest { totalPages ->
+                        binding.tvCoursePageIndicator.text = getString(
+                            R.string.discover_page_indicator,
+                            viewModel.currentCoursePage.value,
+                            totalPages
+                        )
+                        if (!viewModel.isShowingAllCourses.value) {
+                            binding.layoutCoursePagination.isVisible = totalPages > 1
+                            binding.btnPrevCoursePage.isEnabled =
+                                viewModel.currentCoursePage.value > 1 && !viewModel.isLoading.value
+                            binding.btnNextCoursePage.isEnabled =
+                                viewModel.currentCoursePage.value < totalPages && !viewModel.isLoading.value
+                        }
+                    }
+                }
+                launch {
+                    viewModel.isShowingAllCourses.collectLatest { isShowingAll ->
+                        binding.layoutCoursePagination.isVisible =
+                            !isShowingAll && viewModel.totalCoursePages.value > 1
                     }
                 }
                 launch {

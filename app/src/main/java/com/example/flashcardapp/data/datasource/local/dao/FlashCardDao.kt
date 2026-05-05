@@ -30,6 +30,9 @@ interface FlashCardDao {
     @Query("SELECT * FROM flashcard_table WHERE deckId = :deckId")
     fun getCardsByDeckId(deckId: String): Flow<List<FlashCardEntity>>
 
+    @Query("SELECT * FROM flashcard_table WHERE deckId = :deckId")
+    suspend fun getCardsSnapshotByDeckId(deckId: String): List<FlashCardEntity>
+
     @Query("SELECT * FROM flashcard_table")
     fun getAllCards(): Flow<List<FlashCardEntity>>
 

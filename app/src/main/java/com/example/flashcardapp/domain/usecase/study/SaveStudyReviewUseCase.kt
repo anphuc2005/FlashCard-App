@@ -18,7 +18,8 @@ class SaveStudyReviewUseCase(
         cardId: String,
         deckId: String,
         studyMode: String,
-        grade: Int
+        grade: Int,
+        durationSeconds: Int? = null
     ): Result<StudyReview> {
         if (grade !in ALLOWED_STUDY_RATINGS) {
             return Result.failure(IllegalArgumentException("Invalid study rating"))
@@ -31,6 +32,7 @@ class SaveStudyReviewUseCase(
             studyMode = studyMode,
             grade = grade,
             studiedAt = currentUtcTimestamp(),
+            durationSeconds = durationSeconds,
             isSynced = false
         )
         return studyRepository.saveReview(review)

@@ -8,7 +8,8 @@ data class StudyReviewDto(
     @SerializedName("deckId") val deckId: String,
     @SerializedName("studyMode") val studyMode: String,
     @SerializedName("grade") val grade: Int,
-    @SerializedName("studiedAt") val studiedAt: String
+    @SerializedName("studiedAt") val studiedAt: String,
+    @SerializedName("durationSeconds") val durationSeconds: Int? = null
 )
 
 data class StudySyncResponseDto(
@@ -25,6 +26,7 @@ fun StudyReview.toDto(): StudyReviewDto {
         deckId = deckId,
         studyMode = studyMode,
         grade = grade,
-        studiedAt = studiedAt
+        studiedAt = studiedAt,
+        durationSeconds = durationSeconds
     )
 }

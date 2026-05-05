@@ -22,7 +22,6 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 
 private const val TAB_NEW = 1
-private const val TAB_REVIEW = 2
 private const val TAG = "DeckDetailFragment"
 
 class DeckDetailFragment : Fragment() {
@@ -113,11 +112,14 @@ class DeckDetailFragment : Fragment() {
         binding.deckTitle.text = deck?.name ?: getString(R.string.learning_deck_loading)
         binding.deckDesc.text = deck?.description ?: getString(R.string.learning_deck_no_description)
         binding.statTotalCard.statLabel.text = getString(R.string.learning_stat_total)
-        binding.statTotalCard.statValue.text = state.deckSummary.totalCards.toString()
+        binding.statTotalCard.statValue.text = (deck?.cardCount ?: state.deckSummary.totalCards).toString()
         binding.statLearnedCard.statLabel.text = getString(R.string.learning_stat_learned)
         binding.statLearnedCard.statValue.text = state.deckSummary.learnedCards.toString()
         binding.statNewCard.statLabel.text = getString(R.string.learning_stat_new)
-        binding.statNewCard.statValue.text = state.deckSummary.newCards.toString()
+        val totalDeckCards = deck?.cardCount ?: state.deckSummary.totalCards
+        binding.statNewCard.statValue.text = (totalDeckCards - state.deckSummary.learnedCards)
+            .coerceAtLeast(0)
+            .toString()
         binding.ctaButton.isEnabled = !state.isLoading && state.cards.isNotEmpty()
         binding.deckTitle.isVisible = !state.isLoading
         binding.deckDesc.isVisible = !state.isLoading
@@ -151,7 +153,6 @@ class DeckDetailFragment : Fragment() {
         override fun onTabSelected(tab: TabLayout.Tab?) {
             val filter = when (tab?.position) {
                 TAB_NEW -> LearningCardFilter.NEW
-                TAB_REVIEW -> LearningCardFilter.REVIEW
                 else -> LearningCardFilter.ALL
             }
             Log.d(TAG, "Tab selected: position=${tab?.position}, filter=$filter")
