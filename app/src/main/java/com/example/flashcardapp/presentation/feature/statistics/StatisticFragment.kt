@@ -17,7 +17,6 @@ import com.example.flashcardapp.core.utils.chart.WeeklyBarChartView
 import com.example.flashcardapp.databinding.FragmentStatisticBinding
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
-import com.example.flashcardapp.presentation.feature.statistics.adapter.DeckStatisticsAdapter
 import com.example.flashcardapp.presentation.feature.statistics.adapter.StatisticAchievementAdapter
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
 import kotlinx.coroutines.Job
@@ -36,7 +35,6 @@ class StatisticFragment : Fragment() {
         StatisticViewModelFactory(container.statisticsRepository)
     }
     private lateinit var achievementAdapter: StatisticAchievementAdapter
-    private lateinit var deckStatisticsAdapter: DeckStatisticsAdapter
     private var allAchievements: List<StatisticAchievementItem> = emptyList()
 
     private var avatarLoadJob: Job? = null
@@ -67,12 +65,6 @@ class StatisticFragment : Fragment() {
         binding.rvBadges.apply {
             adapter = achievementAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        }
-
-        deckStatisticsAdapter = DeckStatisticsAdapter(statisticFormatter)
-        binding.rvDeckProgress.apply {
-            adapter = deckStatisticsAdapter
-            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
@@ -158,7 +150,6 @@ class StatisticFragment : Fragment() {
         binding.weeklyChart.setData(chartEntries, highlight = highlightIndex)
 
         achievementAdapter.submitList(state.achievements)
-        deckStatisticsAdapter.submitList(state.deckStatistics)
     }
 
     private fun buildChartEntries(timeStatistics: com.example.flashcardapp.domain.model.statistics.TimeStatistics): List<WeeklyBarChartView.DayEntry> {
@@ -189,7 +180,6 @@ class StatisticFragment : Fragment() {
         binding.weeklyChart.setData(emptyList(), highlight = -1)
         allAchievements = emptyList()
         achievementAdapter.submitList(emptyList())
-        deckStatisticsAdapter.submitList(emptyList())
         val safeMessage = if (message.isBlank()) getString(R.string.stat_error_load) else message
         showAppError(safeMessage)
     }
