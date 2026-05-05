@@ -111,7 +111,7 @@
                 android:layout_marginStart="6dp"
                 android:textColor="?attr/subTitleColor"
                 android:textSize="14sp"
-                tools:text="500 cards" />
+                tools:text="500 thẻ" />
 
             <Space
                 android:layout_width="0dp"

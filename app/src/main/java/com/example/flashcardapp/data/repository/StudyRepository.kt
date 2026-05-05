@@ -9,8 +9,12 @@ import com.example.flashcardapp.data.datasource.local.session.StudyStreakStore
 import com.example.flashcardapp.data.datasource.remote.api.StudyApiService
 import com.example.flashcardapp.data.datasource.remote.model.toDto
 import com.example.flashcardapp.domain.model.FlashCard
+import com.example.flashcardapp.domain.model.study.StudyDeckProgress
 import com.example.flashcardapp.domain.model.study.StudyReview
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -25,6 +29,35 @@ class StudyRepository(
     private val flashCardDao: FlashCardDao,
     private val applicationContext: Context
 ) {
+
+    suspend fun getDeckProgress(deckId: String, mode: String): Result<StudyDeckProgress> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = studyApiService.getStudyProgress(deckId, mode)
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(response.data.toDomain())
+                } else {
+                    Result.failure(Exception(response.message ?: "Failed to load study progress"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun getDeckProgressMap(deckIds: List<String>, mode: String): Map<String, StudyDeckProgress> =
+        withContext(Dispatchers.IO) {
+            coroutineScope {
+                deckIds.distinct().map { deckId ->
+                    async {
+                        val progress = getDeckProgress(deckId, mode).getOrNull()
+                        deckId to progress
+                    }
+                }.awaitAll()
+                    .mapNotNull { (deckId, progress) -> progress?.let { deckId to it } }
+                    .toMap()
+            }
+        }
 
     suspend fun getSessionCards(deckId: String, mode: String): Result<List<FlashCard>> {
         return withContext(Dispatchers.IO) {

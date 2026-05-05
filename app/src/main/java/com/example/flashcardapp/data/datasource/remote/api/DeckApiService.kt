@@ -1,6 +1,7 @@
 package com.example.flashcardapp.data.datasource.remote.api
 
 import com.example.flashcardapp.data.datasource.remote.model.ApiResponse
+import com.example.flashcardapp.data.datasource.remote.model.DeckCardCountDto
 import com.example.flashcardapp.data.datasource.remote.model.DeckDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -16,6 +17,9 @@ interface DeckApiService {
 
     @GET("decks/{id}")
     suspend fun getDeckById(@Path("id") id: String): ApiResponse<DeckDto>
+
+    @GET("decks/{deckId}/card-count")
+    suspend fun getDeckCardCount(@Path("deckId") deckId: String): ApiResponse<DeckCardCountDto>
 
     @GET("decks/explore")
     suspend fun exploreDecks(): ApiResponse<List<DeckDto>>
