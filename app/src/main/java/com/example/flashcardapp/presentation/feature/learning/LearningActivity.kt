@@ -12,6 +12,10 @@ import com.example.flashcardapp.databinding.ActivityLearningBinding
 import com.example.flashcardapp.presentation.common.notification.showAppWarning
 
 const val EXTRA_DECK_ID = "DECK_ID"
+const val EXTRA_AUTO_START_SESSION = "AUTO_START_SESSION"
+const val EXTRA_STUDY_MODE = "STUDY_MODE"
+const val EXTRA_START_INDEX = "START_INDEX"
+const val EXTRA_CARD_SEQUENCE = "CARD_SEQUENCE"
 private const val TAG = "LearningActivity"
 
 class LearningActivity : AppCompatActivity() {

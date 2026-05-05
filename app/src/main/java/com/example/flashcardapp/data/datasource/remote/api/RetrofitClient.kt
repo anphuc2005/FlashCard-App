@@ -47,13 +47,8 @@ object RetrofitClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private val groqRetrofit = Retrofit.Builder()
-        .baseUrl(Constants.GROQ_BASE_URL)
-        .client(defaultClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
     val authApiService: AuthApiService = retrofit.create(AuthApiService::class.java)
+    val chatApiService: ChatApiService = retrofit.create(ChatApiService::class.java)
     val deckApiService: DeckApiService = retrofit.create(DeckApiService::class.java)
     val cardApiService: CardApiService = retrofit.create(CardApiService::class.java)
     val categoriesApiService: CategoriesApiService = retrofit.create(CategoriesApiService::class.java)
@@ -61,5 +56,4 @@ object RetrofitClient {
     val uploadApiService: UploadApiService = retrofit.create(UploadApiService::class.java)
     val studyApiService: StudyApiService = retrofit.create(StudyApiService::class.java)
     val statisticsApiService: StatisticsApiService = retrofit.create(StatisticsApiService::class.java)
-    val groqApiService: GroqApiService = groqRetrofit.create(GroqApiService::class.java)
 }

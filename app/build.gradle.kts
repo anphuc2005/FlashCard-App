@@ -1,14 +1,6 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
-}
-
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
 android {
@@ -24,18 +16,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-
-        buildConfigField(
-            "String",
-            "GEMINI_API_KEY",
-            "\"${localProperties["GEMINI_API_KEY"]?.toString()?.trim() ?: ""}\""
-        )
-
-        buildConfigField(
-            "String",
-            "GROQ_API_KEY",
-            "\"${localProperties["GROQ_API_KEY"]?.toString()?.trim() ?: ""}\""
-        )
     }
 
     buildTypes {

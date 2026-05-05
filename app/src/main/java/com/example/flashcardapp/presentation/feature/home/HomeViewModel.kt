@@ -7,6 +7,7 @@ import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
 import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.domain.model.Shortcut
+import com.example.flashcardapp.domain.model.study.StudyRecentSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val activeDeck: Deck? = null,
     val recentDecks: List<Deck> = emptyList(),
+    val recentStudySession: StudyRecentSession? = null,
     val shortcuts: List<Shortcut> = emptyList(),
     val error: String? = null,
     val userStreak: Int = 0,
@@ -30,6 +32,12 @@ data class HomeUiState(
     val userAvatarUrl: String? = null,
     val userProgress: Int = 0,
     val userProgressRaw: Float = 0f
+)
+
+data class ResumeSessionPayload(
+    val mode: String,
+    val currentIndex: Int,
+    val cardSequence: List<String> = emptyList()
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -59,13 +67,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         syncDecksFromApi()
     }
 
-    private fun publishDecks(decks: List<Deck>) {
+    private fun publishDecks(
+        decks: List<Deck>,
+        recentStudySession: StudyRecentSession? = null
+    ) {
         val sortedDecks = decks.sortedByDescending { deck ->
             maxOf(
                 parseTimestampMillis(deck.updatedAt),
                 parseTimestampMillis(deck.createdAt)
             )
         }
+        val prioritizedDecks = prioritizeRecentDeck(sortedDecks, recentStudySession)
+        val activeDeck = findActiveDeck(prioritizedDecks, recentStudySession)
+        val progressRaw = calculateProgressPercent(
+            studiedCount = activeDeck?.studiedCount ?: 0,
+            totalCards = activeDeck?.cardCount ?: 0
+        )
         val activeDeck = findActiveDeck(sortedDecks)
         val progressRaw = activeDeck?.let { deck ->
             if (deck.cardCount > 0) {
@@ -82,7 +99,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = _uiState.value.copy(
             isLoading = false,
             activeDeck = activeDeck,
-            recentDecks = sortedDecks,
+            recentDecks = prioritizedDecks,
+            recentStudySession = recentStudySession,
             userStreak = currentStreak,
             userProgress = formatProgressPercent(progressRaw),
             userProgressRaw = progressRaw,
@@ -92,6 +110,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun syncDecksFromApi() {
         viewModelScope.launch {
+            val recentSession = studyUseCases.getRecentSession().getOrNull()
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
                     val baseDecks = decks.map { deck ->
@@ -99,7 +118,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     }
                     val enrichedDecks = enrichDecksWithProgress(baseDecks)
                     cachedDecks = enrichedDecks
-                    publishDecks(enrichedDecks)
+                    publishDecks(enrichedDecks, recentSession)
                 }
                 .onFailure { throwable ->
                     _uiState.value = _uiState.value.copy(
@@ -128,10 +147,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             ),
             Shortcut(
                 id = "3",
-                title = "Xuất dữ liệu",
-                iconResId = R.drawable.ic_export_data_shortcut,
+                title = "Nhắc nhở",
+                iconResId = R.drawable.ic_time,
                 backgroundResId = R.color.md_icon_red_background,
-                action = "EXPORT_DATA"
+                action = "REMINDER"
             ),
             Shortcut(
                 id = "4",
@@ -148,6 +167,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         syncDecksFromApi()
     }
 
+    fun refreshHomeRealtime() {
+        viewModelScope.launch {
+            if (cachedDecks.isEmpty()) {
+                return@launch
+            }
+
+            val refreshedDecks = enrichDecksWithProgress(cachedDecks)
+            cachedDecks = refreshedDecks
+            val recentSession = studyUseCases.getRecentSession().getOrNull()
+                ?: _uiState.value.recentStudySession
+            publishDecks(refreshedDecks, recentSession)
+        }
+    }
+
     fun markDeckAsStudied(deckId: String) {
         lastOpenedDeckId = deckId
         cachedDecks.firstOrNull { it.id == deckId }?.let { openedDeck ->
@@ -156,7 +189,90 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 if (deck.id == deckId) touchedDeck else deck
             }
             cachedDecks = mergedDecks
-            publishDecks(mergedDecks)
+            publishDecks(mergedDecks, _uiState.value.recentStudySession)
+        }
+    }
+
+    fun restartRecentSession(onResult: (Boolean, String?) -> Unit) {
+        val recentSession = _uiState.value.recentStudySession
+        if (recentSession == null) {
+            onResult(true, null)
+            return
+        }
+
+        viewModelScope.launch {
+            val result = studyUseCases.deleteSessionByDeck(
+                recentSession.deckId,
+                recentSession.mode
+            )
+            if (result.isSuccess) {
+                publishDecks(cachedDecks, null)
+                onResult(true, null)
+            } else {
+                onResult(
+                    false,
+                    result.exceptionOrNull()?.message ?: "Không thể xoá phiên học cũ"
+                )
+            }
+        }
+    }
+
+    fun resolveRecentSessionForResume(onResult: (ResumeSessionPayload?, String?) -> Unit) {
+        val recentSession = _uiState.value.recentStudySession
+        if (recentSession == null) {
+            onResult(null, "Không có phiên học gần nhất")
+            return
+        }
+
+        viewModelScope.launch {
+            val sessionResult = studyUseCases.getSessionByDeck(
+                deckId = recentSession.deckId,
+                mode = recentSession.mode
+            )
+
+            sessionResult
+                .onSuccess { session ->
+                    if (session == null) {
+                        onResult(
+                            ResumeSessionPayload(
+                                mode = recentSession.mode,
+                                currentIndex = recentSession.currentIndex.coerceAtLeast(0),
+                                cardSequence = emptyList()
+                            ),
+                            null
+                        )
+                        return@onSuccess
+                    }
+
+                    val hasCards = session.totalCards > 0
+                    val isCompletedSession = hasCards && session.currentIndex >= session.totalCards
+                    val safeStartIndex = when {
+                        !hasCards -> 0
+                        isCompletedSession -> 0
+                        else -> session.currentIndex.coerceAtLeast(0)
+                    }
+                    val safeCardSequence = if (isCompletedSession) emptyList() else session.cardSequence
+
+                    onResult(
+                        ResumeSessionPayload(
+                            mode = session.mode.ifBlank { recentSession.mode },
+                            currentIndex = safeStartIndex,
+                            cardSequence = safeCardSequence
+                        ),
+                        null
+                    )
+                }
+                .onFailure { throwable ->
+                    // Fallback về dữ liệu recent để không chặn user học tiếp khi API by deck lỗi.
+                    onResult(
+                        ResumeSessionPayload(
+                            mode = recentSession.mode,
+                            currentIndex = recentSession.currentIndex.coerceAtLeast(0),
+                            cardSequence = emptyList()
+                        ),
+                        throwable.message
+                    )
+                }
         }
     }
 
@@ -204,12 +320,34 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun findActiveDeck(sortedDecks: List<Deck>): Deck? {
+    private fun prioritizeRecentDeck(
+        decks: List<Deck>,
+        recentSession: StudyRecentSession?
+    ): List<Deck> {
+        val recentDeckId = recentSession?.deckId ?: return decks
+        val recentDeck = decks.firstOrNull { it.id == recentDeckId } ?: return decks
+        return listOf(recentDeck) + decks.filterNot { it.id == recentDeckId }
+    }
+
+    private fun findActiveDeck(
+        sortedDecks: List<Deck>,
+        recentSession: StudyRecentSession?
+    ): Deck? {
+        val lastOpenedDeck = lastOpenedDeckId?.let { openedId ->
+            sortedDecks.firstOrNull { it.id == openedId }
+        }
+        if (lastOpenedDeck != null) return lastOpenedDeck
+
+        val recentDeck = recentSession?.let { session ->
+            sortedDecks.firstOrNull { it.id == session.deckId }
+        }
+        if (recentDeck != null) return recentDeck
+
         val inProgressDeck = sortedDecks.firstOrNull { deck ->
             deck.cardCount > 0 && deck.studiedCount in 1 until deck.cardCount
         }
         if (inProgressDeck != null) return inProgressDeck
-        return sortedDecks.firstOrNull { it.id == lastOpenedDeckId } ?: sortedDecks.firstOrNull()
+        return sortedDecks.firstOrNull()
     }
 
     private fun calculateProgressPercent(studiedCount: Int, totalCards: Int): Float {

@@ -169,42 +169,41 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- OTHERS -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="KHÁC"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:textSize="12sp"
-                android:textColor="#7D8798" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                android:text="KHÁC"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textAllCaps="true"-->
+<!--                android:textSize="12sp"-->
+<!--                android:textColor="#7D8798" />-->
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="?attr/componentBackground"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="1dp">
+<!--            <com.google.android.material.card.MaterialCardView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                app:cardCornerRadius="14dp"-->
+<!--                app:cardElevation="0dp"-->
+<!--                app:strokeColor="#E8EDF4"-->
+<!--                app:strokeWidth="1dp">-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical">-->
 
-                    <include layout="@layout/item_setting_row" android:id="@+id/rowExport" />
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant"/>
-                    <include layout="@layout/item_setting_row" android:id="@+id/rowRate" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+<!--                    <include layout="@layout/item_setting_row" android:id="@+id/rowExport" />-->
+<!--                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEF1F6"/>-->
+<!--                    <include layout="@layout/item_setting_row" android:id="@+id/rowRate" />-->
+<!--                </LinearLayout>-->
+<!--            </com.google.android.material.card.MaterialCardView>-->
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
+<!--            <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0dp"-->
+<!--                android:layout_weight="1" />-->
+          
             <!-- Logout button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"

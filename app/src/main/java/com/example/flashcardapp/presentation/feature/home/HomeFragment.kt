@@ -1,12 +1,16 @@
 package com.example.flashcardapp.presentation.feature.home
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,19 +24,28 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.bumptech.glide.Glide
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
+import com.example.flashcardapp.data.datasource.local.session.ReminderSettingsStore
 import com.example.flashcardapp.databinding.FragmentHomeBinding
+import com.example.flashcardapp.domain.model.study.StudyRecentSession
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_AUTO_START_SESSION
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_CARD_SEQUENCE
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_DECK_ID
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_START_INDEX
+import com.example.flashcardapp.presentation.feature.learning.EXTRA_STUDY_MODE
 import com.example.flashcardapp.presentation.common.adapter.RecentDeckAdapter
 import com.example.flashcardapp.presentation.common.adapter.ShortcutAdapter
-import com.example.flashcardapp.presentation.common.dialog.accountDialog.ExportDataDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ThemeDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderScheduler
+import com.example.flashcardapp.presentation.common.notification.showAppError
 import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import androidx.core.view.isVisible
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderDialog
 
 class HomeFragment : Fragment() {
 
@@ -49,13 +62,20 @@ class HomeFragment : Fragment() {
     private var notifStudy = true
     private var notifNewDeck = false
     private var notifAchievement = true
-    private var exportFormat = ExportDataDialog.ExportFormat.CSV
 
     private var reminderHour = 8
     private var reminderMinute = 0
     private var reminderEnabled = true
+    private var pendingNotificationAction: (() -> Unit)? = null
     private var avatarLoadJob: Job? = null
     private var skipNextResumeAvatarRefresh = true
+
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            pendingNotificationAction?.invoke()
+        }
+        pendingNotificationAction = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,6 +88,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadReminderAndNotificationSettings()
 
         setupAdapters()
         binding.tvProgressPercent.text = getString(R.string.home_progress_format, 0)
@@ -80,6 +101,8 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.refreshHomeRealtime()
+
         if (skipNextResumeAvatarRefresh) {
             skipNextResumeAvatarRefresh = false
             return
@@ -183,8 +206,16 @@ class HomeFragment : Fragment() {
     private fun setupListeners() {
         binding.apply {
             btnStart.setOnClickListener {
-                viewModel.uiState.value.activeDeck?.let { deck ->
-                    navigateToDeckDetail(deck.id)
+                val state = viewModel.uiState.value
+                val activeDeck = state.activeDeck ?: return@setOnClickListener
+                val recentSession = state.recentStudySession
+                if (recentSession != null &&
+                    recentSession.deckId == activeDeck.id &&
+                    recentSession.canResume
+                ) {
+                    showRecentSessionDialog(activeDeck.id, recentSession)
+                } else {
+                    navigateToDeckDetail(activeDeck.id)
                 }
             }
 
@@ -213,23 +244,99 @@ class HomeFragment : Fragment() {
     private fun handleShortcutClick(action: String?) {
         when (action) {
             "CREATE" -> navigateToCreateDeck()
-            "NOTIFICATIONS" -> showNotifications()
-            "EXPORT_DATA" -> showExportDataDialog()
+            "NOTIFICATIONS" -> ensureNotificationPermission { showNotifications() }
+            "REMINDER" -> ensureNotificationPermission { showReminderDialog() }
             "CHANGE_THEME" -> showChangeThemeDialog()
             else -> {}
         }
+    }
+
+    private fun ensureNotificationPermission(onGranted: () -> Unit) {
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            onGranted()
+            return
+        }
+
+        pendingNotificationAction = onGranted
+        notificationPermissionLauncher.launch(permission)
     }
 
     private fun showError(@Suppress("UNUSED_PARAMETER") error: String) {
         viewModel.clearError()
     }
 
-    private fun navigateToDeckDetail(deckId: String) {
+    private fun navigateToDeckDetail(
+        deckId: String,
+        autoStartSession: Boolean = false,
+        mode: String? = null,
+        startIndex: Int = 0,
+        cardSequence: List<String> = emptyList()
+    ) {
         viewModel.markDeckAsStudied(deckId)
         val intent = Intent(requireActivity(), LearningActivity::class.java).apply {
-            putExtra("DECK_ID", deckId)
+            putExtra(EXTRA_DECK_ID, deckId)
+            putExtra(EXTRA_AUTO_START_SESSION, autoStartSession)
+            putExtra(EXTRA_START_INDEX, startIndex)
+            if (!mode.isNullOrBlank()) {
+                putExtra(EXTRA_STUDY_MODE, mode)
+            }
+            if (cardSequence.isNotEmpty()) {
+                putStringArrayListExtra(EXTRA_CARD_SEQUENCE, ArrayList(cardSequence))
+            }
         }
         startActivity(intent)
+    }
+
+    private fun showRecentSessionDialog(deckId: String, recentSession: StudyRecentSession) {
+        val dialog = AppConfirmDialog.newInstance(
+            title = getString(R.string.learning_recent_dialog_title),
+            message = getString(
+                R.string.learning_recent_dialog_message,
+                (recentSession.currentIndex + 1).coerceAtLeast(1),
+                recentSession.totalCards.coerceAtLeast(1)
+            ),
+            confirmText = getString(R.string.learning_recent_dialog_restart),
+            cancelText = getString(R.string.learning_recent_dialog_resume),
+            iconRes = R.drawable.ic_cards,
+            destructive = false
+        )
+        dialog.isCancelable = false
+        dialog.listener = object : AppConfirmDialog.Listener {
+            override fun onConfirm() {
+                viewModel.restartRecentSession { success, message ->
+                    if (!isAdded) return@restartRecentSession
+                    if (success) {
+                        navigateToDeckDetail(
+                            deckId = deckId,
+                            autoStartSession = true,
+                            mode = recentSession.mode,
+                            startIndex = 0
+                        )
+                    } else {
+                        showAppError(message ?: getString(R.string.learning_recent_delete_failed))
+                    }
+                }
+            }
+
+            override fun onCancel() {
+                viewModel.resolveRecentSessionForResume { payload, _ ->
+                    if (!isAdded) return@resolveRecentSessionForResume
+                    val resumePayload = payload ?: run {
+                        showAppError(getString(R.string.learning_recent_delete_failed))
+                        return@resolveRecentSessionForResume
+                    }
+                    navigateToDeckDetail(
+                        deckId = deckId,
+                        autoStartSession = true,
+                        mode = resumePayload.mode,
+                        startIndex = resumePayload.currentIndex,
+                        cardSequence = resumePayload.cardSequence
+                    )
+                }
+            }
+        }
+        dialog.show(childFragmentManager, "recent_learning_session_dialog")
     }
 
     private fun navigateToAllDecks() {
@@ -252,6 +359,12 @@ class HomeFragment : Fragment() {
                 notifStudy = study
                 notifNewDeck = newDeck
                 notifAchievement = achievement
+                ReminderSettingsStore.saveNotificationSettings(
+                    requireContext(),
+                    study = study,
+                    newDeck = newDeck,
+                    achievement = achievement
+                )
                 ReminderScheduler.schedule(
                     requireContext(),
                     reminderHour,
@@ -263,15 +376,32 @@ class HomeFragment : Fragment() {
         }
         dialog.show(childFragmentManager, "NotificationDialog")
     }
-    
-    private fun showExportDataDialog(){
-        val dialog = ExportDataDialog.newInstance(exportFormat)
-        dialog.listener = object : ExportDataDialog.Listener {
-            override fun onExport(format: ExportDataDialog.ExportFormat) {
-                exportFormat = format
+
+    private fun showReminderDialog(){
+        val dialog = ReminderDialog.newInstance(reminderHour, reminderMinute, reminderEnabled)
+        dialog.listener = object : ReminderDialog.Listener {
+            override fun onReminderSaved(
+                hour: Int,
+                minute: Int,
+                enabled: Boolean
+            ) {
+                reminderHour = hour
+                reminderMinute = minute
+                reminderEnabled = enabled
+                ReminderScheduler.schedule(
+                    requireContext(),
+                    reminderHour,
+                    reminderMinute,
+                    reminderEnabled,
+                    notifStudy
+                )
+            }
+
+            override fun onReminderHistory() {
+
             }
         }
-        dialog.show(childFragmentManager, "ExportDataDialog")
+        dialog.show(childFragmentManager, "ReminderDialog")
     }
 
     private fun showChangeThemeDialog(){
@@ -286,6 +416,18 @@ class HomeFragment : Fragment() {
             }
         }
         dialog.show(childFragmentManager, "ChangeThemeDialog")
+    }
+
+    private fun loadReminderAndNotificationSettings() {
+        val reminderSettings = ReminderSettingsStore.getReminderSettings(requireContext())
+        reminderHour = reminderSettings.hour
+        reminderMinute = reminderSettings.minute
+        reminderEnabled = reminderSettings.enabled
+
+        val notificationSettings = ReminderSettingsStore.getNotificationSettings(requireContext())
+        notifStudy = notificationSettings.study
+        notifNewDeck = notificationSettings.newDeck
+        notifAchievement = notificationSettings.achievement
     }
 
     private fun renderCachedAvatar() {

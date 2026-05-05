@@ -1,16 +1,21 @@
 package com.example.flashcardapp.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.flashcardapp.data.datasource.local.dao.FlashCardDao
 import com.example.flashcardapp.data.datasource.local.dao.StudyReviewDao
 import com.example.flashcardapp.data.datasource.local.entity.FlashCardEntity
 import com.example.flashcardapp.data.datasource.local.entity.toEntity
 import com.example.flashcardapp.data.datasource.local.session.StudyStreakStore
 import com.example.flashcardapp.data.datasource.remote.api.StudyApiService
+import com.example.flashcardapp.data.datasource.remote.model.UpsertStudySessionRequestDto
+import com.example.flashcardapp.data.datasource.remote.model.toDomain
 import com.example.flashcardapp.data.datasource.remote.model.toDto
 import com.example.flashcardapp.domain.model.FlashCard
 import com.example.flashcardapp.domain.model.study.StudyDeckProgress
 import com.example.flashcardapp.domain.model.study.StudyReview
+import com.example.flashcardapp.domain.model.study.StudyRecentSession
+import com.example.flashcardapp.domain.model.study.StudySessionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -22,6 +27,7 @@ import java.time.Instant
 
 private const val STUDY_SYNC_PREFS = "study_sync_prefs"
 private const val KEY_LAST_SYNC_TIME = "lastSyncTime"
+private const val TAG = "StudyRepository"
 
 class StudyRepository(
     private val studyApiService: StudyApiService,
@@ -30,6 +36,19 @@ class StudyRepository(
     private val applicationContext: Context
 ) {
 
+    suspend fun getSessionByDeck(deckId: String, mode: String): Result<StudySessionState?> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = studyApiService.getSessionByDeck(deckId, mode)
+                if (response.isSuccess()) {
+                    Result.success(response.data?.toDomain())
+                } else {
+                    val message = response.message.orEmpty()
+                    if (message.contains("not found", ignoreCase = true)) {
+                        Result.success(null)
+                    } else {
+                        Result.failure(Exception(message.ifBlank { "Failed to load study session by deck" }))
+                    }
     suspend fun getDeckProgress(deckId: String, mode: String): Result<StudyDeckProgress> {
         return withContext(Dispatchers.IO) {
             try {
@@ -45,6 +64,26 @@ class StudyRepository(
         }
     }
 
+    suspend fun getRecentSession(): Result<StudyRecentSession?> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = studyApiService.getRecentSession()
+                if (response.isSuccess()) {
+                    Result.success(response.data?.toDomain())
+                } else {
+                    val message = response.message.orEmpty()
+                    if (message.contains("not found", ignoreCase = true)) {
+                        Result.success(null)
+                    } else {
+                        Result.failure(Exception(message.ifBlank { "Failed to load recent session" }))
+                    }
+                }
+            } catch (_: Exception) {
+                // Không chặn trải nghiệm Home/Learning nếu API recent bị lỗi.
+                Result.success(null)
+            }
+        }
+    }
     suspend fun getDeckProgressMap(deckIds: List<String>, mode: String): Map<String, StudyDeckProgress> =
         withContext(Dispatchers.IO) {
             coroutineScope {
@@ -80,6 +119,70 @@ class StudyRepository(
                 } else {
                     Result.failure(e)
                 }
+            }
+        }
+    }
+
+    suspend fun upsertSession(
+        deckId: String,
+        mode: String,
+        cardSequence: List<String>,
+        currentIndex: Int
+    ): Result<StudySessionState> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = UpsertStudySessionRequestDto(
+                    deckId = deckId,
+                    mode = mode,
+                    cardSequence = cardSequence,
+                    currentIndex = currentIndex
+                )
+                val response = studyApiService.upsertSession(request)
+                if (response.isSuccess() && response.data != null) {
+                    Log.d(
+                        TAG,
+                        "upsertSession success: deckId=$deckId, mode=$mode, cards=${cardSequence.size}, currentIndex=${response.data.currentIndex}, totalCards=${response.data.totalCards}"
+                    )
+                    Result.success(response.data.toDomain())
+                } else {
+                    Log.e(
+                        TAG,
+                        "upsertSession failed: deckId=$deckId, mode=$mode, cards=${cardSequence.size}, message=${response.message}"
+                    )
+                    Result.failure(
+                        Exception(response.message ?: "Failed to save study session state")
+                    )
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun deleteSessionByDeck(deckId: String, mode: String): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = studyApiService.deleteSessionByDeck(deckId, mode)
+                if (response.isSuccessful) {
+                    // Backend may return 204 No Content for DELETE.
+                    Result.success(Unit)
+                } else {
+                    val message = response.body()?.message.orEmpty()
+                    if (message.contains("not found", ignoreCase = true)) {
+                        Result.success(Unit)
+                    } else {
+                        Result.failure(
+                            Exception(
+                                message.ifBlank {
+                                    "Failed to delete study session (HTTP ${response.code()})"
+                                }
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("DELETE STUDY", "deleteSessionByDeck failed: deckId=$deckId, mode=$mode", e)
+                Result.failure(e)
             }
         }
     }

@@ -21,7 +21,17 @@ enum class LearningStudyMode(val sessionMode: String, val syncMode: String) {
     SEQUENTIAL("SEQUENTIAL", "STANDARD"),
     RANDOM("RANDOM", "STANDARD"),
     TIME_ATTACK("TIME_ATTACK", "STANDARD"),
-    SPACED_REPETITION("SPACED_REPETITION", "SPACED_REPETITION")
+    SPACED_REPETITION("SPACED_REPETITION", "SPACED_REPETITION");
+
+    companion object {
+        fun fromSessionMode(rawMode: String?): LearningStudyMode? {
+            if (rawMode.isNullOrBlank()) return null
+            return entries.firstOrNull {
+                it.sessionMode.equals(rawMode, ignoreCase = true) ||
+                    it.name.equals(rawMode, ignoreCase = true)
+            }
+        }
+    }
 }
 
 enum class LearningRating(val syncValue: Int) {

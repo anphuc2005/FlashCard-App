@@ -392,7 +392,12 @@ class LearningCardsFragment : Fragment() {
         )
         dialog.listener = object : AppConfirmDialog.Listener {
             override fun onConfirm() {
-                requireActivity().finish()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.persistCurrentSessionStateNow()
+                    if (isAdded) {
+                        requireActivity().finish()
+                    }
+                }
             }
         }
         dialog.show(childFragmentManager, "learning_exit_confirm")

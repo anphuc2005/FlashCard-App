@@ -9,7 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ProfileRepository(
-    private val profileApiService: ProfileApiService
+    private val profileApiService: ProfileApiService,
+    private val sessionTokenProvider: () -> String?
 ) {
 
     private companion object {
@@ -17,15 +18,37 @@ class ProfileRepository(
     }
     @Volatile
     private var cachedProfile: UserProfile? = null
+    @Volatile
+    private var cachedSessionKey: String? = null
 
-    fun getCachedProfile(): UserProfile? = cachedProfile
+    fun getCachedProfile(): UserProfile? {
+        val currentSessionKey = currentSessionKey()
+        return if (isCacheValidForSession(currentSessionKey)) {
+            cachedProfile
+        } else {
+            clearCachedProfile()
+            null
+        }
+    }
+
+    fun clearCachedProfile() {
+        cachedProfile = null
+        cachedSessionKey = null
+    }
 
     suspend fun getMyProfile(forceRefresh: Boolean = false): Result<UserProfile> {
         return withContext(Dispatchers.IO) {
-            if (!forceRefresh && cachedProfile != null) {
+            val currentSessionKey = currentSessionKey()
+            if (!forceRefresh && isCacheValidForSession(currentSessionKey)) {
                 Log.i(TAG, "GET users/me -> return cached profile: email=${cachedProfile?.email}")
                 return@withContext Result.success(cachedProfile!!)
             }
+
+            if (cachedProfile != null && cachedSessionKey != currentSessionKey) {
+                Log.i(TAG, "Session changed -> invalidate profile cache before GET users/me")
+                clearCachedProfile()
+            }
+
             try {
                 val response = profileApiService.getMyProfile()
                 Log.i(
@@ -35,7 +58,7 @@ class ProfileRepository(
                 )
                 if (response.isSuccess() && response.data != null) {
                     val profile = response.data.toDomain()
-                    cachedProfile = profile
+                    cacheProfile(profile, currentSessionKey)
                     Result.success(profile)
                 } else {
                     Log.w(TAG, "GET users/me returned invalid payload (data is null or non-success)")
@@ -43,7 +66,7 @@ class ProfileRepository(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "GET users/me failed", e)
-                if (cachedProfile != null) {
+                if (isCacheValidForSession(currentSessionKey)) {
                     Log.w(TAG, "GET users/me failed -> fallback to cached profile")
                     return@withContext Result.success(cachedProfile!!)
                 }
@@ -54,6 +77,7 @@ class ProfileRepository(
 
     suspend fun updateMyProfile(displayName: String, imageUrl: String? = null): Result<UserProfile> {
         return withContext(Dispatchers.IO) {
+            val currentSessionKey = currentSessionKey()
             try {
                 val response = profileApiService.updateMyProfile(
                     UpdateProfileRequest(
@@ -69,7 +93,7 @@ class ProfileRepository(
                 )
                 if (response.isSuccess() && response.data != null) {
                     val profile = response.data.toDomain()
-                    cachedProfile = profile
+                    cacheProfile(profile, currentSessionKey)
                     Result.success(profile)
                 } else {
                     Log.w(TAG, "PATCH users/me returned invalid payload (data is null or non-success)")
@@ -80,5 +104,20 @@ class ProfileRepository(
                 Result.failure(e)
             }
         }
+    }
+
+    private fun currentSessionKey(): String? {
+        return sessionTokenProvider()
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+    }
+
+    private fun isCacheValidForSession(sessionKey: String?): Boolean {
+        return cachedProfile != null && cachedSessionKey == sessionKey
+    }
+
+    private fun cacheProfile(profile: UserProfile, sessionKey: String?) {
+        cachedProfile = profile
+        cachedSessionKey = sessionKey
     }
 }

@@ -16,17 +16,10 @@ import com.example.flashcardapp.domain.model.ChatMessage
 import com.example.flashcardapp.utils.MarkdownConverter
 
 class ChatMessageAdapter(
-    private val onConfirmDeckCreation: () -> Unit = {},
-    private val onCancelDeckCreation: () -> Unit = {}
+    private val onOpenDeck: (String) -> Unit = {}
 ) : ListAdapter<ChatMessage, ChatMessageAdapter.ChatMessageViewHolder>(DiffCallback()) {
 
-    private var pendingDeckDraftMessageId: String? = null
-
-    fun setPendingDeckDraftMessageId(messageId: String?) {
-        if (pendingDeckDraftMessageId == messageId) return
-        pendingDeckDraftMessageId = messageId
-        notifyDataSetChanged()
-    }
+    private val deckIdRegex = Regex("`([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})`")
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {
         val binding = ItemChatMessageBinding.inflate(
@@ -36,24 +29,24 @@ class ChatMessageAdapter(
         )
         return ChatMessageViewHolder(
             binding = binding,
-            onConfirmDeckCreation = onConfirmDeckCreation,
-            onCancelDeckCreation = onCancelDeckCreation
+            onOpenDeck = onOpenDeck
         )
     }
 
     override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
         val message = getItem(position)
-        val shouldShowDeckActions = message.id == pendingDeckDraftMessageId && message.sender == "bot"
-        holder.bind(message, shouldShowDeckActions)
+        val matchedDeckId = deckIdRegex.find(message.message)
+            ?.groupValues
+            ?.getOrNull(1)
+        holder.bind(message, matchedDeckId)
     }
 
     class ChatMessageViewHolder(
         private val binding: ItemChatMessageBinding,
-        private val onConfirmDeckCreation: () -> Unit,
-        private val onCancelDeckCreation: () -> Unit
+        private val onOpenDeck: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(message: ChatMessage, showDeckActions: Boolean) {
+        fun bind(message: ChatMessage, deckId: String?) {
             with(binding) {
                 val layoutParams = messageContainer.layoutParams as FrameLayout.LayoutParams
                 if (message.sender == "user") {
@@ -79,12 +72,13 @@ class ChatMessageAdapter(
                 progressBar.visibility = View.GONE
                 tvError.visibility = View.GONE
 
-                if (showDeckActions) {
+                if (message.sender == "bot" && !deckId.isNullOrBlank()) {
                     actionContainer.visibility = View.VISIBLE
                     btnConfirmDeck.visibility = View.VISIBLE
-                    btnCancelDeck.visibility = View.VISIBLE
-                    btnConfirmDeck.setOnClickListener { onConfirmDeckCreation() }
-                    btnCancelDeck.setOnClickListener { onCancelDeckCreation() }
+                    btnConfirmDeck.text = root.context.getString(R.string.ai_open_deck)
+                    btnCancelDeck.visibility = View.GONE
+                    btnConfirmDeck.setOnClickListener { onOpenDeck(deckId) }
+                    btnCancelDeck.setOnClickListener(null)
                 } else {
                     actionContainer.visibility = View.GONE
                     btnConfirmDeck.visibility = View.GONE
