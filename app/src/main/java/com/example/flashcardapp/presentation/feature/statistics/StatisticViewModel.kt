@@ -143,6 +143,7 @@ class StatisticViewModel(
         val timeStatistics = TimeStatistics(
             range = activeRange,
             labels = emptyList(),
+            rawDates = emptyList(),
             values = emptyList(),
             totalStudySessions = range?.activeDays ?: 0,
             totalReviewedCards = range?.totalStudied ?: 0,
@@ -211,6 +212,7 @@ class StatisticViewModel(
         return TimeStatistics(
             range = range,
             labels = labels,
+            rawDates = dashboard.chart.orEmpty().map { it.date },
             values = values,
             totalStudySessions = rangeSummary?.activeDays ?: 0,
             totalReviewedCards = rangeSummary?.totalStudied ?: 0,

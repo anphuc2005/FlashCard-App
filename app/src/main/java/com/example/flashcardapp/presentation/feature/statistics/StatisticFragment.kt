@@ -22,6 +22,7 @@ import com.example.flashcardapp.presentation.feature.statistics.model.StatisticA
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import androidx.core.view.isVisible
 
 class StatisticFragment : Fragment() {
@@ -136,17 +137,7 @@ class StatisticFragment : Fragment() {
         )
 
         val chartEntries = buildChartEntries(timeStatistics)
-
-        val highlightIndex = when {
-            chartEntries.isEmpty() -> -1
-            timeStatistics.range == STAT_RANGE_WEEK -> {
-                (LocalDate.now().dayOfWeek.value - 1).coerceIn(0, chartEntries.lastIndex)
-            }
-            else -> {
-                timeStatistics.values.indexOf(timeStatistics.values.maxOrNull() ?: 0)
-                    .coerceAtLeast(-1)
-            }
-        }
+        val highlightIndex = resolveHighlightIndex(timeStatistics, chartEntries.size)
         binding.weeklyChart.setData(chartEntries, highlight = highlightIndex)
 
         achievementAdapter.submitList(state.achievements)
@@ -164,6 +155,28 @@ class StatisticFragment : Fragment() {
             val label = labels.getOrNull(index) ?: defaultLabels.getOrElse(index) { "${index + 1}" }
             val value = values.getOrNull(index)?.toFloat() ?: 0f
             WeeklyBarChartView.DayEntry(label = label, value = value)
+        }
+    }
+
+    private fun resolveHighlightIndex(
+        timeStatistics: com.example.flashcardapp.domain.model.statistics.TimeStatistics,
+        entryCount: Int
+    ): Int {
+        if (entryCount == 0) return -1
+
+        val today = LocalDate.now()
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE
+        val rawDates = timeStatistics.rawDates
+        val todayIndex = rawDates.indexOfFirst { rawDate ->
+            runCatching { LocalDate.parse(rawDate, formatter) }.getOrNull() == today
+        }
+        if (todayIndex >= 0) return todayIndex
+
+        return if (timeStatistics.range == STAT_RANGE_WEEK) {
+            -1
+        } else {
+            timeStatistics.values.indexOf(timeStatistics.values.maxOrNull() ?: 0)
+                .takeIf { it >= 0 } ?: -1
         }
     }
 
