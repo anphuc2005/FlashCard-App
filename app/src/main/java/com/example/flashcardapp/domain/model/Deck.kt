@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 
 data class Deck(
     val id: String,
-    val categoryId: String = "",
+    val categoryId: String?,
     val name: String,
     val description: String? = null,
     val themeColor: String? = null,

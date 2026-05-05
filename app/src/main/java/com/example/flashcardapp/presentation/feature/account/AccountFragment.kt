@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
 import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.data.datasource.local.session.ReminderSettingsStore
 import com.example.flashcardapp.databinding.FragmentAccountBinding
 import com.example.flashcardapp.databinding.ItemSettingRowBinding
 import com.example.flashcardapp.domain.model.UserProfile
@@ -87,6 +88,7 @@ class AccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadReminderAndNotificationSettings()
         setupRows()
         setupActions()
         renderCachedProfile()
@@ -135,21 +137,21 @@ class AccountFragment : Fragment() {
             iconBgRes = android.R.color.transparent
         )
 
-        configureRow(
-            row = binding.rowExport,
-            title = "Xuất dữ liệu",
-            iconRes = R.drawable.ic_export_data,
-            iconColorAttr = R.attr.iconBlue,
-            iconBgRes = android.R.color.transparent
-        )
-
-        configureRow(
-            row = binding.rowRate,
-            title = "Đánh giá ứng dụng",
-            iconRes = R.drawable.ic_rating,
-            iconColorAttr = R.attr.iconBlue,
-            iconBgRes = android.R.color.transparent
-        )
+//        configureRow(
+//            row = binding.rowExport,
+//            title = "Xuất dữ liệu",
+//            iconRes = R.drawable.ic_export_data,
+//            iconColorAttr = R.attr.iconBlue,
+//            iconBgRes = android.R.color.transparent
+//        )
+//
+//        configureRow(
+//            row = binding.rowRate,
+//            title = "Đánh giá ứng dụng",
+//            iconRes = R.drawable.ic_rating,
+//            iconColorAttr = R.attr.iconBlue,
+//            iconBgRes = android.R.color.transparent
+//        )
     }
 
     private fun setupActions() {
@@ -162,8 +164,8 @@ class AccountFragment : Fragment() {
         binding.rowNotification.root.setOnClickListener {
             ensureNotificationPermission { showNotificationDialog() }
         }
-        binding.rowExport.root.setOnClickListener { showExportDialog() }
-        binding.rowRate.root.setOnClickListener { showRatingDialog() }
+//        binding.rowExport.root.setOnClickListener { showExportDialog() }
+//        binding.rowRate.root.setOnClickListener { showRatingDialog() }
         binding.btnSettings.setOnClickListener {
             findNavController().navigate(R.id.action_accountFragment_to_editProfileFragment)
         }
@@ -225,6 +227,18 @@ class AccountFragment : Fragment() {
         )
     }
 
+    private fun loadReminderAndNotificationSettings() {
+        val reminderSettings = ReminderSettingsStore.getReminderSettings(requireContext())
+        reminderHour = reminderSettings.hour
+        reminderMinute = reminderSettings.minute
+        reminderEnabled = reminderSettings.enabled
+
+        val notificationSettings = ReminderSettingsStore.getNotificationSettings(requireContext())
+        notifStudy = notificationSettings.study
+        notifNewDeck = notificationSettings.newDeck
+        notifAchievement = notificationSettings.achievement
+    }
+
     private fun showReminderDialog() {
         val dialog = ReminderDialog.newInstance(reminderHour, reminderMinute, reminderEnabled)
         dialog.listener = object : ReminderDialog.Listener {
@@ -263,6 +277,12 @@ class AccountFragment : Fragment() {
                 notifStudy = study
                 notifNewDeck = newDeck
                 notifAchievement = achievement
+                ReminderSettingsStore.saveNotificationSettings(
+                    requireContext(),
+                    study = study,
+                    newDeck = newDeck,
+                    achievement = achievement
+                )
                 scheduleReminderIfNeeded()
             }
         }

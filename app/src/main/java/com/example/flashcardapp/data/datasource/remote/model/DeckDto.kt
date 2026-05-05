@@ -36,7 +36,7 @@ fun Deck.toDto(): DeckDto {
         id = id,
         name = name,
         description = description,
-        categoryId = categoryId,
+        categoryId = categoryId ?: "",
         themeColor = themeColor,
         isPublic = isPublic,
         createdAt = createdAt,

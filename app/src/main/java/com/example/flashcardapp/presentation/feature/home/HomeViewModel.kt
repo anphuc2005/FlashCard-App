@@ -295,6 +295,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         sortedDecks: List<Deck>,
         recentSession: StudyRecentSession?
     ): Deck? {
+        val lastOpenedDeck = lastOpenedDeckId?.let { openedId ->
+            sortedDecks.firstOrNull { it.id == openedId }
+        }
+        if (lastOpenedDeck != null) return lastOpenedDeck
+
         val recentDeck = recentSession?.let { session ->
             sortedDecks.firstOrNull { it.id == session.deckId }
         }
@@ -304,7 +309,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             deck.cardCount > 0 && deck.studiedCount in 1 until deck.cardCount
         }
         if (inProgressDeck != null) return inProgressDeck
-        return sortedDecks.firstOrNull { it.id == lastOpenedDeckId } ?: sortedDecks.firstOrNull()
+        return sortedDecks.firstOrNull()
     }
 
     private fun calculateProgressPercent(studiedCount: Int, totalCards: Int): Float {

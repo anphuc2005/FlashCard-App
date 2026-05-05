@@ -2,7 +2,6 @@ package com.example.flashcardapp.presentation.feature.deck
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashcardapp.core.utils.MockDeckData
 import com.example.flashcardapp.data.repository.DeckRepository
 import com.example.flashcardapp.domain.model.Deck
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,17 +35,13 @@ class DeckViewModel(
     private var currentSearchQuery: String = ""
 
     init {
-        if (deckRepository == null) {
-            loadMockData()
-        } else {
-            syncDecksFromApi()
-        }
+        syncDecksFromApi()
     }
 
-    private fun loadMockData() {
-        allDecks = MockDeckData.getMockDecks()
-        publishFilteredDecks()
-    }
+//    private fun loadMockData() {
+//        allDecks = MockDeckData.getMockDecks()
+//        publishFilteredDecks()
+//    }
 
     fun syncDecksFromApi() {
         viewModelScope.launch {
@@ -67,22 +62,22 @@ class DeckViewModel(
         }
     }
 
-    fun createDeck(name: String, description: String) {
-        viewModelScope.launch {
-            if (deckRepository != null) {
-                val newDeck = Deck(
-                    id = java.util.UUID.randomUUID().toString(),
-                    name = name,
-                    description = description,
-                    createdAt = System.currentTimeMillis().toString(),
-                    updatedAt = System.currentTimeMillis().toString(),
-                    isPublic = true
-                )
-                deckRepository.createDeck(newDeck)
-                syncDecksFromApi()
-            }
-        }
-    }
+//    fun createDeck(name: String, description: String) {
+//        viewModelScope.launch {
+//            if (deckRepository != null) {
+//                val newDeck = Deck(
+//                    id = java.util.UUID.randomUUID().toString(),
+//                    name = name,
+//                    description = description,
+//                    createdAt = System.currentTimeMillis().toString(),
+//                    updatedAt = System.currentTimeMillis().toString(),
+//                    isPublic = true
+//                )
+//                deckRepository.createDeck(newDeck)
+//                syncDecksFromApi()
+//            }
+//        }
+//    }
 
     fun deleteDeck(deckId: String) {
         viewModelScope.launch {

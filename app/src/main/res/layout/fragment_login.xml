@@ -249,26 +249,26 @@
                     android:layout_width="@dimen/auth_social_buttons_spacing"
                     android:layout_height="@dimen/auth_divider_height" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/auth_social_button_height"
-                    android:layout_weight="1"
-                    android:backgroundTint="?attr/componentBackground"
-                    android:elevation="0dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="Facebook"
-                    android:textAllCaps="false"
-                    android:textColor="?attr/textColor"
-                    android:textSize="@dimen/auth_label_text_size"
-                    app:cornerRadius="@dimen/auth_social_button_corner_radius"
-                    app:icon="@drawable/ic_face"
-                    app:iconGravity="textStart"
-                    app:iconPadding="@dimen/auth_social_button_icon_padding"
-                    app:iconSize="@dimen/auth_social_button_icon_size"
-                    app:iconTint="@null"
-                    app:strokeColor="?attr/buttonBottomNavInactive"
-                    app:strokeWidth="@dimen/auth_input_stroke_width" />
+<!--                <com.google.android.material.button.MaterialButton-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="@dimen/auth_social_button_height"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:backgroundTint="?attr/componentBackground"-->
+<!--                    android:elevation="0dp"-->
+<!--                    android:insetTop="0dp"-->
+<!--                    android:insetBottom="0dp"-->
+<!--                    android:text="Facebook"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="?attr/textColor"-->
+<!--                    android:textSize="@dimen/auth_label_text_size"-->
+<!--                    app:cornerRadius="@dimen/auth_social_button_corner_radius"-->
+<!--                    app:icon="@drawable/ic_face"-->
+<!--                    app:iconGravity="textStart"-->
+<!--                    app:iconPadding="@dimen/auth_social_button_icon_padding"-->
+<!--                    app:iconSize="@dimen/auth_social_button_icon_size"-->
+<!--                    app:iconTint="@null"-->
+<!--                    app:strokeColor="?attr/buttonBottomNavInactive"-->
+<!--                    app:strokeWidth="@dimen/auth_input_stroke_width" />-->
             </LinearLayout>
 
             <TextView

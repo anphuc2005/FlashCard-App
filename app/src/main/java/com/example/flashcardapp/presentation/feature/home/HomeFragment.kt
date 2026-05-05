@@ -24,6 +24,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.bumptech.glide.Glide
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
+import com.example.flashcardapp.data.datasource.local.session.ReminderSettingsStore
 import com.example.flashcardapp.databinding.FragmentHomeBinding
 import com.example.flashcardapp.domain.model.study.StudyRecentSession
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
@@ -67,7 +68,6 @@ class HomeFragment : Fragment() {
     private var reminderEnabled = true
     private var pendingNotificationAction: (() -> Unit)? = null
     private var avatarLoadJob: Job? = null
-    private var skipNextResumeHomeRefresh = true
     private var skipNextResumeAvatarRefresh = true
 
     private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -88,6 +88,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadReminderAndNotificationSettings()
 
         setupAdapters()
         binding.tvProgressPercent.text = getString(R.string.home_progress_format, 0)
@@ -100,11 +101,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (skipNextResumeHomeRefresh) {
-            skipNextResumeHomeRefresh = false
-        } else {
-            viewModel.refreshHomeRealtime()
-        }
+        viewModel.refreshHomeRealtime()
 
         if (skipNextResumeAvatarRefresh) {
             skipNextResumeAvatarRefresh = false
@@ -362,6 +359,12 @@ class HomeFragment : Fragment() {
                 notifStudy = study
                 notifNewDeck = newDeck
                 notifAchievement = achievement
+                ReminderSettingsStore.saveNotificationSettings(
+                    requireContext(),
+                    study = study,
+                    newDeck = newDeck,
+                    achievement = achievement
+                )
                 ReminderScheduler.schedule(
                     requireContext(),
                     reminderHour,
@@ -373,7 +376,7 @@ class HomeFragment : Fragment() {
         }
         dialog.show(childFragmentManager, "NotificationDialog")
     }
-    
+
     private fun showReminderDialog(){
         val dialog = ReminderDialog.newInstance(reminderHour, reminderMinute, reminderEnabled)
         dialog.listener = object : ReminderDialog.Listener {
@@ -413,6 +416,18 @@ class HomeFragment : Fragment() {
             }
         }
         dialog.show(childFragmentManager, "ChangeThemeDialog")
+    }
+
+    private fun loadReminderAndNotificationSettings() {
+        val reminderSettings = ReminderSettingsStore.getReminderSettings(requireContext())
+        reminderHour = reminderSettings.hour
+        reminderMinute = reminderSettings.minute
+        reminderEnabled = reminderSettings.enabled
+
+        val notificationSettings = ReminderSettingsStore.getNotificationSettings(requireContext())
+        notifStudy = notificationSettings.study
+        notifNewDeck = notificationSettings.newDeck
+        notifAchievement = notificationSettings.achievement
     }
 
     private fun renderCachedAvatar() {

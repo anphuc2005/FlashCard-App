@@ -5,6 +5,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import com.example.flashcardapp.data.datasource.local.session.ReminderSettingsStore
 import java.util.Calendar
 
 /** Schedules/cancels the daily reminder alarm. */
@@ -13,15 +15,38 @@ object ReminderScheduler {
 
     @SuppressLint("ScheduleExactAlarm")
     fun schedule(context: Context, hour: Int, minute: Int, enabled: Boolean, studyEnabled: Boolean) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = buildPendingIntent(context, hour, minute, studyEnabled)
+        val appContext = context.applicationContext
+        ReminderSettingsStore.saveReminderSettings(appContext, hour, minute, enabled)
+        ReminderSettingsStore.saveStudyNotificationEnabled(appContext, studyEnabled)
+
+        val alarmManager = appContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pendingIntent = buildPendingIntent(appContext, hour, minute, studyEnabled)
 
         alarmManager.cancel(pendingIntent)
 
         if (!enabled || !studyEnabled) return
 
         val triggerAt = nextTriggerMillis(hour, minute)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+            return
+        }
+
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+    }
+
+    fun restoreFromSavedSettings(context: Context) {
+        val appContext = context.applicationContext
+        val reminder = ReminderSettingsStore.getReminderSettings(appContext)
+        val notification = ReminderSettingsStore.getNotificationSettings(appContext)
+        schedule(
+            context = appContext,
+            hour = reminder.hour,
+            minute = reminder.minute,
+            enabled = reminder.enabled,
+            studyEnabled = notification.study
+        )
     }
 
     private fun buildPendingIntent(context: Context, hour: Int, minute: Int, studyEnabled: Boolean): PendingIntent {

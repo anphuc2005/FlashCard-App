@@ -141,17 +141,25 @@ class StudyRepository(
         return withContext(Dispatchers.IO) {
             try {
                 val response = studyApiService.deleteSessionByDeck(deckId, mode)
-                if (response.isSuccess()) {
+                if (response.isSuccessful) {
+                    // Backend may return 204 No Content for DELETE.
                     Result.success(Unit)
                 } else {
-                    val message = response.message.orEmpty()
+                    val message = response.body()?.message.orEmpty()
                     if (message.contains("not found", ignoreCase = true)) {
                         Result.success(Unit)
                     } else {
-                        Result.failure(Exception(message.ifBlank { "Failed to delete study session" }))
+                        Result.failure(
+                            Exception(
+                                message.ifBlank {
+                                    "Failed to delete study session (HTTP ${response.code()})"
+                                }
+                            )
+                        )
                     }
                 }
             } catch (e: Exception) {
+                Log.e("DELETE STUDY", "deleteSessionByDeck failed: deckId=$deckId, mode=$mode", e)
                 Result.failure(e)
             }
         }
