@@ -49,14 +49,28 @@ class StudyRepository(
                     } else {
                         Result.failure(Exception(message.ifBlank { "Failed to load study session by deck" }))
                     }
-    suspend fun getDeckProgress(deckId: String, mode: String): Result<StudyDeckProgress> {
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun getDeckProgress(
+        deckId: String,
+        mode: String
+    ): Result<StudyDeckProgress> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = studyApiService.getStudyProgress(deckId, mode)
                 if (response.isSuccess() && response.data != null) {
                     Result.success(response.data.toDomain())
                 } else {
-                    Result.failure(Exception(response.message ?: "Failed to load study progress"))
+                    Result.failure(
+                        Exception(
+                            response.message ?: "Failed to load study progress"
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 Result.failure(e)
@@ -84,7 +98,11 @@ class StudyRepository(
             }
         }
     }
-    suspend fun getDeckProgressMap(deckIds: List<String>, mode: String): Map<String, StudyDeckProgress> =
+
+    suspend fun getDeckProgressMap(
+        deckIds: List<String>,
+        mode: String
+    ): Map<String, StudyDeckProgress> =
         withContext(Dispatchers.IO) {
             coroutineScope {
                 deckIds.distinct().map { deckId ->
@@ -113,7 +131,8 @@ class StudyRepository(
                     Result.failure(Exception(response.message ?: "Failed to load study session"))
                 }
             } catch (e: Exception) {
-                val cachedCards = flashCardDao.getCardsSnapshotByDeckId(deckId).map { it.toDomain() }
+                val cachedCards =
+                    flashCardDao.getCardsSnapshotByDeckId(deckId).map { it.toDomain() }
                 if (cachedCards.isNotEmpty()) {
                     Result.success(buildOfflineSession(cachedCards, mode))
                 } else {
@@ -150,7 +169,9 @@ class StudyRepository(
                         "upsertSession failed: deckId=$deckId, mode=$mode, cards=${cardSequence.size}, message=${response.message}"
                     )
                     Result.failure(
-                        Exception(response.message ?: "Failed to save study session state")
+                        Exception(
+                            response.message ?: "Failed to save study session state"
+                        )
                     )
                 }
             } catch (e: Exception) {
@@ -181,7 +202,11 @@ class StudyRepository(
                     }
                 }
             } catch (e: Exception) {
-                Log.e("DELETE STUDY", "deleteSessionByDeck failed: deckId=$deckId, mode=$mode", e)
+                Log.e(
+                    "DELETE STUDY",
+                    "deleteSessionByDeck failed: deckId=$deckId, mode=$mode",
+                    e
+                )
                 Result.failure(e)
             }
         }
@@ -191,7 +216,10 @@ class StudyRepository(
         return withContext(Dispatchers.IO) {
             try {
                 studyReviewDao.insertReview(review.toEntity())
-                StudyStreakStore.recordStudyEvent(applicationContext, review.studiedAt)
+                StudyStreakStore.recordStudyEvent(
+                    applicationContext,
+                    review.studiedAt
+                )
                 Result.success(review)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -215,30 +243,30 @@ class StudyRepository(
         }
     }
 
-    suspend fun syncReviews(): Result<Int> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val unsyncedReviews = studyReviewDao.getUnsyncedReviews()
-                if (unsyncedReviews.isEmpty()) {
-                    return@withContext Result.success(0)
-                }
-
-                val reviews = unsyncedReviews.map { it.toDomain() }
-                val response = studyApiService.syncReviews(reviews.map { it.toDto() })
-
-                if (response.isSuccess() && response.data != null) {
-                    val syncedReviews = unsyncedReviews.map { it.copy(isSynced = true) }
-                    studyReviewDao.insertReviews(syncedReviews)
-                    saveLastSyncTime(response.data.syncedAt)
-                    Result.success(unsyncedReviews.size)
-                } else {
-                    Result.failure(Exception(response.message ?: "Failed to sync study reviews"))
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
+//                    suspend fun syncReviews(): Result<Int> {
+//                        return withContext(Dispatchers.IO) {
+//                            try {
+//                                val unsyncedReviews = studyReviewDao.getUnsyncedReviews()
+//                                if (unsyncedReviews.isEmpty()) {
+//                                    return@withContext Result.success(0)
+//                                }
+//
+//                                val reviews = unsyncedReviews.map { it.toDomain() }
+//                                val response = studyApiService.syncReviews(reviews.map { it.toDto() })
+//
+//                                if (response.isSuccess() && response.data != null) {
+//                                    val syncedReviews = unsyncedReviews.map { it.copy(isSynced = true) }
+//                                    studyReviewDao.insertReviews(syncedReviews)
+//                                    saveLastSyncTime(response.data.syncedAt)
+//                                    Result.success(unsyncedReviews.size)
+//                                } else {
+//                                    Result.failure(Exception(response.message ?: "Failed to sync study reviews"))
+//                                }
+//                            } catch (e: Exception) {
+//                                Result.failure(e)
+//                            }
+//                        }
+//                    }
 
     fun getCurrentStreak(): Int {
         return StudyStreakStore.getSnapshot(applicationContext).currentStreak
@@ -248,7 +276,7 @@ class StudyRepository(
         return StudyStreakStore.hasStudiedToday(applicationContext)
     }
 
-    private fun saveLastSyncTime(syncedAt: String) {
+    fun saveLastSyncTime(syncedAt: String) {
         applicationContext
             .getSharedPreferences(STUDY_SYNC_PREFS, Context.MODE_PRIVATE)
             .edit()
@@ -256,7 +284,7 @@ class StudyRepository(
             .apply()
     }
 
-    private fun buildOfflineSession(cards: List<FlashCard>, mode: String): List<FlashCard> {
+    fun buildOfflineSession(cards: List<FlashCard>, mode: String): List<FlashCard> {
         return when (mode) {
             "SEQUENTIAL" -> cards.sortedBy { it.id }
             "RANDOM", "TIME_ATTACK" -> cards.shuffled()
@@ -266,16 +294,17 @@ class StudyRepository(
                     .filter { it.repetition > 0 && isDueForReview(it.nextReviewDate, now) }
                 val newCards = cards
                     .filter { it.repetition == 0 }
-                    .take(DEFAULT_DAILY_NEW_CARD_LIMIT)
                 reviewCards + newCards
             }
+
             else -> cards
         }
     }
 
-    private fun isDueForReview(nextReviewDate: String?, now: Instant): Boolean {
+    fun isDueForReview(nextReviewDate: String?, now: Instant): Boolean {
         if (nextReviewDate.isNullOrBlank()) return true
-        val parsed = runCatching { Instant.parse(nextReviewDate) }.getOrNull() ?: return true
+        val parsed =
+            runCatching { Instant.parse(nextReviewDate) }.getOrNull() ?: return true
         return !parsed.isAfter(now)
     }
 
@@ -306,9 +335,5 @@ class StudyRepository(
             easeFactor = easeFactor,
             nextReviewDate = nextReviewDate
         )
-    }
-
-    private companion object {
-        const val DEFAULT_DAILY_NEW_CARD_LIMIT = 20
     }
 }

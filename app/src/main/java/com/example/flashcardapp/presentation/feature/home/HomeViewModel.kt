@@ -79,11 +79,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         val prioritizedDecks = prioritizeRecentDeck(sortedDecks, recentStudySession)
         val activeDeck = findActiveDeck(prioritizedDecks, recentStudySession)
-        val progressRaw = calculateProgressPercent(
-            studiedCount = activeDeck?.studiedCount ?: 0,
-            totalCards = activeDeck?.cardCount ?: 0
-        )
-        val activeDeck = findActiveDeck(sortedDecks)
         val progressRaw = activeDeck?.let { deck ->
             if (deck.cardCount > 0) {
                 calculateProgressPercent(
