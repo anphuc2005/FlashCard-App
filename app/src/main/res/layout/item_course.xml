@@ -43,38 +43,36 @@
                 android:layout_weight="1" />
 
             <LinearLayout
+                android:id="@+id/layoutReportCourse"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/discover_report_deck_content"
+                android:focusable="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp">
 
                 <ImageView
+                    android:id="@+id/btnReportCourse"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:contentDescription="@null"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_star" />
+                    android:src="@drawable/ic_report"
+                    app:tint="@color/md_icon_red" />
 
                 <TextView
-                    android:id="@+id/courseRating"
+                    android:id="@+id/tvReportCourse"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:textColor="?attr/textColor"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    tools:text="4.9" />
-
-                <TextView
-                    android:id="@+id/courseRatingCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:textColor="?attr/subTitleColor"
-                    android:textSize="12sp"
-                    android:visibility="gone"
-                    tools:text="(1.2k)"
-                    tools:visibility="gone" />
+                    android:text="@string/discover_report_action"
+                    android:textColor="@color/md_icon_red"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 

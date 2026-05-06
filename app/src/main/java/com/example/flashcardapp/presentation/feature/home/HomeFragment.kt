@@ -27,6 +27,7 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.data.datasource.local.session.ReminderSettingsStore
 import com.example.flashcardapp.databinding.FragmentHomeBinding
 import com.example.flashcardapp.domain.model.study.StudyRecentSession
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AdminNotificationInboxDialog
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.NotificationDialog
 import com.example.flashcardapp.presentation.feature.addDeck.AddDeckContainerActivity
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
@@ -97,11 +98,13 @@ class HomeFragment : Fragment() {
         setupListeners()
         renderCachedAvatar()
         loadUserAvatar(forceRefresh = false)
+        viewModel.refreshUnreadNotificationCount()
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.refreshHomeRealtime()
+        viewModel.refreshUnreadNotificationCount()
 
         if (skipNextResumeAvatarRefresh) {
             skipNextResumeAvatarRefresh = false
@@ -183,8 +186,8 @@ class HomeFragment : Fragment() {
                         tvHello.text = state.userGreeting.ifBlank {
                             getString(com.example.flashcardapp.R.string.home_welcome_back)
                         }
-                        tvStreak.text = state.userStreak.toString()
                     }
+                    renderNotificationBadge(state.unreadNotificationCount)
 
                     // Handle loading state
                     binding.btnStart.isEnabled = !state.isLoading && state.activeDeck != null
@@ -236,6 +239,10 @@ class HomeFragment : Fragment() {
                 val currentDecks = viewModel.uiState.value.recentDecks
                 val displayedDecks = if (isExpandedRecentDecks) currentDecks else currentDecks.take(2)
                 recentDeckAdapter.submitList(displayedDecks)
+            }
+
+            notificationBellCard.setOnClickListener {
+                showAdminNotificationsInbox()
             }
 
         }
@@ -375,6 +382,34 @@ class HomeFragment : Fragment() {
             }
         }
         dialog.show(childFragmentManager, "NotificationDialog")
+    }
+
+    private fun showAdminNotificationsInbox() {
+        val existing = childFragmentManager.findFragmentByTag("AdminNotificationInboxDialog")
+        if (existing != null) return
+
+        val dialog = AdminNotificationInboxDialog.newInstance(
+            viewModel.uiState.value.unreadNotificationCount
+        )
+        dialog.listener = object : AdminNotificationInboxDialog.Listener {
+            override fun onUnreadCountChanged(unreadCount: Int) {
+                viewModel.setUnreadNotificationCount(unreadCount)
+            }
+        }
+        dialog.show(childFragmentManager, "AdminNotificationInboxDialog")
+    }
+
+    private fun renderNotificationBadge(unreadCount: Int) {
+        binding.tvNotificationBadge.isVisible = unreadCount > 0
+        if (unreadCount <= 0) {
+            binding.tvNotificationBadge.contentDescription = null
+            return
+        }
+
+        val formattedCount = if (unreadCount > 99) "99+" else unreadCount.toString()
+        binding.tvNotificationBadge.text = formattedCount
+        binding.tvNotificationBadge.contentDescription =
+            getString(R.string.home_notification_badge_content, unreadCount)
     }
 
     private fun showReminderDialog(){

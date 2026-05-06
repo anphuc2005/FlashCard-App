@@ -16,7 +16,8 @@ import com.example.flashcardapp.R
 
 class CourseAdapter(
     private val onItemClick: (Deck) -> Unit,
-    private val onSaveClick: (Deck) -> Unit
+    private val onSaveClick: (Deck) -> Unit,
+    private val onReportClick: (Deck) -> Unit
 ) : ListAdapter<Deck, CourseAdapter.CourseViewHolder>(CourseDiffCallback()) {
 
     private var categoryMap: Map<String, String> = emptyMap()
@@ -29,7 +30,7 @@ class CourseAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
         val binding = ItemCourseBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CourseViewHolder(binding, onItemClick, onSaveClick)
+        return CourseViewHolder(binding, onItemClick, onSaveClick, onReportClick)
     }
 
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
@@ -39,7 +40,8 @@ class CourseAdapter(
     class CourseViewHolder(
         private val binding: ItemCourseBinding,
         private val onItemClick: (Deck) -> Unit,
-        private val onSaveClick: (Deck) -> Unit
+        private val onSaveClick: (Deck) -> Unit,
+        private val onReportClick: (Deck) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Deck, categoryMap: Map<String, String>) {
@@ -66,6 +68,10 @@ class CourseAdapter(
 
                 btnSaveCourse.setOnClickListener {
                     onSaveClick(item)
+                }
+
+                layoutReportCourse.setOnClickListener {
+                    onReportClick(item)
                 }
             }
         }

@@ -8,6 +8,7 @@ import com.example.flashcardapp.domain.model.DeckExplorePage
 import com.example.flashcardapp.domain.usecase.category.GetAllCategoriesUseCase
 import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
 import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCase
+import com.example.flashcardapp.domain.usecase.report.SubmitDeckReportUseCase
 import java.text.Normalizer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,7 +23,8 @@ import kotlinx.coroutines.launch
 class DiscoverViewModel(
     private val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase,
     private val getAllCategoriesUseCase: GetAllCategoriesUseCase,
-    private val cloneDeckUseCase: CloneDeckUseCase
+    private val cloneDeckUseCase: CloneDeckUseCase,
+    private val submitDeckReportUseCase: SubmitDeckReportUseCase
 ) : ViewModel() {
 
     private companion object {
@@ -44,6 +46,9 @@ class DiscoverViewModel(
 
     private val _cloneSuccess = MutableSharedFlow<String>()
     val cloneSuccess: SharedFlow<String> = _cloneSuccess.asSharedFlow()
+
+    private val _reportSuccess = MutableSharedFlow<String>()
+    val reportSuccess: SharedFlow<String> = _reportSuccess.asSharedFlow()
 
     private var allCourses: List<Deck> = emptyList()
     private var latestPage: DeckExplorePage = DeckExplorePage()
@@ -155,6 +160,30 @@ class DiscoverViewModel(
                     _cloneSuccess.emit("Đã lưu bộ thẻ thành công!")
                 } else {
                     _error.value = result.exceptionOrNull()?.message ?: "Lỗi khi lưu bộ thẻ"
+                }
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun submitDeckReport(deckId: String, reason: String) {
+        val trimmedReason = reason.trim()
+        if (trimmedReason.length !in 10..500) {
+            _error.value = "Lý do báo cáo cần từ 10 đến 500 ký tự."
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val result = submitDeckReportUseCase(deckId, trimmedReason)
+                if (result.isSuccess) {
+                    _reportSuccess.emit(result.getOrDefault("Đã gửi báo cáo thành công!"))
+                } else {
+                    _error.value = result.exceptionOrNull()?.message ?: "Không thể gửi báo cáo"
                 }
             } catch (e: Exception) {
                 _error.value = e.message

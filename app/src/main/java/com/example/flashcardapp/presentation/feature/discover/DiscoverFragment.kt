@@ -19,6 +19,7 @@ import com.example.flashcardapp.databinding.FragmentDiscoverBinding
 import com.example.flashcardapp.presentation.common.adapter.CategoryAdapter
 import com.example.flashcardapp.presentation.common.adapter.CourseAdapter
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReportDeckDialog
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
@@ -48,7 +49,8 @@ class DiscoverFragment : Fragment() {
         DiscoverViewModelFactory(
             appContainer.getAllDecksFromApiUseCase,
             appContainer.getAllCategoriesUseCase,
-            appContainer.cloneDeckUseCase
+            appContainer.cloneDeckUseCase,
+            appContainer.submitDeckReportUseCase
         )
     }
 
@@ -124,6 +126,9 @@ class DiscoverFragment : Fragment() {
                     }
                 }
                 dialog.show(childFragmentManager, "discover_save_deck_confirm")
+            },
+            onReportClick = { course ->
+                showReportDialog(course.id, course.name)
             }
         )
         binding.rvCourses.apply {
@@ -222,8 +227,23 @@ class DiscoverFragment : Fragment() {
                         showAppSuccess(message)
                     }
                 }
+                launch {
+                    viewModel.reportSuccess.collectLatest { message ->
+                        showAppSuccess(message)
+                    }
+                }
             }
         }
+    }
+
+    private fun showReportDialog(deckId: String, deckName: String) {
+        val dialog = ReportDeckDialog.newInstance(deckId, deckName)
+        dialog.listener = object : ReportDeckDialog.Listener {
+            override fun onSubmit(deckId: String, reason: String) {
+                viewModel.submitDeckReport(deckId, reason)
+            }
+        }
+        dialog.show(childFragmentManager, "discover_report_deck_dialog")
     }
 
     private fun renderCategorySection() {

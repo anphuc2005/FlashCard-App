@@ -8,6 +8,7 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.domain.model.Shortcut
 import com.example.flashcardapp.domain.model.study.StudyRecentSession
+import com.example.flashcardapp.domain.usecase.notification.GetUnreadNotificationCountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,7 @@ data class HomeUiState(
     val shortcuts: List<Shortcut> = emptyList(),
     val error: String? = null,
     val userStreak: Int = 0,
+    val unreadNotificationCount: Int = 0,
     val userGreeting: String = "",
     val userAvatarUrl: String? = null,
     val userProgress: Int = 0,
@@ -50,6 +52,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val deckRepository = appContainer.deckRepository
     private val studyUseCases = appContainer.studyUseCases
     private val studyRepository = appContainer.studyRepository
+    private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase =
+        appContainer.getUnreadNotificationCountUseCase
 
     private val _uiState = MutableStateFlow(
         HomeUiState(
@@ -273,6 +277,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun refreshUnreadNotificationCount() {
+        viewModelScope.launch {
+            getUnreadNotificationCountUseCase()
+                .onSuccess { count ->
+                    _uiState.value = _uiState.value.copy(
+                        unreadNotificationCount = count.coerceAtLeast(0)
+                    )
+                }
+        }
+    }
+
+    fun setUnreadNotificationCount(count: Int) {
+        _uiState.value = _uiState.value.copy(
+            unreadNotificationCount = count.coerceAtLeast(0)
+        )
     }
 
     private suspend fun enrichDecksWithProgress(decks: List<Deck>): List<Deck> {
