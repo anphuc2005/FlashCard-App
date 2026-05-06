@@ -56,37 +56,49 @@
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/notificationBellCard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?attr/componentBackground"
+                android:contentDescription="@string/home_notification_bell_content"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
-                android:backgroundTint="?attr/componentBackground"
                 app:strokeColor="?attr/componentBackground">
 
-                <LinearLayout
+                <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:paddingHorizontal="12dp"
-                    android:paddingVertical="8dp"
-                    android:orientation="horizontal">
+                    android:paddingVertical="8dp">
 
                     <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_fire"
-                        app:tint="?attr/iconGreen"/>
+                        android:id="@+id/imgNotificationBell"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_bell"
+                        app:tint="?attr/iconBlue" />
 
                     <TextView
-                        android:id="@+id/tv_Streak"
+                        android:id="@+id/tvNotificationBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="12"
-                        android:textColor="?attr/iconGreen"
-                        android:textSize="12sp"
-                        android:textStyle="bold"/>
-                </LinearLayout>
+                        android:layout_gravity="top|end"
+                        android:background="@drawable/bg_notification_badge"
+                        android:gravity="center"
+                        android:minWidth="16dp"
+                        android:minHeight="16dp"
+                        android:paddingHorizontal="4dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="9"
+                        tools:visibility="visible" />
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 

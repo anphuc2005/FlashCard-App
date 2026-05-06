@@ -10,7 +10,9 @@ import com.example.flashcardapp.data.repository.FlashCardRepository
 import com.example.flashcardapp.data.repository.StudyRepository
 import com.example.flashcardapp.data.repository.CategoryRepository
 import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
+import com.example.flashcardapp.data.repository.NotificationRepository
 import com.example.flashcardapp.data.repository.ProfileRepository
+import com.example.flashcardapp.data.repository.ReportRepository
 import com.example.flashcardapp.data.repository.StatisticsRepository
 import com.example.flashcardapp.data.repository.UploadRepositoryImpl
 import com.example.flashcardapp.domain.repository.UploadRepository
@@ -46,6 +48,10 @@ import com.example.flashcardapp.domain.usecase.study.SaveStudySessionStateUseCas
 import com.example.flashcardapp.domain.usecase.study.SaveStudyReviewUseCase
 import com.example.flashcardapp.domain.usecase.study.StudyUseCases
 import com.example.flashcardapp.domain.usecase.study.SyncStudyReviewsUseCase
+import com.example.flashcardapp.domain.usecase.notification.GetNotificationsPageUseCase
+import com.example.flashcardapp.domain.usecase.notification.GetUnreadNotificationCountUseCase
+import com.example.flashcardapp.domain.usecase.notification.MarkNotificationReadUseCase
+import com.example.flashcardapp.domain.usecase.report.SubmitDeckReportUseCase
 
 /**
  * Dependency Injection Container
@@ -96,6 +102,14 @@ class AppContainer(private val applicationContext: Context) {
 
     val statisticsRepository: StatisticsRepository by lazy {
         StatisticsRepository(RetrofitClient.statisticsApiService)
+    }
+
+    val notificationRepository: NotificationRepository by lazy {
+        NotificationRepository(RetrofitClient.notificationApiService)
+    }
+
+    val reportRepository: ReportRepository by lazy {
+        ReportRepository(RetrofitClient.reportApiService)
     }
 
         val studyRepository: StudyRepository by lazy {
@@ -180,6 +194,22 @@ class AppContainer(private val applicationContext: Context) {
 
         val updateMyProfileUseCase: UpdateMyProfileUseCase by lazy {
             UpdateMyProfileUseCase(profileRepository)
+        }
+
+        val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase by lazy {
+            GetUnreadNotificationCountUseCase(notificationRepository)
+        }
+
+        val getNotificationPageUseCase: GetNotificationsPageUseCase by lazy {
+            GetNotificationsPageUseCase(notificationRepository)
+        }
+
+        val markNotificationAsReadUseCase: MarkNotificationReadUseCase by lazy {
+            MarkNotificationReadUseCase(notificationRepository)
+        }
+
+        val submitDeckReportUseCase: SubmitDeckReportUseCase by lazy {
+            SubmitDeckReportUseCase(reportRepository)
         }
 
         val studyUseCases: StudyUseCases by lazy {

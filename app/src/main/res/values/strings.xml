@@ -61,6 +61,8 @@
     <string name="item_deck_card_count">%d thẻ</string>
     <string name="home_progress_format">%d%%</string>
     <string name="home_no_active_deck">Không có bộ thẻ nào</string>
+    <string name="home_notification_bell_content">Mở thông báo</string>
+    <string name="home_notification_badge_content">%1$d thông báo chưa đọc</string>
 
     <string name="app_deck">Bộ thẻ của tôi</string>
     <string name="app_session_setting_deck_count">Số lượng thẻ</string>
@@ -90,6 +92,7 @@
     <string name="otp_error_incomplete">Vui lòng nhập đầy đủ mã OTP</string>
     <string name="otp_resent_success">Đã gửi lại mã OTP</string>
     <string name="common_back">Quay lại</string>
+    <string name="common_close">Đóng</string>
     <string name="home_welcome_back">Chào mừng trở lại</string>
     <string name="home_welcome_subtitle">Sẵn sàng tiếp tục học tập cùng cộng đồng flashcard.</string>
     <string name="onboarding_skip">Bỏ qua</string>
@@ -274,6 +277,20 @@
     <string name="discover_save_deck_message">Bạn có muốn lưu bộ thẻ "%1$s" vào thư viện của mình không?</string>
     <string name="discover_save_deck_action">Lưu</string>
     <string name="discover_save_deck_cancel">Hủy</string>
+    <string name="discover_report_action">Báo cáo</string>
+    <string name="discover_report_deck_content">Báo cáo bộ thẻ</string>
+    <string name="report_dialog_title">Báo cáo bộ thẻ</string>
+    <string name="report_dialog_reason_hint">Mô tả lý do báo cáo (10 - 500 ký tự)</string>
+    <string name="report_dialog_cancel">Hủy</string>
+    <string name="report_dialog_submit">Gửi báo cáo</string>
+    <string name="report_dialog_reason_too_short">Lý do cần ít nhất 10 ký tự.</string>
+    <string name="report_dialog_reason_too_long">Lý do tối đa 500 ký tự.</string>
+    <string name="report_dialog_deck_label">Bộ thẻ: %1$s</string>
+    <string name="notifications_inbox_title">Thông báo từ Admin</string>
+    <string name="notifications_inbox_empty">Bạn chưa có thông báo nào.</string>
+    <string name="notifications_inbox_type_deck_warning">Cảnh báo bộ thẻ</string>
+    <string name="notifications_inbox_type_report_result">Kết quả báo cáo</string>
+    <string name="notifications_inbox_type_system">Thông báo hệ thống</string>
     <string name="add_card_header_title">Thêm thẻ mới</string>
     <string name="add_card_front_label">Mặt trước (câu hỏi)</string>
     <string name="add_card_front_hint">Nhập nội dung câu hỏi tại đây...</string>
