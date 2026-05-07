@@ -233,7 +233,7 @@ class DeckFragment : Fragment() {
 
     private fun updateSelectionUi() {
         if (selectedDeckIds.isEmpty()) {
-            binding.filterButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_filter)
+            binding.filterButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
             binding.filterButton.setBackgroundColor(Color.TRANSPARENT)
             binding.filterButton.iconTint = null
             return
@@ -300,14 +300,12 @@ class DeckFragment : Fragment() {
     }
 
     private fun showLoading() {
-        binding.searchContainer.alpha = 0.6f
         binding.decksRecycler.alpha = 0.6f
         binding.btnAddDesk.isEnabled = false
         binding.swipeRefresh.isRefreshing = true
     }
 
     private fun hideLoading() {
-        binding.searchContainer.alpha = 1f
         binding.decksRecycler.alpha = 1f
         binding.btnAddDesk.isEnabled = true
         binding.swipeRefresh.isRefreshing = false

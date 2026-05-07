@@ -288,7 +288,7 @@ class StatisticViewModel(
             "achievement_streak_30",
             "achievement_streak_60",
             "achievement_streak_100",
-            "achievement_streak_365" -> R.drawable.ic_fire
+            "achievement_streak_365" -> R.drawable.ic_fire_achivement
 
             "achievement_deck_first",
             "achievement_deck_5",
@@ -302,7 +302,7 @@ class StatisticViewModel(
             "achievement_review_5000",
             "achievement_retention_80",
             "achievement_retention_90",
-            "achievement_retention_95" -> R.drawable.ic_check
+            "achievement_retention_95" -> R.drawable.ic_pen_achivement
 
             "achievement_time_60",
             "achievement_time_300",

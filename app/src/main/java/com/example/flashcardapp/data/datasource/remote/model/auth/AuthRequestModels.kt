@@ -1,5 +1,7 @@
 package com.example.flashcardapp.data.datasource.remote.model.auth
 
+import com.google.gson.annotations.SerializedName
+
 data class LoginRequest(
     val email: String,
     val password: String
@@ -27,7 +29,7 @@ data class ResetPasswordRequest(
 )
 
 data class GoogleLoginRequest(
+    @SerializedName("token")
     val idToken: String
 )
-
 

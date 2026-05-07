@@ -36,12 +36,17 @@ import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
+    companion object {
+        private const val TAG = "LoginFragment"
+    }
+
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewModel: LoginViewModel
     private var loadingDialog: LoadingDialogFragment? = null
     private lateinit var googleSignInClient: GoogleSignInClient
+    private var googleSignInConfigured = false
 
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -55,8 +60,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 showAppError("Không lấy được mã xác thực Google")
             }
         } catch (e: ApiException) {
-            Log.e("LoginFragment", "Google sign in failed", e)
+            Log.e(
+                TAG,
+                "Google sign in failed. statusCode=${e.statusCode}, message=${e.message}",
+                e
+            )
             val errorMessage = when (e.statusCode) {
+                10 -> "Cấu hình Google Sign-In chưa đúng. Kiểm tra Web Client ID, package name và SHA-1/SHA-256 trên Firebase/Google Cloud."
+                12500 -> "Google từ chối đăng nhập cho tài khoản hiện tại. Vui lòng kiểm tra lại cấu hình OAuth (Web Client ID, SHA, package) hoặc thử tài khoản Google khác."
                 7 -> "Lỗi mạng hoặc chưa cài đặt Google Play Services"
                 12501 -> "Bạn đã hủy đăng nhập"
                 1033 -> "Lỗi kết nối đến server. Vui lòng thử lại sau"
@@ -82,12 +93,23 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     private fun setupGoogleSignIn() {
+        val webClientId = getString(R.string.default_web_client_id).trim()
+        if (!isValidGoogleWebClientId(webClientId)) {
+            googleSignInConfigured = false
+            Log.e(
+                TAG,
+                "Invalid default_web_client_id. Current package=${requireContext().packageName}, value=$webClientId"
+            )
+            return
+        }
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestIdToken(webClientId)
             .requestEmail()
             .build()
 
         googleSignInClient = getClient(requireActivity(), gso)
+        googleSignInConfigured = true
     }
 
     override fun onResume() {
@@ -118,6 +140,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
         binding.buttonLogin.setOnClickListener { viewModel.submit() }
         binding.buttonGoogle.setOnClickListener {
+            if (!googleSignInConfigured) {
+                showAppError("Google Sign-In chưa được cấu hình đúng. Vui lòng kiểm tra default_web_client_id.")
+                return@setOnClickListener
+            }
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
@@ -197,5 +223,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private fun hideMainChrome() {
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)?.visibility = View.GONE
         requireActivity().findViewById<FloatingActionButton>(R.id.fabChat)?.visibility = View.GONE
+    }
+
+    private fun isValidGoogleWebClientId(clientId: String): Boolean {
+        return clientId.isNotBlank() &&
+            clientId.endsWith(".apps.googleusercontent.com") &&
+            !clientId.startsWith("YOUR_")
     }
 }

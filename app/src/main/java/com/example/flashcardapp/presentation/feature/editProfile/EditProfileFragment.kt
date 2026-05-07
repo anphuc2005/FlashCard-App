@@ -3,6 +3,7 @@ package com.example.flashcardapp.presentation.feature.editProfile
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -135,7 +136,7 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun requestGalleryPermissionAndPick() {
-        val permission = Manifest.permission.READ_MEDIA_IMAGES
+        val permission = getGalleryPermission()
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 permission
@@ -144,6 +145,14 @@ class EditProfileFragment : Fragment() {
             openImagePicker()
         } else {
             galleryPermissionLauncher.launch(permission)
+        }
+    }
+
+    private fun getGalleryPermission(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
         }
     }
 
