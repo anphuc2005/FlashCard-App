@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="24dp"
+    android:background="?attr/colorOnBackground">
+
+    <ImageButton
+        android:id="@+id/buttonBack"
+        android:layout_width="@dimen/auth_back_button_size"
+        android:layout_height="@dimen/auth_back_button_size"
+        android:layout_marginTop="@dimen/auth_screen_padding_top"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/common_back"
+        android:padding="@dimen/auth_back_button_padding"
+        android:src="@drawable/ic_onboarding_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/textColor" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/otp_content_margin_top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonBack">
+
+        <FrameLayout
+            android:id="@+id/iconContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_otp_icon_container"
+            app:layout_constraintDimensionRatio="1:1"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.18">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:contentDescription="@null"
+                android:maxHeight="@dimen/otp_icon_size"
+                android:maxWidth="@dimen/otp_icon_size"
+                android:src="@drawable/ic_otp_mail" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/textOtpTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/otp_title_margin_top"
+            android:gravity="center"
+            android:text="@string/otp_title"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/otp_title_text_size"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iconContainer" />
+
+        <TextView
+            android:id="@+id/textOtpSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/otp_subtitle_margin_top"
+            android:gravity="center"
+            android:text="@string/otp_subtitle"
+            android:textColor="?attr/subTitleColor"
+            android:textSize="@dimen/otp_subtitle_text_size"
+            android:layout_marginHorizontal="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textOtpTitle" />
+        <LinearLayout
+            android:id="@+id/otpBoxesRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/otp_boxes_margin_top"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textOtpSubtitle">
+
+            <EditText
+                android:id="@+id/inputOtp1"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp2"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp3"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp4"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp5"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+
+            <EditText
+                android:id="@+id/inputOtp6"
+                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_otp_digit_box"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/otp_digit_color"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/otp_digit_text_size" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textNoCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/otp_resend_label_margin_top"
+            android:gravity="center"
+            android:text="@string/otp_no_code"
+            android:textColor="?attr/subTitleColor"
+            android:textSize="@dimen/otp_resend_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/otpBoxesRow" />
+
+        <TextView
+            android:id="@+id/textResendCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/otp_resend_margin_top"
+            android:gravity="center"
+            android:text="@string/otp_resend_ready"
+            android:textColor="?attr/buttonColor"
+            android:textSize="@dimen/otp_resend_text_size"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textNoCode" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonConfirmOtp"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/otp_button_height"
+            android:layout_marginTop="@dimen/otp_button_margin_top"
+            android:backgroundTint="?attr/buttonColor"
+            android:elevation="@dimen/otp_button_elevation"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:stateListAnimator="@null"
+            android:text="@string/app_otp_button"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/auth_button_text_size"
+            android:textStyle="bold"
+            app:cornerRadius="@dimen/otp_button_corner_radius"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textResendCode" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

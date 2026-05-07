@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Background -->
+    <color name="md_theme_light_background1">#F8FAFC</color>
+    <color name="md_theme_light_background2">#2563EB</color>
+
+    <color name="md_theme_dard_background1">#3B82F633</color>
+    <color name="md_theme_dark_background2">#0F172A</color>
+
+    <!-- Loading Background -->
+    <color name="md_theme_light_loading_background1">#2563EB</color>
+    <color name="md_theme_light_loading_background2">#22D3EE</color>
+
+    <color name="md_theme_light_bottomNav">#FFFFFFFF</color>
+    <color name="md_theme_dark_bottomNav">#1E293BF2</color>
+
+
+
+    <!-- Splash -->
+    <color name="splash_background_base">#F4F8FF</color>
+    <color name="splash_background_glow_start">#807DB7FF</color>
+    <color name="splash_background_glow_center">#4D7DB7FF</color>
+    <color name="splash_background_glow_end">#00F4F8FF</color>
+    <color name="splash_title_shadow">#4D4B83FF</color>
+    <color name="splash_subtitle_shadow">#264B83FF</color>
+    <color name="splash_progress_shadow">#334B83FF</color>
+    <color name="splash_loading_text">#6B7C93</color>
+    <color name="splash_progress_track">#DCE6F7</color>
+    <color name="splash_progress_start">#2E6BFF</color>
+    <color name="splash_progress_center">#2E86FF</color>
+    <color name="splash_progress_end">#2BD4F3</color>
+    <color name="splash_badge_background">#2E6BFF</color>
+    <color name="splash_logo_outline">#2E6BFF</color>
+    <color name="splash_logo_inner_stroke">#B9CBF6</color>
+
+    <!-- Button -->
+    <color name="md_button">#2563EB</color>
+    <color name="md_button_ripple">#332563EB</color>
+
+    <!-- Auth -->
+    <color name="auth_input_background">#FFFFFFFF</color>
+    <color name="auth_input_stroke_default">#D9E6F5</color>
+    <color name="auth_input_stroke_focused">#B7CCEA</color>
+    <color name="auth_input_hint">#9FB0C9</color>
+    <color name="otp_icon_background">#E8F1FF</color>
+    <color name="otp_icon_stroke">#2E80E8</color>
+    <color name="otp_digit_color">#6E7788</color>
+    <color name="otp_button_shadow">#332E6BFF</color>
+
+    <!-- Onboarding -->
+    <color name="md_onboarding_card_background">#FFFFFFFF</color>
+    <color name="md_onboarding_card_glow">#1A2563EB</color>
+    <color name="md_onboarding_indicator_inactive">#CBD5E1</color>
+
+    <!-- Button Bottom Nav -->
+    <color name="md_button_bottom_nav_active">#2E6BFF</color>
+    <color name="md_button_bottom_nav_inactive">#64748B</color>
+
+    <!-- Main Background -->
+    <color name="md_theme_light_main_background">#F8FAFC</color>
+    <color name="md_theme_dark_main_background">#0F172A</color>
+
+    <!-- Component Background -->
+    <color name="md_theme_light_component_background">#FFFFFF</color>
+    <color name="md_theme_dark_component_background">#1E293B</color>
+
+
+    <!-- Sub title -->
+    <color name="md_sub_title">#64748B</color>
+
+    <!-- Text -->
+    <color name="md_theme_light_text">#000000</color>
+    <color name="md_theme_dark_text">#FFFFFF</color>
+
+    <!-- Color icon -->
+    <color name="md_icon_blue">#247BDF</color>
+    <color name="md_icon_red">#F43F5E</color>
+    <color name="md_icon_green">#10B981</color>
+    <color name="md_icon_yellow">#F59E0B</color>
+    <color name="md_icon_purple">#6366F1</color>
+    <color name="md_icon_gray">#64748B</color>
+    <color name="md_icon_orange">#F97316</color>
+
+    <color name="md_icon_blue_background">#19247BDF</color>
+    <color name="md_icon_red_background">#19F43F5E</color>
+    <color name="md_icon_green_background">#1910B981</color>
+    <color name="md_icon_yellow_background">#19F59E0B</color>
+    <color name="md_icon_purple_background">#196366F1</color>
+    <color name="md_icon_gray_background">#1964748B</color>
+    <color name="md_icon_orange_background">#19F97316</color>
+
+    <!-- Nav_bar active -->
+    <color name="md_navbar_active">#247BDF</color>
+
+    <!-- Bar chart -->
+    <color name="blue_primary">#2E6BFF</color>
+    <color name="bar_track">#E5ECF6</color>
+    <color name="gray_600">#9AA6B6</color>
+
+    <!-- Deck Colors -->
+    <color name="color_red">#FF6B6B</color>
+    <color name="color_blue">#4ECDC4</color>
+    <color name="color_yellow">#FFE66D</color>
+    <color name="color_green">#95E1D3</color>
+    <color name="color_purple">#C7A2FF</color>
+    <color name="color_orange">#FFA500</color>
+
+    <!-- Chip Color -->
+    <color name="chip_selector">#EAF2FF</color>
+    <color name="switch_thumb">#2E6BFF</color>
+    <color name="switch_track">#99C2FF</color>
+
+    <color name="switch_thumb_blue">#0A63E8</color>
+    <color name="switch_track_blue">#99BFF5</color>
+    <color name="switch_thumb_gray">#FFFFFF</color>
+    <color name="switch_track_gray">#D9DDE2</color>
+
+    <!-- Learning -->
+    <color name="learning_background">#F8FAFC</color>
+    <color name="learning_surface">#FFFFFF</color>
+    <color name="learning_border">#E2E8F0</color>
+    <color name="learning_soft_border">#F1F5F9</color>
+    <color name="learning_primary">#247BDF</color>
+    <color name="learning_primary_soft">#1A247BDF</color>
+    <color name="learning_primary_extra_soft">#0D247BDF</color>
+    <color name="learning_text_primary">#0F172A</color>
+    <color name="learning_text_secondary">#475569</color>
+    <color name="learning_text_muted">#64748B</color>
+    <color name="learning_text_soft">#94A3B8</color>
+    <color name="learning_chip_unselected">#F1F5F9</color>
+    <color name="learning_close_background">#80E2E8F0</color>
+    <color name="learning_again_bg">#1AEF4444</color>
+    <color name="learning_again_stroke">#33EF4444</color>
+    <color name="learning_again_text">#EF4444</color>
+    <color name="learning_hard_bg">#1AF59E0B</color>
+    <color name="learning_hard_stroke">#33F59E0B</color>
+    <color name="learning_hard_text">#F59E0B</color>
+    <color name="learning_good_bg">#1A2563EB</color>
+    <color name="learning_good_stroke">#332563EB</color>
+    <color name="learning_good_text">#2563EB</color>
+    <color name="learning_easy_bg">#1A22C55E</color>
+    <color name="learning_easy_stroke">#3322C55E</color>
+    <color name="learning_easy_text">#22C55E</color>
+
+    <!-- App Notification -->
+    <color name="app_notification_success">#2CC9A1</color>
+    <color name="app_notification_error">#F43F6D</color>
+    <color name="app_notification_warning">#FB9A2A</color>
+    <color name="discover_course_stroke_soft">#66A3AEC2</color>
+    <color name="app_notification_border">#E8EEF6</color>
+    <color name="app_notification_title">#1F2937</color>
+    <color name="app_notification_message">#7A8AA0</color>
+    <color name="loading_dialog_stroke">#DDE7F3</color>
+    <color name="loading_dialog_text">#23324A</color>
+    <color name="deck_swipe_delete_bg">#F37E33</color>
+    <color name="deck_bulk_delete_active_bg">#E53935</color>
+    <color name="password_strength_inactive">#E5E9F1</color>
+</resources>

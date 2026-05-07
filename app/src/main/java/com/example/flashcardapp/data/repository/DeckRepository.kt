@@ -1,0 +1,168 @@
+package com.example.flashcardapp.data.repository
+
+import com.example.flashcardapp.data.datasource.remote.api.DeckApiService
+import com.example.flashcardapp.data.datasource.remote.model.toDto
+import com.example.flashcardapp.domain.model.Deck
+import com.example.flashcardapp.domain.model.DeckExplorePage
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class DeckRepository(
+    private val deckApiService: DeckApiService
+) {
+
+    suspend fun getAllDecksFromApi(): Result<List<Deck>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.getAllDecks()
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(enrichDecksWithCardCount(response.data.map { it.toDomain() }))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun getDeckByIdFromApi(id: String): Result<Deck> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.getDeckById(id)
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(enrichDeckWithCardCount(response.data.toDomain()))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun exploreDecks(): Result<List<Deck>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.exploreDecks()
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(enrichDecksWithCardCount(response.data.map { it.toDomain() }))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun exploreDecksPaged(
+        page: Int = 0,
+        size: Int = 5,
+        query: String? = null
+    ): Result<DeckExplorePage> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.exploreDecksPaged(
+                    page = page,
+                    size = size.coerceIn(1, 50),
+                    query = query?.takeIf { it.isNotBlank() }
+                )
+                if (response.isSuccess() && response.data != null) {
+                    val decks = enrichDecksWithCardCount(response.data.content.map { it.toDomain() })
+                    Result.success(response.data.toDomain(decks))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun cloneDeck(deckId: String): Result<Deck> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.cloneDeck(deckId)
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(enrichDeckWithCardCount(response.data.toDomain()))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun createDeck(deck: Deck): Result<Deck> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.createDeck(deck.toDto())
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(enrichDeckWithCardCount(response.data.toDomain()))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun updateDeck(id: String, deck: Deck): Result<Deck> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.updateDeck(id, deck.toDto())
+                if (response.isSuccess() && response.data != null) {
+                    Result.success(enrichDeckWithCardCount(response.data.toDomain()))
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun deleteDeck(id: String): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = deckApiService.deleteDeck(id)
+                if (response.isSuccess()) {
+                    Result.success(response.message ?: "Deleted successfully")
+                } else {
+                    Result.failure(Exception(response.message ?: "Unknown error"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    private suspend fun enrichDecksWithCardCount(decks: List<Deck>): List<Deck> = coroutineScope {
+        decks.map { deck ->
+            async { enrichDeckWithCardCount(deck) }
+        }.awaitAll()
+    }
+
+    private suspend fun enrichDeckWithCardCount(deck: Deck): Deck {
+        val fallbackCount = deck.customCardCount ?: deck.cards.size
+        val resolvedCount = runCatching {
+            val response = deckApiService.getDeckCardCount(deck.id)
+            if (response.isSuccess() && response.data != null) {
+                response.data.totalCards
+                    .coerceAtLeast(0L)
+                    .coerceAtMost(Int.MAX_VALUE.toLong())
+                    .toInt()
+            } else {
+                fallbackCount.coerceAtLeast(0)
+            }
+        }.getOrDefault(fallbackCount.coerceAtLeast(0))
+
+        return deck.copy(customCardCount = resolvedCount)
+    }
+}

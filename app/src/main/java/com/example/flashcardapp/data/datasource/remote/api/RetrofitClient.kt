@@ -1,0 +1,61 @@
+package com.example.flashcardapp.data.datasource.remote.api
+
+import com.example.flashcardapp.core.constants.Constants
+import com.example.flashcardapp.BuildConfig
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.Interceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+
+object RetrofitClient {
+
+    var tokenProvider: (() -> String?)? = null
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BASIC
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+    }
+
+    private val authInterceptor = Interceptor { chain ->
+        val originalRequest = chain.request()
+        val requestBuilder = originalRequest.newBuilder()
+        val hasAuthorizationHeader = originalRequest.header("Authorization") != null
+
+        if (!hasAuthorizationHeader) {
+            tokenProvider?.invoke()?.let { token ->
+                requestBuilder.addHeader("Authorization", "Bearer $token")
+            }
+        }
+        chain.proceed(requestBuilder.build())
+    }
+
+    private val defaultClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(authInterceptor)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(Constants.BASE_URL)
+        .client(defaultClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val authApiService: AuthApiService = retrofit.create(AuthApiService::class.java)
+    val chatApiService: ChatApiService = retrofit.create(ChatApiService::class.java)
+    val deckApiService: DeckApiService = retrofit.create(DeckApiService::class.java)
+    val cardApiService: CardApiService = retrofit.create(CardApiService::class.java)
+    val categoriesApiService: CategoriesApiService = retrofit.create(CategoriesApiService::class.java)
+    val profileApiService: ProfileApiService = retrofit.create(ProfileApiService::class.java)
+    val notificationApiService: NotificationApiService = retrofit.create(NotificationApiService::class.java)
+    val reportApiService: ReportApiService = retrofit.create(ReportApiService::class.java)
+    val uploadApiService: UploadApiService = retrofit.create(UploadApiService::class.java)
+    val studyApiService: StudyApiService = retrofit.create(StudyApiService::class.java)
+    val statisticsApiService: StatisticsApiService = retrofit.create(StatisticsApiService::class.java)
+}

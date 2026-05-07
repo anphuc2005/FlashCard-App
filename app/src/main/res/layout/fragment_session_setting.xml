@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorOnBackground"
+    tools:context=".presentation.feature.learning.SessionSettingFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/learning_top_bar_height"
+        android:backgroundTint="?attr/colorOnBackground"
+        app:cardCornerRadius="@dimen/learning_zero"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="@dimen/learning_icon_button_size"
+                android:layout_height="@dimen/learning_icon_button_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/learning_session_title"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/learning_toolbar_large_text_size"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="@dimen/learning_icon_button_size"
+                android:layout_height="@dimen/learning_icon_button_size" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:overScrollMode="never"
+        android:paddingHorizontal="@dimen/learning_screen_padding_horizontal"
+        android:paddingTop="@dimen/learning_screen_padding_large"
+        android:paddingBottom="@dimen/learning_space_lg"
+        app:layout_constraintBottom_toTopOf="@+id/btnStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_session_setting_deck_count"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/learning_toolbar_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textCardLimit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_sm"
+                android:textColor="?attr/subTitleColor"
+                android:textSize="@dimen/learning_body_text_size"
+                tools:text="20/40 thẻ" />
+
+            <com.example.flashcardapp.core.utils.slider.CustomSliderView
+                android:id="@+id/customSlider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_slider_height"
+                android:layout_marginTop="@dimen/learning_space_xs" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_xl"
+                android:text="@string/learning_order_title"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/learning_toolbar_text_size"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRandom"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_order_card_height"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:backgroundTint="?attr/componentBackground"
+                app:cardCornerRadius="@dimen/learning_card_radius_medium"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="@dimen/learning_stroke_width">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/learning_card_padding">
+
+                    <ImageView
+                        android:layout_width="@dimen/learning_feedback_icon_size"
+                        android:layout_height="@dimen/learning_feedback_icon_size"
+                        android:src="@drawable/ic_random" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/learning_space_md"
+                        android:layout_weight="1"
+                        android:text="@string/learning_order_random"
+                        android:textColor="?attr/textColor"
+                        android:textSize="@dimen/learning_body_text_size"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbRandom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="?attr/buttonColor" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardOrdered"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_order_card_height"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:backgroundTint="?attr/componentBackground"
+                app:cardCornerRadius="@dimen/learning_card_radius_medium"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="@dimen/learning_stroke_width">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/learning_card_padding">
+
+                    <ImageView
+                        android:layout_width="@dimen/learning_feedback_icon_size"
+                        android:layout_height="@dimen/learning_feedback_icon_size"
+                        android:src="@drawable/ic_stt" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/learning_space_md"
+                        android:layout_weight="1"
+                        android:text="@string/learning_order_ordered"
+                        android:textColor="?attr/textColor"
+                        android:textSize="@dimen/learning_body_text_size"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbOrdered"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="?attr/buttonColor" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardTimeAttack"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/learning_order_card_height"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:backgroundTint="?attr/componentBackground"
+                app:cardCornerRadius="@dimen/learning_card_radius_medium"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="@dimen/learning_stroke_width">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/learning_card_padding">
+
+                    <ImageView
+                        android:layout_width="@dimen/learning_feedback_icon_size"
+                        android:layout_height="@dimen/learning_feedback_icon_size"
+                        android:src="@drawable/ic_time" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/learning_space_md"
+                        android:layout_weight="1"
+                        android:text="@string/learning_order_time_attack"
+                        android:textColor="?attr/textColor"
+                        android:textSize="@dimen/learning_body_text_size"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbTimeAttack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="?attr/buttonColor" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/layoutTimeLimit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_md"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/learning_time_limit_title"
+                    android:textColor="?attr/textColor"
+                    android:textSize="@dimen/learning_body_text_size"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupTimeLimit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/learning_space_md"
+                    app:chipSpacingHorizontal="@dimen/learning_space_md"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTimeOneMinute"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/learning_time_limit_one_minute"
+                        android:textColor="@color/learning_chip_text_selector"
+                        app:checkedIconVisible="false"
+                        app:chipBackgroundColor="@color/learning_chip_background_selector" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTimeThreeMinutes"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/learning_time_limit_three_minutes"
+                        android:textColor="@color/learning_chip_text_selector"
+                        app:checkedIconVisible="false"
+                        app:chipBackgroundColor="@color/learning_chip_background_selector" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTimeFiveMinutes"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/learning_time_limit_five_minutes"
+                        android:textColor="@color/learning_chip_text_selector"
+                        app:checkedIconVisible="false"
+                        app:chipBackgroundColor="@color/learning_chip_background_selector" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_xl"
+                android:text="@string/learning_card_type_title"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/learning_toolbar_text_size"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_space_md"
+                app:chipSpacingHorizontal="@dimen/learning_space_md"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAll"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/learning_card_type_all"
+                    android:textColor="@color/learning_chip_text_selector"
+                    app:checkedIconVisible="false"
+                    app:chipBackgroundColor="@color/learning_chip_background_selector" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipNew"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/learning_card_type_new"
+                    android:textColor="@color/learning_chip_text_selector"
+                    app:checkedIconVisible="false"
+                    app:chipBackgroundColor="@color/learning_chip_background_selector" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/learning_screen_padding_large"
+                android:background="@drawable/bg_learning_visual_placeholder">
+
+                <ImageView
+                    android:layout_width="@dimen/learning_type_icon_size"
+                    android:layout_height="@dimen/learning_type_icon_size"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="@dimen/learning_space_lg"
+                    android:alpha="0.45"
+                    android:src="@drawable/ic_book"
+                    app:tint="?attr/buttonColor" />
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnStart"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/learning_cta_height"
+        android:layout_marginHorizontal="@dimen/learning_screen_padding_large"
+        android:layout_marginBottom="@dimen/learning_screen_padding_large"
+        android:backgroundTint="?attr/buttonColor"
+        android:text="@string/learning_start_now"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/learning_toolbar_text_size"
+        android:textStyle="bold"
+        app:cornerRadius="@dimen/learning_card_radius_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

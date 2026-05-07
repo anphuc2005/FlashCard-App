@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Learning (Night overrides) -->
+    <color name="learning_background">#0B1220</color>
+    <color name="learning_surface">#111C30</color>
+    <color name="learning_border">#2A3955</color>
+    <color name="learning_soft_border">#23324A</color>
+    <color name="learning_primary">#4B8DFF</color>
+    <color name="learning_primary_soft">#334B8DFF</color>
+    <color name="learning_primary_extra_soft">#1F4B8DFF</color>
+    <color name="learning_text_primary">#EAF0FF</color>
+    <color name="learning_text_secondary">#A8B5CC</color>
+    <color name="learning_text_muted">#8D9AB1</color>
+    <color name="learning_text_soft">#7D8AA4</color>
+    <color name="learning_chip_unselected">#1A2740</color>
+    <color name="learning_close_background">#33465D82</color>
+
+    <!-- Keep rating semantic colors visible on dark -->
+    <color name="learning_again_bg">#33EF4444</color>
+    <color name="learning_again_stroke">#66EF4444</color>
+    <color name="learning_again_text">#FF7A7A</color>
+    <color name="learning_hard_bg">#33F59E0B</color>
+    <color name="learning_hard_stroke">#66F59E0B</color>
+    <color name="learning_hard_text">#FFC86A</color>
+    <color name="learning_good_bg">#334B8DFF</color>
+    <color name="learning_good_stroke">#664B8DFF</color>
+    <color name="learning_good_text">#8AB5FF</color>
+    <color name="learning_easy_bg">#3322C55E</color>
+    <color name="learning_easy_stroke">#6622C55E</color>
+    <color name="learning_easy_text">#66E398</color>
+</resources>

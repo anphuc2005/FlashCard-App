@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="statistics_screen_padding_vertical">12dp</dimen>
+    <dimen name="statistics_screen_padding_bottom">132dp</dimen>
+    <dimen name="statistics_content_padding_horizontal">14dp</dimen>
+</resources>

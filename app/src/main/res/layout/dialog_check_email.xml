@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="18dp"
+    android:background="@drawable/bg_dialog_round">
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_info"
+        android:padding="15dp"
+        android:background="@drawable/bg_circle_soft_blue"/>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Kiểm tra email"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="#1C1F2E"/>
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="Chúng tôi đã gửi mã xác minh đến email của bạn. Vui lòng kiểm tra hộp thư (và cả thư rác)."
+        android:textSize="14sp"
+        android:textColor="#55627A"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOk"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="18dp"
+        android:text="Đã hiểu"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:backgroundTint="#0A63E8"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="22dp"/>
+
+    <TextView
+        android:id="@+id/btnResend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Gửi lại mã xác minh"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="#0A63E8"/>
+</LinearLayout>
