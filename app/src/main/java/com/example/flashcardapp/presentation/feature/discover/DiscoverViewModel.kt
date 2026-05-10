@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+const val DISCOVER_OFFLINE_MODE_MESSAGE = "Đang ở chế độ offline"
+private const val OFFLINE_DECK_NAME_PREFIX = "Bộ thẻ đã lưu"
+
 class DiscoverViewModel(
     private val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase,
     private val getAllCategoriesUseCase: GetAllCategoriesUseCase,
@@ -78,13 +81,13 @@ class DiscoverViewModel(
                 if (categoryResult.isSuccess) {
                     _categories.value = categoryResult.getOrNull() ?: emptyList()
                 } else {
-                    _error.value = categoryResult.exceptionOrNull()?.message
+                    _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
                 }
 
                 loadCoursesPage(page = 0)
 
             } catch (e: Exception) {
-                _error.value = e.message
+                _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
             } finally {
                 _isLoading.value = false
             }
@@ -219,12 +222,15 @@ class DiscoverViewModel(
             val pageResult = deckResult.getOrDefault(DeckExplorePage())
             latestPage = pageResult
             allCourses = pageResult.content
+            if (pageResult.content.any(::isOfflineDeck)) {
+                _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
+            }
             _isShowingAllCourses.value = false
             _currentCoursePage.value = (pageResult.currentPage + 1).coerceAtLeast(1)
             _totalCoursePages.value = pageResult.totalPages.coerceAtLeast(1)
             applyFilters()
         } else {
-            _error.value = deckResult.exceptionOrNull()?.message
+            _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
             if (!preserveOnFailure) {
                 latestPage = DeckExplorePage()
                 allCourses = emptyList()
@@ -269,7 +275,7 @@ class DiscoverViewModel(
         )
 
         if (firstPageResult.isFailure) {
-            _error.value = firstPageResult.exceptionOrNull()?.message
+            _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
             if (!preserveOnFailure) {
                 latestPage = DeckExplorePage()
                 allCourses = emptyList()
@@ -293,7 +299,7 @@ class DiscoverViewModel(
                     query = searchQuery.takeIf { it.isNotBlank() }
                 )
                 if (nextPageResult.isFailure) {
-                    _error.value = nextPageResult.exceptionOrNull()?.message
+                    _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
                     break
                 }
                 combinedCourses += nextPageResult.getOrDefault(DeckExplorePage()).content
@@ -302,6 +308,9 @@ class DiscoverViewModel(
 
         latestPage = firstPage
         allCourses = combinedCourses.distinctBy { it.id }
+        if (allCourses.any(::isOfflineDeck)) {
+            _error.value = DISCOVER_OFFLINE_MODE_MESSAGE
+        }
         _isShowingAllCourses.value = true
         _currentCoursePage.value = 1
         _totalCoursePages.value = totalPages
@@ -313,5 +322,14 @@ class DiscoverViewModel(
             .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
             .replace('đ', 'd')
             .trim()
+    }
+    fun clearError() {
+        _error.value = null
+    }
+
+    private fun isOfflineDeck(deck: Deck): Boolean {
+        return deck.categoryId == null &&
+            deck.cards.isNotEmpty() &&
+            deck.name.startsWith(OFFLINE_DECK_NAME_PREFIX)
     }
 }

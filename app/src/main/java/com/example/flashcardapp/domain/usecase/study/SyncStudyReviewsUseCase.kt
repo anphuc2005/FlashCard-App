@@ -6,7 +6,6 @@ class SyncStudyReviewsUseCase(
     private val studyRepository: StudyRepository
 ) {
     suspend operator fun invoke(): Result<Int> {
-//        return studyRepository.syncReviews()
-        return Result.success(0)
+        return studyRepository.syncReviews()
     }
 }
