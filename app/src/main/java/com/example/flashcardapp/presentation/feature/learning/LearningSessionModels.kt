@@ -76,6 +76,7 @@ data class LearningUiState(
     val isSessionStarted: Boolean = false,
     val isCompleted: Boolean = false,
     val isTimeExpired: Boolean = false,
+    val isOfflineMode: Boolean = false,
     val timeRemainingSeconds: Long? = null,
     val result: LearningResult = LearningResult()
 ) {

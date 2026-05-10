@@ -22,6 +22,7 @@ import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConf
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReportDeckDialog
 import com.example.flashcardapp.presentation.common.notification.showAppError
 import com.example.flashcardapp.presentation.common.notification.showAppSuccess
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
 import com.example.flashcardapp.presentation.feature.learning.LearningActivity
 import com.example.flashcardapp.domain.model.Category
 import kotlinx.coroutines.flow.collectLatest
@@ -219,7 +220,14 @@ class DiscoverFragment : Fragment() {
                 }
                 launch {
                     viewModel.error.collectLatest { error ->
-                        error?.let { showAppError(it) }
+                        error?.let {
+                            if (it == DISCOVER_OFFLINE_MODE_MESSAGE) {
+                                showAppWarning(it)
+                            } else {
+                                showAppError(it)
+                            }
+                            viewModel.clearError()
+                        }
                     }
                 }
                 launch {

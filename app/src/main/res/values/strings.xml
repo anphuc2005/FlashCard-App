@@ -170,6 +170,7 @@
     <string name="stat_placeholder_cards">-- thẻ</string>
     <string name="learning_missing_deck">Không tìm thấy bộ thẻ để học</string>
     <string name="learning_deck_loading">Đang tải bộ thẻ</string>
+    <string name="learning_offline_deck_title">Bộ thẻ đã lưu</string>
     <string name="learning_deck_no_description">Chưa có mô tả cho bộ thẻ này.</string>
     <string name="learning_stat_total">TOTAL</string>
     <string name="learning_stat_learned">LEARNED</string>

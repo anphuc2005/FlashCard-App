@@ -118,6 +118,7 @@ class StudyRepository(
 
     suspend fun getSessionCards(deckId: String, mode: String): Result<List<FlashCard>> {
         return withContext(Dispatchers.IO) {
+            val cachedCards = getCachedCards(deckId, mode)
             try {
                 val response = studyApiService.getSessionCards(deckId, mode)
                 if (response.isSuccess() && response.data != null) {
@@ -128,16 +129,28 @@ class StudyRepository(
                     flashCardDao.insertAllCards(entities)
                     Result.success(normalizedCards)
                 } else {
-                    Result.failure(Exception(response.message ?: "Failed to load study session"))
+                    if (cachedCards.isNotEmpty()) {
+                        Result.success(cachedCards)
+                    } else {
+                        Result.failure(Exception(response.message ?: "Failed to load study session"))
+                    }
                 }
             } catch (e: Exception) {
-                val cachedCards =
-                    flashCardDao.getCardsSnapshotByDeckId(deckId).map { it.toDomain() }
                 if (cachedCards.isNotEmpty()) {
-                    Result.success(buildOfflineSession(cachedCards, mode))
+                    Result.success(cachedCards)
                 } else {
                     Result.failure(e)
                 }
+            }
+        }
+    }
+
+    suspend fun getCachedSessionCards(deckId: String, mode: String): Result<List<FlashCard>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Result.success(getCachedCards(deckId, mode))
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
     }
@@ -243,30 +256,30 @@ class StudyRepository(
         }
     }
 
-//                    suspend fun syncReviews(): Result<Int> {
-//                        return withContext(Dispatchers.IO) {
-//                            try {
-//                                val unsyncedReviews = studyReviewDao.getUnsyncedReviews()
-//                                if (unsyncedReviews.isEmpty()) {
-//                                    return@withContext Result.success(0)
-//                                }
-//
-//                                val reviews = unsyncedReviews.map { it.toDomain() }
-//                                val response = studyApiService.syncReviews(reviews.map { it.toDto() })
-//
-//                                if (response.isSuccess() && response.data != null) {
-//                                    val syncedReviews = unsyncedReviews.map { it.copy(isSynced = true) }
-//                                    studyReviewDao.insertReviews(syncedReviews)
-//                                    saveLastSyncTime(response.data.syncedAt)
-//                                    Result.success(unsyncedReviews.size)
-//                                } else {
-//                                    Result.failure(Exception(response.message ?: "Failed to sync study reviews"))
-//                                }
-//                            } catch (e: Exception) {
-//                                Result.failure(e)
-//                            }
-//                        }
-//                    }
+    suspend fun syncReviews(): Result<Int> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val unsyncedReviews = studyReviewDao.getUnsyncedReviews()
+                if (unsyncedReviews.isEmpty()) {
+                    return@withContext Result.success(0)
+                }
+
+                val reviews = unsyncedReviews.map { it.toDomain() }
+                val response = studyApiService.syncReviews(reviews.map { it.toDto() })
+
+                if (response.isSuccess() && response.data != null) {
+                    val syncedReviews = unsyncedReviews.map { it.copy(isSynced = true) }
+                    studyReviewDao.insertReviews(syncedReviews)
+                    saveLastSyncTime(response.data.syncedAt)
+                    Result.success(unsyncedReviews.size)
+                } else {
+                    Result.failure(Exception(response.message ?: "Failed to sync study reviews"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 
     fun getCurrentStreak(): Int {
         return StudyStreakStore.getSnapshot(applicationContext).currentStreak
@@ -299,6 +312,13 @@ class StudyRepository(
 
             else -> cards
         }
+    }
+
+    private suspend fun getCachedCards(deckId: String, mode: String): List<FlashCard> {
+        return flashCardDao
+            .getCardsSnapshotByDeckId(deckId)
+            .map { it.toDomain() }
+            .let { buildOfflineSession(it, mode) }
     }
 
     fun isDueForReview(nextReviewDate: String?, now: Instant): Boolean {

@@ -38,6 +38,7 @@ import com.example.flashcardapp.domain.usecase.profile.GetMyProfileUseCase
 import com.example.flashcardapp.domain.usecase.profile.UpdateMyProfileUseCase
 import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
 import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetCachedStudySessionCardsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetCurrentStudyStreakUseCase
 import com.example.flashcardapp.domain.usecase.study.GetRecentStudySessionUseCase
@@ -77,7 +78,13 @@ class AppContainer(private val applicationContext: Context) {
     }
 
     val deckRepository: DeckRepository by lazy {
-        DeckRepository(RetrofitClient.deckApiService)
+        val database = FlashCardDatabase.getInstance(applicationContext)
+        DeckRepository(
+            deckApiService = RetrofitClient.deckApiService,
+            flashCardDao = database.flashCardDao(),
+            cardApiService = RetrofitClient.cardApiService,
+            deckDao = database.deckDao()
+        )
     }
 
     val categoryRepository: CategoryRepository by lazy {
@@ -215,6 +222,7 @@ class AppContainer(private val applicationContext: Context) {
         val studyUseCases: StudyUseCases by lazy {
             StudyUseCases(
                 getSessionCards = GetStudySessionCardsUseCase(studyRepository),
+                getCachedSessionCards = GetCachedStudySessionCardsUseCase(studyRepository),
                 getRecentSession = GetRecentStudySessionUseCase(studyRepository),
                 getSessionByDeck = GetStudySessionByDeckUseCase(studyRepository),
                 saveSessionState = SaveStudySessionStateUseCase(studyRepository),

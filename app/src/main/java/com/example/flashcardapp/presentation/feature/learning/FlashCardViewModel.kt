@@ -1,6 +1,9 @@
 package com.example.flashcardapp.presentation.feature.learning
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,15 +41,37 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
     private var sessionStartedAt: Long = 0L
     private var currentCardPresentedAtMillis: Long = 0L
     private var timerJob: Job? = null
+    private var deckLoadJob: Job? = null
+    private var networkReloadJob: Job? = null
+    private val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
+    private var wasNetworkAvailable = isNetworkAvailable()
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+            handleNetworkAvailabilityChanged(hasValidatedInternet(networkCapabilities))
+        }
 
-    fun loadDeck(deckId: String) {
-        if (_uiState.value.deckId == deckId && _uiState.value.cards.isNotEmpty()) {
+        override fun onLost(network: Network) {
+            handleNetworkAvailabilityChanged(isNetworkAvailable())
+        }
+    }
+
+    init {
+        runCatching {
+            connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        }.onFailure { throwable ->
+            Log.e(TAG, "register network callback failed: ${throwable.message}", throwable)
+        }
+    }
+
+    fun loadDeck(deckId: String, forceRefresh: Boolean = false) {
+        if (!forceRefresh && _uiState.value.deckId == deckId && _uiState.value.cards.isNotEmpty()) {
             Log.d(TAG, "loadDeck skipped: deckId=$deckId already loaded with ${_uiState.value.cards.size} cards")
             return
         }
 
-        viewModelScope.launch {
-            Log.d(TAG, "loadDeck started: deckId=$deckId")
+        deckLoadJob?.cancel()
+        deckLoadJob = viewModelScope.launch {
+            Log.d(TAG, "loadDeck started: deckId=$deckId, forceRefresh=$forceRefresh")
             timerJob?.cancel()
             syncPendingReviews()
             _uiState.value = _uiState.value.copy(
@@ -57,40 +82,83 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 isCompleted = false,
                 isSessionStarted = false,
                 isTimeExpired = false,
+                isOfflineMode = false,
                 timeRemainingSeconds = null
             )
+
+            val reviewedCardIds = studyUseCases.getReviewedCardIds(deckId).getOrDefault(emptySet())
+            val cachedCards = studyUseCases
+                .getCachedSessionCards(deckId, LearningStudyMode.SEQUENTIAL.sessionMode)
+                .getOrDefault(emptyList())
+            if (cachedCards.isNotEmpty() && !forceRefresh) {
+                val defaultLimit = min(DEFAULT_LEARNING_CARD_LIMIT, cachedCards.size.coerceAtLeast(1))
+                _uiState.value = _uiState.value.copy(
+                    deck = buildOfflineDeck(deckId, cachedCards),
+                    cards = cachedCards,
+                    reviewedCardIds = reviewedCardIds,
+                    sessionCards = emptyList(),
+                    settings = _uiState.value.settings.copy(cardLimit = defaultLimit),
+                    currentIndex = 0,
+                    ratings = emptyMap(),
+                    isLoading = false,
+                    errorMessage = null,
+                    isCompleted = false,
+                    isSessionStarted = false,
+                    isTimeExpired = false,
+                    isOfflineMode = !isNetworkAvailable(),
+                    timeRemainingSeconds = null,
+                    result = LearningResult()
+                )
+                Log.d(TAG, "loadDeck rendered cached cards first: deckId=$deckId, cards=${cachedCards.size}")
+            }
 
             val deckResult = getDeckByIdUseCase(deckId)
             // Use study/session API for learning module pre-load.
             val cardsResult = studyUseCases.getSessionCards(deckId, LearningStudyMode.SEQUENTIAL.sessionMode)
-            val reviewedCardIds = studyUseCases.getReviewedCardIds(deckId).getOrDefault(emptySet())
             logDeckAndCardsResult(deckId, deckResult.getOrNull(), deckResult.exceptionOrNull(), cardsResult.getOrNull(), cardsResult.exceptionOrNull(), reviewedCardIds.size)
 
-            val deck = deckResult.getOrNull()
+            val cards = cardsResult.getOrDefault(cachedCards)
+            val deck = deckResult.getOrNull() ?: if (cards.isNotEmpty()) {
+                _uiState.value.deck ?: buildOfflineDeck(deckId, cards)
+            } else {
+                null
+            }
             if (cardsResult.isFailure) {
                 Log.e(
                     TAG,
                     "loadDeck failed to fetch cards: deckId=$deckId, message=${cardsResult.exceptionOrNull()?.message}",
                     cardsResult.exceptionOrNull()
                 )
+                if (cachedCards.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        deck = deck,
+                        cards = cachedCards,
+                        reviewedCardIds = reviewedCardIds,
+                        isLoading = false,
+                        isOfflineMode = true,
+                        errorMessage = null
+                    )
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(
                     deck = deck,
                     cards = emptyList(),
                     reviewedCardIds = reviewedCardIds,
                     sessionCards = emptyList(),
                     isLoading = false,
+                    isOfflineMode = !isNetworkAvailable(),
                     errorMessage = cardsResult.exceptionOrNull()?.message
                         ?: stringRes(R.string.learning_load_cards_error)
                 )
                 return@launch
             }
 
-            val cards = cardsResult.getOrDefault(emptyList())
             val defaultLimit = min(DEFAULT_LEARNING_CARD_LIMIT, cards.size.coerceAtLeast(1))
             val currentState = _uiState.value
+            val isOfflineResult = !isNetworkAvailable() && cards.isNotEmpty()
             Log.d(
                 TAG,
-                "loadDeck completed: deckId=$deckId, deckFound=${deck != null}, cards=${cards.size}, reviewed=${reviewedCardIds.size}, defaultLimit=$defaultLimit"
+                "loadDeck completed: deckId=$deckId, deckFound=${deck != null}, cards=${cards.size}, reviewed=${reviewedCardIds.size}, defaultLimit=$defaultLimit, offline=$isOfflineResult"
             )
             _uiState.value = currentState.copy(
                 deck = deck,
@@ -101,10 +169,11 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 currentIndex = 0,
                 ratings = emptyMap(),
                 isLoading = false,
-                errorMessage = deckResult.exceptionOrNull()?.message,
+                errorMessage = if (cards.isEmpty()) deckResult.exceptionOrNull()?.message else null,
                 isCompleted = false,
                 isSessionStarted = false,
                 isTimeExpired = false,
+                isOfflineMode = isOfflineResult,
                 timeRemainingSeconds = null,
                 result = LearningResult()
             )
@@ -245,6 +314,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                     Log.e(TAG, "startSession failed: no fallback cards available for deckId=$deckId")
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
+                        isOfflineMode = !isNetworkAvailable(),
                         errorMessage = sourceCards.exceptionOrNull()?.message
                             ?: stringRes(R.string.learning_load_cards_error)
                     )
@@ -271,6 +341,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 )
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
+                    isOfflineMode = !isNetworkAvailable(),
                     errorMessage = when (effectiveMode) {
                         LearningStudyMode.SPACED_REPETITION -> stringRes(R.string.learning_due_completed)
                         else -> stringRes(R.string.learning_session_empty)
@@ -290,6 +361,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 Log.w(TAG, "startSession aborted: sessionCards empty after take, deckId=$deckId, cardLimit=$effectiveCardLimit")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
+                    isOfflineMode = !isNetworkAvailable(),
                     errorMessage = stringRes(R.string.learning_no_cards)
                 )
                 onSessionReady(false)
@@ -297,9 +369,10 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             }
 
             sessionStartedAt = System.currentTimeMillis()
+            val isOfflineSource = !isNetworkAvailable() && sourceCards.getOrDefault(emptyList()).isNotEmpty()
             Log.d(
                 TAG,
-                "startSession ready: deckId=$deckId, sessionCards=${sessionCards.size}, firstCardId=${sessionCards.firstOrNull()?.id}, timer=${initialTimeRemainingSeconds(state.settings)}"
+                "startSession ready: deckId=$deckId, sessionCards=${sessionCards.size}, firstCardId=${sessionCards.firstOrNull()?.id}, timer=${initialTimeRemainingSeconds(state.settings)}, offline=$isOfflineSource"
             )
             _uiState.value = _uiState.value.copy(
                 sessionCards = sessionCards,
@@ -309,6 +382,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 isSessionStarted = true,
                 isCompleted = false,
                 isTimeExpired = false,
+                isOfflineMode = isOfflineSource,
                 reviewedCardIds = reviewedCardIds,
                 settings = _uiState.value.settings.copy(mode = effectiveMode, filter = effectiveFilter),
                 timeRemainingSeconds = initialTimeRemainingSeconds(
@@ -491,7 +565,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         val orderedCards = when (mode) {
             LearningStudyMode.RANDOM,
             LearningStudyMode.TIME_ATTACK -> cards.shuffled()
-            LearningStudyMode.SEQUENTIAL,
+            LearningStudyMode.SEQUENTIAL -> cards
             LearningStudyMode.SPACED_REPETITION -> buildSpacedRepetitionFallback(cards)
         }
         val resumeOrderedCards = applyCardSequenceIfAvailable(orderedCards, forcedCardSequence)
@@ -519,6 +593,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
             isSessionStarted = true,
             isCompleted = false,
             isTimeExpired = false,
+            isOfflineMode = true,
             reviewedCardIds = reviewedCardIds,
             settings = _uiState.value.settings.copy(mode = mode),
             timeRemainingSeconds = initialTimeRemainingSeconds(state.settings.copy(mode = mode)),
@@ -678,8 +753,55 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    private fun handleNetworkAvailabilityChanged(isAvailable: Boolean) {
+        val wasAvailable = wasNetworkAvailable
+        wasNetworkAvailable = isAvailable
+        if (!wasAvailable && isAvailable) {
+            reloadOfflineScreenAfterNetworkRestored()
+        }
+    }
+
+    private fun reloadOfflineScreenAfterNetworkRestored() {
+        val state = _uiState.value
+        val deckId = state.deckId
+        if (!state.isOfflineMode || deckId.isNullOrBlank()) return
+
+        networkReloadJob?.cancel()
+        networkReloadJob = viewModelScope.launch {
+            Log.d(
+                TAG,
+                "network restored while offline: deckId=$deckId, sessionStarted=${state.isSessionStarted}"
+            )
+            if (state.isSessionStarted) {
+                syncPendingReviews()
+                _uiState.value = _uiState.value.copy(isOfflineMode = false)
+            } else {
+                loadDeck(deckId, forceRefresh = true)
+            }
+        }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        return hasValidatedInternet(connectivityManager.getNetworkCapabilities(activeNetwork))
+    }
+
+    private fun hasValidatedInternet(capabilities: NetworkCapabilities?): Boolean {
+        return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
+
     private fun stringRes(resId: Int): String {
         return getApplication<FlashcardApp>().getString(resId)
+    }
+
+    private fun buildOfflineDeck(deckId: String, cards: List<FlashCard>): Deck {
+        return Deck(
+            id = deckId,
+            categoryId = null,
+            name = stringRes(R.string.learning_offline_deck_title),
+            customCardCount = cards.size
+        )
     }
 
     private fun logDeckAndCardsResult(
@@ -697,6 +819,14 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     override fun onCleared() {
+        runCatching {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+        }.onFailure { throwable ->
+            Log.e(TAG, "unregister network callback failed: ${throwable.message}", throwable)
+        }
+        deckLoadJob?.cancel()
+        networkReloadJob?.cancel()
+        timerJob?.cancel()
         super.onCleared()
     }
 }
