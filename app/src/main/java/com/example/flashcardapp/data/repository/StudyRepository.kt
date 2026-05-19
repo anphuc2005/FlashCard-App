@@ -2,6 +2,7 @@ package com.example.flashcardapp.data.repository
 
 import android.content.Context
 import android.util.Log
+import com.example.flashcardapp.data.datasource.local.OfflineCardImageStore
 import com.example.flashcardapp.data.datasource.local.dao.FlashCardDao
 import com.example.flashcardapp.data.datasource.local.dao.StudyReviewDao
 import com.example.flashcardapp.data.datasource.local.entity.FlashCardEntity
@@ -33,6 +34,7 @@ class StudyRepository(
     private val studyApiService: StudyApiService,
     private val studyReviewDao: StudyReviewDao,
     private val flashCardDao: FlashCardDao,
+    private val offlineCardImageStore: OfflineCardImageStore,
     private val applicationContext: Context
 ) {
 
@@ -122,9 +124,11 @@ class StudyRepository(
             try {
                 val response = studyApiService.getSessionCards(deckId, mode)
                 if (response.isSuccess() && response.data != null) {
-                    val normalizedCards = response.data.map { dto ->
-                        dto.toDomain().copy(deckId = deckId)
-                    }
+                    val normalizedCards = offlineCardImageStore.cacheImages(
+                        response.data.map { dto ->
+                            dto.toDomain().copy(deckId = deckId)
+                        }
+                    )
                     val entities = normalizedCards.map { it.toEntity(isSynced = true) }
                     flashCardDao.insertAllCards(entities)
                     Result.success(normalizedCards)
@@ -334,6 +338,7 @@ class StudyRepository(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
+            localImagePath = localImagePath,
             deckId = deckId,
             interval = interval,
             repetition = repetition,
@@ -349,6 +354,7 @@ class StudyRepository(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
+            localImagePath = localImagePath,
             deckId = deckId,
             interval = interval,
             repetition = repetition,

@@ -2,6 +2,7 @@ package com.example.flashcardapp.data.repository
 
 import com.example.flashcardapp.data.datasource.local.dao.DeckDao
 import com.example.flashcardapp.data.datasource.local.dao.FlashCardDao
+import com.example.flashcardapp.data.datasource.local.OfflineCardImageStore
 import com.example.flashcardapp.data.datasource.local.entity.DeckEntity
 import com.example.flashcardapp.data.datasource.local.entity.FlashCardEntity
 import com.example.flashcardapp.data.datasource.remote.api.CardApiService
@@ -22,7 +23,8 @@ class DeckRepository(
     private val deckApiService: DeckApiService,
     private val flashCardDao: FlashCardDao? = null,
     private val cardApiService: CardApiService? = null,
-    private val deckDao: DeckDao? = null
+    private val deckDao: DeckDao? = null,
+    private val offlineCardImageStore: OfflineCardImageStore? = null
 ) {
 
     suspend fun getAllDecksFromApi(): Result<List<Deck>> {
@@ -31,8 +33,9 @@ class DeckRepository(
                 val response = deckApiService.getAllDecks()
                 if (response.isSuccess() && response.data != null) {
                     val decks = enrichDecksWithCardCount(response.data.map { it.toDomain() })
-                    cacheDecks(decks)
-                    Result.success(decks)
+                    val offlineReadyDecks = cacheDecksForOffline(decks)
+                    cacheDecks(offlineReadyDecks)
+                    Result.success(offlineReadyDecks)
                 } else {
                     cachedDecksOrFailure(Exception(response.message ?: "Unknown error"))
                 }
@@ -48,8 +51,13 @@ class DeckRepository(
                 val response = deckApiService.getDeckById(id)
                 if (response.isSuccess() && response.data != null) {
                     val deck = enrichDeckWithCardCount(response.data.toDomain())
-                    cacheDeck(deck)
-                    Result.success(deck)
+                    val offlineReadyDeck = cacheDeckForOffline(deck)
+                    if (offlineReadyDeck != null) {
+                        cacheDeck(offlineReadyDeck)
+                        Result.success(offlineReadyDeck)
+                    } else {
+                        cachedDeckByIdOrFailure(id, Exception("Deck cards are not ready for offline use"))
+                    }
                 } else {
                     cachedDeckByIdOrFailure(id, Exception(response.message ?: "Unknown error"))
                 }
@@ -270,6 +278,7 @@ class DeckRepository(
         val metadataDecks = deckDao
             ?.getAllDecksSnapshot()
             .orEmpty()
+            .filter { deckEntity -> cardsByDeckId[deckEntity.id].orEmpty().isNotEmpty() }
             .map { deckEntity ->
                 val cards = cardsByDeckId[deckEntity.id].orEmpty().map { it.toDomain() }
                 deckEntity.toDomain(
@@ -305,6 +314,27 @@ class DeckRepository(
         if (decks.isNotEmpty()) {
             deckDao?.insertDecks(decks.map { it.toEntity() })
         }
+    }
+
+    private suspend fun cacheDecksForOffline(decks: List<Deck>): List<Deck> = coroutineScope {
+        decks.map { deck ->
+            async { cacheDeckForOffline(deck) }
+        }.awaitAll().filterNotNull()
+    }
+
+    private suspend fun cacheDeckForOffline(deck: Deck): Deck? {
+        val localCount = flashCardDao
+            ?.getCardCountByDeckId(deck.id)
+            ?: 0
+        val downloadedCount = cacheDeckCards(deck.id)
+        if (downloadedCount == null && localCount == 0) {
+            deckDao?.deleteDeckById(deck.id)
+            return null
+        }
+        val resolvedCount = downloadedCount
+            ?: localCount.takeIf { it > 0 }
+            ?: (deck.customCardCount ?: deck.cards.size).coerceAtLeast(0)
+        return deck.copy(customCardCount = resolvedCount)
     }
 
     private fun DeckEntity.toDomain(
@@ -345,6 +375,7 @@ class DeckRepository(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
+            localImagePath = localImagePath,
             deckId = deckId,
             interval = interval,
             repetition = repetition,
@@ -359,9 +390,13 @@ class DeckRepository(
         return runCatching {
             val response = api.getCardOfDeck(deckId)
             if (response.isSuccess() && response.data != null) {
-                val cards = response.data.map { dto ->
+                val remoteCards = response.data.map { dto ->
                     dto.toDomain().copy(deckId = deckId).toEntity(isSynced = true)
                 }
+                val cards = offlineCardImageStore
+                    ?.cacheImages(remoteCards.map { it.toDomain() })
+                    ?.map { it.toEntity(isSynced = true) }
+                    ?: remoteCards
                 if (cards.isNotEmpty()) {
                     dao.insertAllCards(cards)
                 }
@@ -378,6 +413,7 @@ class DeckRepository(
             question = question,
             answer = answer,
             imageUrl = imageUrl,
+            localImagePath = localImagePath,
             deckId = deckId,
             interval = interval,
             repetition = repetition,

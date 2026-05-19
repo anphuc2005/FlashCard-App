@@ -61,6 +61,11 @@ class StatisticFragment : Fragment() {
         loadUserAvatar(forceRefresh = false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshData()
+    }
+
     private fun setupAdapters() {
         achievementAdapter = StatisticAchievementAdapter()
         binding.rvBadges.apply {

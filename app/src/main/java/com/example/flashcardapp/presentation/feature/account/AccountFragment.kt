@@ -331,16 +331,19 @@ class AccountFragment : Fragment() {
         )
         dialog.listener = object : AppConfirmDialog.Listener {
             override fun onConfirm() {
-                val container = (requireActivity().application as FlashcardApp).container
-                container.profileRepository.clearCachedProfile()
-                val sessionManager = container.sessionManager
-                sessionManager.clearLoginSession()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val container = (requireActivity().application as FlashcardApp).container
+                    container.profileRepository.clearCachedProfile()
+                    container.clearAccountLocalCache()
+                    val sessionManager = container.sessionManager
+                    sessionManager.clearLoginSession()
 
-                val intent = Intent(requireContext(), AuthActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    putExtra("OPEN_LOGIN", true)
+                    val intent = Intent(requireContext(), AuthActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        putExtra("OPEN_LOGIN", true)
+                    }
+                    startActivity(intent)
                 }
-                startActivity(intent)
             }
         }
         dialog.show(childFragmentManager, "logout_confirm")

@@ -1,6 +1,8 @@
 package com.example.flashcardapp.data.repository
 
 import android.util.Log
+import com.example.flashcardapp.data.datasource.local.dao.UserProfileDao
+import com.example.flashcardapp.data.datasource.local.entity.toEntity
 import com.example.flashcardapp.data.datasource.remote.api.ProfileApiService
 import com.example.flashcardapp.data.datasource.remote.model.profile.UpdateProfileRequest
 import com.example.flashcardapp.data.datasource.remote.model.profile.toDomain
@@ -10,6 +12,7 @@ import kotlinx.coroutines.withContext
 
 class ProfileRepository(
     private val profileApiService: ProfileApiService,
+    private val userProfileDao: UserProfileDao,
     private val sessionTokenProvider: () -> String?
 ) {
 
@@ -36,6 +39,13 @@ class ProfileRepository(
         cachedSessionKey = null
     }
 
+    suspend fun clearLocalProfile() {
+        clearCachedProfile()
+        withContext(Dispatchers.IO) {
+            userProfileDao.deleteProfile()
+        }
+    }
+
     suspend fun getMyProfile(forceRefresh: Boolean = false): Result<UserProfile> {
         return withContext(Dispatchers.IO) {
             val currentSessionKey = currentSessionKey()
@@ -58,7 +68,7 @@ class ProfileRepository(
                 )
                 if (response.isSuccess() && response.data != null) {
                     val profile = response.data.toDomain()
-                    cacheProfile(profile, currentSessionKey)
+                    cacheProfile(profile, currentSessionKey, persistLocal = true)
                     Result.success(profile)
                 } else {
                     Log.w(TAG, "GET users/me returned invalid payload (data is null or non-success)")
@@ -70,7 +80,14 @@ class ProfileRepository(
                     Log.w(TAG, "GET users/me failed -> fallback to cached profile")
                     return@withContext Result.success(cachedProfile!!)
                 }
-                Result.failure(e)
+                val localProfile = userProfileDao.getProfile()?.toDomain()
+                if (localProfile != null) {
+                    Log.w(TAG, "GET users/me failed -> fallback to local profile")
+                    cacheProfile(localProfile, currentSessionKey, persistLocal = false)
+                    Result.success(localProfile)
+                } else {
+                    Result.failure(e)
+                }
             }
         }
     }
@@ -93,7 +110,7 @@ class ProfileRepository(
                 )
                 if (response.isSuccess() && response.data != null) {
                     val profile = response.data.toDomain()
-                    cacheProfile(profile, currentSessionKey)
+                    cacheProfile(profile, currentSessionKey, persistLocal = true)
                     Result.success(profile)
                 } else {
                     Log.w(TAG, "PATCH users/me returned invalid payload (data is null or non-success)")
@@ -116,8 +133,15 @@ class ProfileRepository(
         return cachedProfile != null && cachedSessionKey == sessionKey
     }
 
-    private fun cacheProfile(profile: UserProfile, sessionKey: String?) {
+    private suspend fun cacheProfile(
+        profile: UserProfile,
+        sessionKey: String?,
+        persistLocal: Boolean
+    ) {
         cachedProfile = profile
         cachedSessionKey = sessionKey
+        if (persistLocal) {
+            userProfileDao.upsertProfile(profile.toEntity())
+        }
     }
 }

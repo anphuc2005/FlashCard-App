@@ -31,4 +31,7 @@ interface DeckDao {
 
     @Query("DELETE FROM deck_table WHERE id = :id")
     suspend fun deleteDeckById(id: String)
+
+    @Query("DELETE FROM deck_table")
+    suspend fun deleteAllDecks()
 }

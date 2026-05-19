@@ -33,6 +33,9 @@ interface FlashCardDao {
     @Query("SELECT * FROM flashcard_table WHERE deckId = :deckId")
     suspend fun getCardsSnapshotByDeckId(deckId: String): List<FlashCardEntity>
 
+    @Query("SELECT COUNT(*) FROM flashcard_table WHERE deckId = :deckId")
+    suspend fun getCardCountByDeckId(deckId: String): Int
+
     @Query("SELECT * FROM flashcard_table")
     fun getAllCards(): Flow<List<FlashCardEntity>>
 
@@ -44,4 +47,7 @@ interface FlashCardDao {
 
     @Query("DELETE FROM flashcard_table WHERE deckId = :deckId")
     suspend fun deleteCardsByDeckId(deckId: String)
+
+    @Query("DELETE FROM flashcard_table")
+    suspend fun deleteAllCards()
 }

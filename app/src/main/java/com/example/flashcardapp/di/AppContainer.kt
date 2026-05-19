@@ -2,6 +2,7 @@ package com.example.flashcardapp.di
 
 import android.content.Context
 import com.example.flashcardapp.AppSessionManager
+import com.example.flashcardapp.data.datasource.local.OfflineCardImageStore
 import com.example.flashcardapp.data.datasource.local.database.FlashCardDatabase
 import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreImpl
 import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
@@ -53,6 +54,8 @@ import com.example.flashcardapp.domain.usecase.notification.GetNotificationsPage
 import com.example.flashcardapp.domain.usecase.notification.GetUnreadNotificationCountUseCase
 import com.example.flashcardapp.domain.usecase.notification.MarkNotificationReadUseCase
 import com.example.flashcardapp.domain.usecase.report.SubmitDeckReportUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Dependency Injection Container
@@ -72,6 +75,13 @@ class AppContainer(private val applicationContext: Context) {
         AuthSessionStoreImpl(sessionManager)
     }
 
+    private val offlineCardImageStore by lazy {
+        OfflineCardImageStore(
+            context = applicationContext,
+            accountKeyProvider = { sessionManager.accessToken }
+        )
+    }
+
     // 3. Repositories
     val authRepository by lazy {
         EmailAuthRepositoryImpl(RetrofitClient.authApiService, authSessionStore)
@@ -83,8 +93,18 @@ class AppContainer(private val applicationContext: Context) {
             deckApiService = RetrofitClient.deckApiService,
             flashCardDao = database.flashCardDao(),
             cardApiService = RetrofitClient.cardApiService,
-            deckDao = database.deckDao()
+            deckDao = database.deckDao(),
+            offlineCardImageStore = offlineCardImageStore
         )
+    }
+
+    suspend fun clearAccountLocalCache() = withContext(Dispatchers.IO) {
+        val database = FlashCardDatabase.getInstance(applicationContext)
+        database.studyReviewDao().deleteAllReviews()
+        database.flashCardDao().deleteAllCards()
+        database.deckDao().deleteAllDecks()
+        database.userProfileDao().deleteProfile()
+        offlineCardImageStore.clearAllImages()
     }
 
     val categoryRepository: CategoryRepository by lazy {
@@ -93,7 +113,11 @@ class AppContainer(private val applicationContext: Context) {
 
     val flashCardRepository: FlashCardRepository by lazy {
         val database = FlashCardDatabase.getInstance(applicationContext)
-        FlashCardRepository(RetrofitClient.cardApiService, database.flashCardDao())
+        FlashCardRepository(
+            RetrofitClient.cardApiService,
+            database.flashCardDao(),
+            offlineCardImageStore
+        )
     }
 
     val uploadRepository: UploadRepository by lazy {
@@ -101,8 +125,10 @@ class AppContainer(private val applicationContext: Context) {
     }
 
     val profileRepository: ProfileRepository by lazy {
+        val database = FlashCardDatabase.getInstance(applicationContext)
         ProfileRepository(
             profileApiService = RetrofitClient.profileApiService,
+            userProfileDao = database.userProfileDao(),
             sessionTokenProvider = { sessionManager.accessToken }
         )
     }
@@ -125,6 +151,7 @@ class AppContainer(private val applicationContext: Context) {
                 RetrofitClient.studyApiService,
                 database.studyReviewDao(),
                 database.flashCardDao(),
+                offlineCardImageStore,
                 applicationContext
             )
         }

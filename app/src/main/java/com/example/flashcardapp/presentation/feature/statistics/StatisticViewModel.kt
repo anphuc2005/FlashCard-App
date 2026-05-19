@@ -10,6 +10,7 @@ import com.example.flashcardapp.domain.model.statistics.DeckStatistics
 import com.example.flashcardapp.domain.model.statistics.StatisticsOverview
 import com.example.flashcardapp.domain.model.statistics.TimeStatistics
 import com.example.flashcardapp.presentation.feature.statistics.model.StatisticAchievementItem
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -29,11 +30,12 @@ class StatisticViewModel(
     val uiState: kotlinx.coroutines.flow.StateFlow<StatisticUiState> = _uiState
 
     private var activeRange: String = STAT_RANGE_WEEK
+    private var loadJob: Job? = null
     private val localAchievementPlaceholders = listOf(
-        achievementTemplate("first_study", "Khởi đầu", 0, 1, R.drawable.ic_book),
-        achievementTemplate("streak_7", "Chuyên cần", 0, 7, R.drawable.ic_fire),
-        achievementTemplate("review_100", "Ôn tập", 0, 100, R.drawable.ic_check),
-        achievementTemplate("deck_5", "Nhà sưu tầm", 0, 5, R.drawable.ic_deck)
+        achievementTemplate("first_study", "Khoi dau", 0, 1, R.drawable.ic_book),
+        achievementTemplate("streak_7", "Chuyen can", 0, 7, R.drawable.ic_fire),
+        achievementTemplate("review_100", "On tap", 0, 100, R.drawable.ic_check),
+        achievementTemplate("deck_5", "Nha suu tam", 0, 5, R.drawable.ic_deck)
     )
 
     init {
@@ -50,26 +52,26 @@ class StatisticViewModel(
     }
 
     private fun loadStatistics(range: String) {
-        val placeholderAchievements = if (_uiState.value.achievements.isEmpty()) {
+        loadJob?.cancel()
+        val current = _uiState.value
+        val placeholderAchievements = current.achievements.ifEmpty {
             localAchievementPlaceholders.take(FEATURED_ACHIEVEMENT_COUNT)
-        } else {
-            _uiState.value.achievements
         }
-        _uiState.value = _uiState.value.copy(
+        _uiState.value = current.copy(
             isLoading = true,
             errorMessage = null,
             achievements = placeholderAchievements,
-            allAchievements = if (_uiState.value.allAchievements.isEmpty()) localAchievementPlaceholders else _uiState.value.allAchievements
+            allAchievements = current.allAchievements.ifEmpty { localAchievementPlaceholders }
         )
 
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             val days = rangeToDays(range)
             val (dashboardResult, achievementsResult) = supervisorScope {
                 val dashboardDeferred = async { repository.getDashboard(days) }
                 val achievementsDeferred = async {
                     repository.getAchievements(featuredLimit = FEATURED_ACHIEVEMENT_COUNT)
                 }
-                Pair(dashboardDeferred.await(), achievementsDeferred.await())
+                dashboardDeferred.await() to achievementsDeferred.await()
             }
 
             dashboardResult.onSuccess { dashboard ->
@@ -78,16 +80,12 @@ class StatisticViewModel(
                     dashboard = dashboard
                 )
 
-                val overview = buildOverview(dashboard)
-                val timeStatistics = buildTimeStatistics(range, dashboard)
-                val deckStatistics = buildDeckStatistics(dashboard)
-
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     isInitialized = true,
-                    overview = overview,
-                    timeStatistics = timeStatistics,
-                    deckStatistics = deckStatistics,
+                    overview = buildOverview(dashboard),
+                    timeStatistics = buildTimeStatistics(range, dashboard),
+                    deckStatistics = buildDeckStatistics(dashboard),
                     achievements = allAchievements.take(FEATURED_ACHIEVEMENT_COUNT),
                     allAchievements = allAchievements,
                     errorMessage = null
@@ -113,25 +111,19 @@ class StatisticViewModel(
         }
 
         if (rangeResult.isFailure && achievementsResult.isFailure && decksResult.isFailure) {
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                isInitialized = true,
-                errorMessage = rangeResult.exceptionOrNull()?.message
-                    ?: achievementsResult.exceptionOrNull()?.message
-                    ?: decksResult.exceptionOrNull()?.message
-                    ?: "Không tải được dữ liệu thống kê"
-            )
+            keepExistingStatisticsOrShowEmptyState()
             return
         }
 
         val range = rangeResult.getOrNull()
+        val decks = decksResult.getOrDefault(emptyList())
         val overview = StatisticsOverview(
             userId = "me",
-            userName = "Bạn",
+            userName = "Ban",
             xpToday = range?.totalStudied ?: 0,
             streakDays = 0,
-            totalDecks = decksResult.getOrDefault(emptyList()).size,
-            totalCards = decksResult.getOrDefault(emptyList()).sumOf { it.totalCards },
+            totalDecks = decks.size,
+            totalCards = decks.sumOf { it.totalCards },
             learnedCards = range?.totalStudied ?: 0,
             unlearnedCards = 0,
             reviewCount = range?.reviewCardsStudied ?: 0,
@@ -150,7 +142,7 @@ class StatisticViewModel(
             totalStudyMinutes = range?.studyTimeMinutes ?: 0
         )
 
-        val deckStatistics = decksResult.getOrDefault(emptyList()).map {
+        val deckStatistics = decks.map {
             DeckStatistics(
                 deckId = it.deckId,
                 deckName = it.deckName,
@@ -176,6 +168,57 @@ class StatisticViewModel(
         )
     }
 
+    private fun keepExistingStatisticsOrShowEmptyState() {
+        val currentState = _uiState.value
+        _uiState.value = if (currentState.overview != null && currentState.timeStatistics != null) {
+            currentState.copy(
+                isLoading = false,
+                isInitialized = true,
+                errorMessage = null
+            )
+        } else {
+            currentState.copy(
+                isLoading = false,
+                isInitialized = true,
+                overview = emptyOverview(),
+                timeStatistics = emptyTimeStatistics(),
+                deckStatistics = emptyList(),
+                achievements = localAchievementPlaceholders.take(FEATURED_ACHIEVEMENT_COUNT),
+                allAchievements = localAchievementPlaceholders,
+                errorMessage = null
+            )
+        }
+    }
+
+    private fun emptyOverview(): StatisticsOverview {
+        return StatisticsOverview(
+            userId = "me",
+            userName = "Ban",
+            xpToday = 0,
+            streakDays = 0,
+            totalDecks = 0,
+            totalCards = 0,
+            learnedCards = 0,
+            unlearnedCards = 0,
+            reviewCount = 0,
+            accuracy = 0.0,
+            correctAnswers = 0,
+            wrongAnswers = 0
+        )
+    }
+
+    private fun emptyTimeStatistics(): TimeStatistics {
+        return TimeStatistics(
+            range = activeRange,
+            labels = emptyList(),
+            rawDates = emptyList(),
+            values = emptyList(),
+            totalStudySessions = 0,
+            totalReviewedCards = 0,
+            totalStudyMinutes = 0
+        )
+    }
+
     private fun resolveAchievements(
         fullAchievements: List<AchievementDto>?,
         dashboard: DashboardDataDto
@@ -192,7 +235,7 @@ class StatisticViewModel(
         val rangeSummary = dashboard.rangeSummary
         return StatisticsOverview(
             userId = "me",
-            userName = "Bạn",
+            userName = "Ban",
             xpToday = rangeSummary?.totalStudied ?: 0,
             streakDays = summary?.currentStreak ?: 0,
             totalDecks = dashboard.deckStatistics?.size ?: 0,

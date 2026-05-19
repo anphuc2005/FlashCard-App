@@ -18,6 +18,7 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.FragmentBackCardBinding
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Locale
 
 private const val SECONDS_PER_MINUTE = 60L
@@ -105,7 +106,7 @@ class BackCardFragment : Fragment() {
         }
         binding.btnSpeakAnswer.isEnabled = !card?.answer.isNullOrBlank()
         renderTimer(state.timeRemainingSeconds)
-        loadCardImage(card?.imageUrl)
+        loadCardImage(card?.localImagePath?.takeIf { File(it).exists() } ?: card?.imageUrl)
     }
 
     private fun rateCard(rating: LearningRating) {

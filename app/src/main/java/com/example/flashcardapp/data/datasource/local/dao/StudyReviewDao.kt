@@ -27,4 +27,7 @@ interface StudyReviewDao {
 
     @Query("DELETE FROM study_review_table WHERE id IN (:ids)")
     suspend fun deleteReviews(ids: List<String>)
+
+    @Query("DELETE FROM study_review_table")
+    suspend fun deleteAllReviews()
 }

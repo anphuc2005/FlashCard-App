@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.ItemLearningSessionPageBinding
 import com.example.flashcardapp.domain.model.FlashCard
+import java.io.File
 
 class LearningSessionPagerAdapter(
     private val onCardTapped: (position: Int) -> Unit,
@@ -95,7 +96,10 @@ class LearningSessionPagerAdapter(
                     onSpeakTapped(card.answer)
                 }
             }
-            if (card.imageUrl.isNullOrBlank()) {
+            val imageSource = card.localImagePath
+                ?.takeIf { File(it).exists() }
+                ?: card.imageUrl
+            if (imageSource.isNullOrBlank()) {
                 Glide.with(binding.root).clear(binding.cardImage)
                 binding.cardImage.setImageDrawable(null)
                 binding.cardImage.isVisible = false
@@ -104,7 +108,7 @@ class LearningSessionPagerAdapter(
                 binding.cardImage.isVisible = true
                 setAnswerLayoutForImage()
                 Glide.with(binding.root)
-                    .load(card.imageUrl)
+                    .load(imageSource)
                     .placeholder(R.drawable.test)
                     .error(R.drawable.test)
                     .centerCrop()
