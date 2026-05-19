@@ -12,7 +12,7 @@ class GoogleLoginUseCase(
         val result = authRepository.googleLogin(request)
         
         result.onSuccess {
-            authRepository.saveLoginSession(it.accessToken)
+            authRepository.saveLoginSession(it.accessToken, it.refreshToken)
         }
         
         return result

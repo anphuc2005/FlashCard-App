@@ -33,8 +33,16 @@ data class HomeUiState(
     val userGreeting: String = "",
     val userAvatarUrl: String? = null,
     val userProgress: Int = 0,
-    val userProgressRaw: Float = 0f
+    val userProgressRaw: Float = 0f,
+    val requiresLogin: Boolean = false,
+    val syncStatus: HomeSyncStatus = HomeSyncStatus.Synced
 )
+
+sealed class HomeSyncStatus {
+    object Synced : HomeSyncStatus()
+    object Offline : HomeSyncStatus()
+    data class Pending(val count: Int) : HomeSyncStatus()
+}
 
 data class ResumeSessionPayload(
     val mode: String,
@@ -50,6 +58,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val appContainer = (application as FlashcardApp).container
     private val deckRepository = appContainer.deckRepository
+    private val offlineSyncManager = appContainer.offlineSyncManager
     private val studyUseCases = appContainer.studyUseCases
     private val studyRepository = appContainer.studyRepository
     private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase =
@@ -69,6 +78,28 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         syncDecksFromApi()
+    }
+
+    fun refreshSessionState() {
+        val sessionManager = appContainer.sessionManager
+        _uiState.value = _uiState.value.copy(
+            requiresLogin = sessionManager.isAuthExpired || sessionManager.accessToken.isNullOrBlank()
+        )
+        refreshSyncStatus()
+    }
+
+    fun refreshSyncStatus() {
+        viewModelScope.launch {
+            val pendingCount = offlineSyncManager.getPendingChangeCount()
+            val isOnline = appContainer.networkMonitor.isCurrentlyOnline()
+            _uiState.value = _uiState.value.copy(
+                syncStatus = when {
+                    !isOnline -> HomeSyncStatus.Offline
+                    pendingCount > 0 -> HomeSyncStatus.Pending(pendingCount)
+                    else -> HomeSyncStatus.Synced
+                }
+            )
+        }
     }
 
     private fun publishDecks(
@@ -103,12 +134,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             userStreak = currentStreak,
             userProgress = formatProgressPercent(progressRaw),
             userProgressRaw = progressRaw,
+            requiresLogin = appContainer.sessionManager.isAuthExpired,
             error = null
         )
+        refreshSyncStatus()
     }
 
     private fun syncDecksFromApi() {
         viewModelScope.launch {
+            refreshSessionState()
+            if (_uiState.value.requiresLogin) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                return@launch
+            }
+            syncPendingStudyReviews()
             val recentSession = studyUseCases.getRecentSession().getOrNull()
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
@@ -281,6 +320,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshUnreadNotificationCount() {
         viewModelScope.launch {
+            if (appContainer.sessionManager.isAuthExpired) {
+                refreshSessionState()
+                return@launch
+            }
             getUnreadNotificationCountUseCase()
                 .onSuccess { count ->
                     _uiState.value = _uiState.value.copy(
@@ -295,6 +338,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             unreadNotificationCount = count.coerceAtLeast(0)
         )
     }
+
+    private suspend fun syncPendingStudyReviews() {
+        if (appContainer.sessionManager.isAuthExpired) return
+        offlineSyncManager.syncPending()
+        refreshSyncStatus()
+    }
+
 
     private suspend fun enrichDecksWithProgress(decks: List<Deck>): List<Deck> {
         val progressMap = HOME_PROGRESS_MODES

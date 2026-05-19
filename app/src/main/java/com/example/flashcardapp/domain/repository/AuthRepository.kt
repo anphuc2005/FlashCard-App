@@ -20,6 +20,6 @@ interface AuthRepository {
     suspend fun forgotPassword(request: ForgotPasswordRequest): Result<ForgotPasswordResponse>
     suspend fun verifyOtp(request: VerifyOtpRequest): Result<VerifyOtpResponse>
     suspend fun resetPassword(request: ResetPasswordRequest): Result<ResetPasswordResponse>
-    fun saveLoginSession(accessToken: String?)
+    fun saveLoginSession(accessToken: String?, refreshToken: String? = null)
     fun clearLoginSession()
 }

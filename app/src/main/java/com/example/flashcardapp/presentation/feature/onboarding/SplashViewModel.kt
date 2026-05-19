@@ -50,18 +50,27 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                         sessionManager.clearLoginSession()
                         SplashState.NavigateToLogin
                     }
-                    isSessionTokenValid() -> SplashState.NavigateToHome
-                    else -> SplashState.NavigateToLogin
+                    sessionManager.isAuthExpired -> SplashState.NavigateToLogin
+                    isSessionUsableForStartup() -> SplashState.NavigateToHome
+                    hasOfflineDeckData() -> SplashState.NavigateToHome
+                    else -> {
+                        sessionManager.clearLoginSession()
+                        SplashState.NavigateToLogin
+                    }
                 }
             }.getOrElse {
-                sessionManager.clearLoginSession()
-                SplashState.NavigateToLogin
+                if (!sessionManager.isAuthExpired && hasOfflineDeckData()) {
+                    SplashState.NavigateToHome
+                } else {
+                    sessionManager.clearLoginSession()
+                    SplashState.NavigateToLogin
+                }
             }
             _splashState.value = nextState
         }
     }
 
-    private suspend fun isSessionTokenValid(): Boolean {
+    private suspend fun isSessionUsableForStartup(): Boolean {
         val appContainer = (getApplication<Application>() as FlashcardApp).container
         val sessionManager = appContainer.sessionManager
         val result = runCatching {
@@ -81,13 +90,22 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
             is HttpException -> {
                 val unauthorized = throwable.code() == HTTP_UNAUTHORIZED || throwable.code() == HTTP_FORBIDDEN
                 if (unauthorized) {
-                    sessionManager.clearLoginSession()
+                    sessionManager.markAuthExpired()
                 }
-                !unauthorized
+                return false
             }
             is IOException -> true
             else -> true
         }
+    }
+
+    private suspend fun hasOfflineDeckData(): Boolean {
+        val appContainer = (getApplication<Application>() as FlashcardApp).container
+        return runCatching {
+            withContext(Dispatchers.IO) {
+                appContainer.deckRepository.hasOfflineDeckData()
+            }
+        }.getOrDefault(false)
     }
 
     private companion object {

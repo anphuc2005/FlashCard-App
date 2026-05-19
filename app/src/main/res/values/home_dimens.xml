@@ -41,4 +41,9 @@
     <dimen name="home_recent_header_margin_top">10dp</dimen>
     <dimen name="home_recent_list_margin_top">12dp</dimen>
     <dimen name="home_recent_list_padding_horizontal">2dp</dimen>
+    <dimen name="home_sync_banner_margin_top">12dp</dimen>
+    <dimen name="home_sync_banner_radius">12dp</dimen>
+    <dimen name="home_sync_banner_padding_horizontal">14dp</dimen>
+    <dimen name="home_sync_banner_padding_vertical">10dp</dimen>
+    <dimen name="home_sync_banner_text_size">13sp</dimen>
 </resources>

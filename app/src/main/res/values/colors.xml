@@ -158,4 +158,6 @@
     <color name="deck_swipe_delete_bg">#F37E33</color>
     <color name="deck_bulk_delete_active_bg">#E53935</color>
     <color name="password_strength_inactive">#E5E9F1</color>
+    <color name="home_sync_banner_background">#EAF2FF</color>
+    <color name="home_sync_banner_text">#1D4ED8</color>
 </resources>

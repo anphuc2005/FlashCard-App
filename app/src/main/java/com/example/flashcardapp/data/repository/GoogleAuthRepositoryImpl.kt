@@ -64,8 +64,8 @@ class GoogleAuthRepositoryImpl(
         return Result.failure(UnsupportedOperationException("Google Auth không hỗ trợ đặt lại mật khẩu"))
     }
 
-    override fun saveLoginSession(accessToken: String?) {
-        sessionStore.saveLoginSession(accessToken)
+    override fun saveLoginSession(accessToken: String?, refreshToken: String?) {
+        sessionStore.saveLoginSession(accessToken, refreshToken)
     }
 
     override fun clearLoginSession() {

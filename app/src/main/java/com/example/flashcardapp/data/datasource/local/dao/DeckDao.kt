@@ -20,15 +20,21 @@ interface DeckDao {
     @Update
     suspend fun updateDeck(deck: DeckEntity)
 
-    @Query("SELECT * FROM deck_table ORDER BY updatedAt DESC, createdAt DESC, name ASC")
+    @Query("SELECT * FROM deck_table WHERE isDeleted = 0 ORDER BY updatedAt DESC, createdAt DESC, name ASC")
     fun getAllDecks(): Flow<List<DeckEntity>>
 
-    @Query("SELECT * FROM deck_table ORDER BY updatedAt DESC, createdAt DESC, name ASC")
+    @Query("SELECT * FROM deck_table WHERE isDeleted = 0 ORDER BY updatedAt DESC, createdAt DESC, name ASC")
     suspend fun getAllDecksSnapshot(): List<DeckEntity>
 
-    @Query("SELECT * FROM deck_table WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM deck_table WHERE id = :id AND isDeleted = 0 LIMIT 1")
     suspend fun getDeckById(id: String): DeckEntity?
 
     @Query("DELETE FROM deck_table WHERE id = :id")
     suspend fun deleteDeckById(id: String)
+
+    @Query("SELECT * FROM deck_table WHERE isSynced = 0 ORDER BY updatedAt ASC, createdAt ASC")
+    suspend fun getUnsyncedDecks(): List<DeckEntity>
+
+    @Query("SELECT COUNT(*) FROM deck_table WHERE isSynced = 0")
+    suspend fun getUnsyncedDeckCount(): Int
 }

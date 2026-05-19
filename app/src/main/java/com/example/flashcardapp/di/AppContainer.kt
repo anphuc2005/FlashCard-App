@@ -2,6 +2,7 @@ package com.example.flashcardapp.di
 
 import android.content.Context
 import com.example.flashcardapp.AppSessionManager
+import com.example.flashcardapp.core.network.NetworkMonitor
 import com.example.flashcardapp.data.datasource.local.database.FlashCardDatabase
 import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreImpl
 import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
@@ -15,6 +16,7 @@ import com.example.flashcardapp.data.repository.ProfileRepository
 import com.example.flashcardapp.data.repository.ReportRepository
 import com.example.flashcardapp.data.repository.StatisticsRepository
 import com.example.flashcardapp.data.repository.UploadRepositoryImpl
+import com.example.flashcardapp.data.sync.OfflineSyncManager
 import com.example.flashcardapp.domain.repository.UploadRepository
 import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
 import com.example.flashcardapp.domain.usecase.auth.ForgotPasswordUseCase
@@ -62,9 +64,15 @@ class AppContainer(private val applicationContext: Context) {
 
     // 1. Core / Managers
     val sessionManager = AppSessionManager(applicationContext)
+    val networkMonitor = NetworkMonitor(applicationContext)
 
     init {
         RetrofitClient.tokenProvider = { sessionManager.accessToken }
+        RetrofitClient.refreshTokenProvider = { sessionManager.refreshToken }
+        RetrofitClient.tokenRefreshHandler = { accessToken, refreshToken ->
+            sessionManager.saveLoginSession(accessToken, refreshToken)
+        }
+        RetrofitClient.authExpiredHandler = { sessionManager.markAuthExpired() }
     }
 
     // 2. Data Stores
@@ -126,6 +134,16 @@ class AppContainer(private val applicationContext: Context) {
                 database.studyReviewDao(),
                 database.flashCardDao(),
                 applicationContext
+            )
+        }
+
+        val offlineSyncManager: OfflineSyncManager by lazy {
+            OfflineSyncManager(
+                networkMonitor = networkMonitor,
+                sessionManager = sessionManager,
+                deckRepository = deckRepository,
+                flashCardRepository = flashCardRepository,
+                studyRepository = studyRepository
             )
         }
 

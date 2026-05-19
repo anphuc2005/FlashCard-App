@@ -281,6 +281,12 @@ class StudyRepository(
         }
     }
 
+    suspend fun getPendingReviewCount(): Int {
+        return withContext(Dispatchers.IO) {
+            studyReviewDao.getUnsyncedReviewCount()
+        }
+    }
+
     fun getCurrentStreak(): Int {
         return StudyStreakStore.getSnapshot(applicationContext).currentStreak
     }

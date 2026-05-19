@@ -18,7 +18,7 @@ class LoginUseCase(private val repository: AuthRepository) {
         
         // Lưu session nếu đăng nhập thành công.
         result.onSuccess { response ->
-            repository.saveLoginSession(response.accessToken)
+            repository.saveLoginSession(response.accessToken, response.refreshToken)
         }
         
         return result

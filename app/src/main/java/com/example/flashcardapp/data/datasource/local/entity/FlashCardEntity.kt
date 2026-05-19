@@ -19,5 +19,8 @@ data class FlashCardEntity(
     val repetition: Int = 0,
     val easeFactor: Double = 2.5,
     val nextReviewDate: String? = null,
-    val isSynced: Boolean = true // Thêm trường này để đánh dấu đã đồng bộ với server hay chưa
+    val isSynced: Boolean = true,
+    val isDeleted: Boolean = false,
+    val createdAt: String? = null,
+    val updatedAt: String? = null
 )

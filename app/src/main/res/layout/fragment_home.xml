@@ -102,6 +102,20 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/textSyncStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/home_sync_banner_margin_top"
+            android:background="@drawable/bg_home_sync_banner"
+            android:paddingHorizontal="@dimen/home_sync_banner_padding_horizontal"
+            android:paddingVertical="@dimen/home_sync_banner_padding_vertical"
+            android:textColor="@color/home_sync_banner_text"
+            android:textSize="@dimen/home_sync_banner_text_size"
+            android:visibility="gone"
+            tools:text="@string/home_sync_pending"
+            tools:visibility="visible" />
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

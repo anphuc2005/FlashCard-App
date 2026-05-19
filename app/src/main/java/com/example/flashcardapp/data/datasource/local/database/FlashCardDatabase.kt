@@ -22,7 +22,7 @@ import com.example.flashcardapp.data.datasource.local.entity.StudyReviewEntity
         StudyReviewEntity::class,
         DeckEntity::class
     ],
-    version = 9,
+    version = 11,
     exportSchema = false
 )
 abstract class FlashCardDatabase : RoomDatabase() {
@@ -57,6 +57,22 @@ abstract class FlashCardDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `deck_table` ADD COLUMN `isSynced` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE `deck_table` ADD COLUMN `pendingOperation` TEXT")
+                db.execSQL("ALTER TABLE `flashcard_table` ADD COLUMN `isDeleted` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `flashcard_table` ADD COLUMN `createdAt` TEXT")
+                db.execSQL("ALTER TABLE `flashcard_table` ADD COLUMN `updatedAt` TEXT")
+            }
+        }
+
+        private val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `deck_table` ADD COLUMN `isDeleted` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getInstance(context: Context): FlashCardDatabase {
             return instance ?: synchronized(this) {
                 val db = Room.databaseBuilder(
@@ -64,8 +80,7 @@ abstract class FlashCardDatabase : RoomDatabase() {
                     FlashCardDatabase::class.java,
                     "flashcard_database"
                 )
-                    .addMigrations(MIGRATION_8_9)
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                     .build()
                 instance = db
                 db

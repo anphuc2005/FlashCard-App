@@ -33,3 +33,7 @@ data class GoogleLoginRequest(
     val idToken: String
 )
 
+data class RefreshTokenRequest(
+    val refreshToken: String
+)
+

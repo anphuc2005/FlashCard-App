@@ -19,6 +19,9 @@ interface StudyReviewDao {
     @Query("SELECT * FROM study_review_table WHERE isSynced = 0 ORDER BY studiedAt ASC")
     suspend fun getUnsyncedReviews(): List<StudyReviewEntity>
 
+    @Query("SELECT COUNT(*) FROM study_review_table WHERE isSynced = 0")
+    suspend fun getUnsyncedReviewCount(): Int
+
     @Query("SELECT * FROM study_review_table WHERE deckId = :deckId ORDER BY studiedAt DESC")
     fun observeReviewsByDeck(deckId: String): Flow<List<StudyReviewEntity>>
 

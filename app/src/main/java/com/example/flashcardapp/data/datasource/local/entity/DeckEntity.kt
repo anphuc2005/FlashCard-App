@@ -14,5 +14,8 @@ data class DeckEntity(
     val isPublic: Boolean = false,
     val createdAt: String? = null,
     val updatedAt: String? = null,
-    val cardCount: Int = 0
+    val cardCount: Int = 0,
+    val isSynced: Boolean = true,
+    val pendingOperation: String? = null,
+    val isDeleted: Boolean = false
 )

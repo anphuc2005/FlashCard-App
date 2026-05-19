@@ -9,13 +9,16 @@ import com.example.flashcardapp.data.datasource.remote.model.auth.LoginRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.LoginResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.RegisterResponse
+import com.example.flashcardapp.data.datasource.remote.model.auth.RefreshTokenRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.ResetPasswordResponse
 import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpRequest
 import com.example.flashcardapp.data.datasource.remote.model.auth.VerifyOtpResponse
 
 import retrofit2.Response
+import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface AuthApiService {
@@ -37,6 +40,10 @@ interface AuthApiService {
 
     @POST("auth/google")
     suspend fun googleLogin(@Body request: GoogleLoginRequest): Response<ApiResponse<GoogleLoginResponse>>
+
+    @Headers("No-Auth: true")
+    @POST("auth/refresh")
+    fun refreshAccessToken(@Body request: RefreshTokenRequest): Call<ApiResponse<LoginResponse>>
 
 }
 

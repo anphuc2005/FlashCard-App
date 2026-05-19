@@ -17,6 +17,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 private const val OFFLINE_DECK_NAME_PREFIX = "B\u1ed9 th\u1ebb \u0111\u00e3 l\u01b0u"
+private const val PENDING_CREATE = "CREATE"
+private const val PENDING_UPDATE = "UPDATE"
+private const val PENDING_DELETE = "DELETE"
 
 class DeckRepository(
     private val deckApiService: DeckApiService,
@@ -28,6 +31,7 @@ class DeckRepository(
     suspend fun getAllDecksFromApi(): Result<List<Deck>> {
         return withContext(Dispatchers.IO) {
             try {
+                syncPendingDecks()
                 val response = deckApiService.getAllDecks()
                 if (response.isSuccess() && response.data != null) {
                     val decks = enrichDecksWithCardCount(response.data.map { it.toDomain() })
@@ -39,6 +43,12 @@ class DeckRepository(
             } catch (e: Exception) {
                 cachedDecksOrFailure(e)
             }
+        }
+    }
+
+    suspend fun hasOfflineDeckData(): Boolean {
+        return withContext(Dispatchers.IO) {
+            getCachedDecks().isNotEmpty()
         }
     }
 
@@ -134,40 +144,115 @@ class DeckRepository(
 
     suspend fun createDeck(deck: Deck): Result<Deck> {
         return withContext(Dispatchers.IO) {
+            val pendingDeck = deck.copy(
+                createdAt = deck.createdAt ?: System.currentTimeMillis().toString(),
+                updatedAt = deck.updatedAt ?: System.currentTimeMillis().toString()
+            )
+            cacheDeck(pendingDeck, isSynced = false, pendingOperation = PENDING_CREATE)
             try {
-                val response = deckApiService.createDeck(deck.toDto())
+                val response = deckApiService.createDeck(pendingDeck.toDto())
                 if (response.isSuccess() && response.data != null) {
                     val createdDeck = enrichDeckWithCardCount(response.data.toDomain())
                     cacheDeck(createdDeck)
                     Result.success(createdDeck)
                 } else {
-                    Result.failure(Exception(response.message ?: "Unknown error"))
+                    Result.success(pendingDeck)
                 }
+            } catch (e: Exception) {
+                Result.success(pendingDeck)
+            }
+        }
+    }
+
+    suspend fun syncPendingDecks(): Result<Int> {
+        return withContext(Dispatchers.IO) {
+            val dao = deckDao ?: return@withContext Result.success(0)
+            val pendingDecks = dao.getUnsyncedDecks()
+            var syncedCount = 0
+            try {
+                pendingDecks.forEach { entity ->
+                    val deck = entity.toDomain(cards = emptyList(), cardCountOverride = entity.cardCount)
+                    when (entity.pendingOperation) {
+                        PENDING_CREATE -> {
+                            val response = deckApiService.createDeck(deck.toDto())
+                            if (response.isSuccess() && response.data != null) {
+                                cacheDeck(response.data.toDomain())
+                                syncedCount += 1
+                            }
+                        }
+                        PENDING_UPDATE -> {
+                            val response = deckApiService.updateDeck(entity.id, deck.toDto())
+                            if (response.isSuccess() && response.data != null) {
+                                cacheDeck(response.data.toDomain())
+                                syncedCount += 1
+                            }
+                        }
+                        PENDING_DELETE -> {
+                            val response = deckApiService.deleteDeck(entity.id)
+                            if (response.isSuccess()) {
+                                dao.deleteDeckById(entity.id)
+                                flashCardDao?.deleteCardsByDeckId(entity.id)
+                                syncedCount += 1
+                            }
+                        }
+                    }
+                }
+                Result.success(syncedCount)
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
     }
 
+    suspend fun getPendingDeckCount(): Int {
+        return withContext(Dispatchers.IO) {
+            deckDao?.getUnsyncedDeckCount() ?: 0
+        }
+    }
+
     suspend fun updateDeck(id: String, deck: Deck): Result<Deck> {
         return withContext(Dispatchers.IO) {
+            val pendingDeck = deck.copy(id = id, updatedAt = System.currentTimeMillis().toString())
+            val existingPending = deckDao?.getUnsyncedDecks()?.firstOrNull { it.id == id }
+            val pendingOperation = if (existingPending?.pendingOperation == PENDING_CREATE) {
+                PENDING_CREATE
+            } else {
+                PENDING_UPDATE
+            }
+            cacheDeck(pendingDeck, isSynced = false, pendingOperation = pendingOperation)
             try {
-                val response = deckApiService.updateDeck(id, deck.toDto())
+                val response = deckApiService.updateDeck(id, pendingDeck.toDto())
                 if (response.isSuccess() && response.data != null) {
                     val updatedDeck = enrichDeckWithCardCount(response.data.toDomain())
                     cacheDeck(updatedDeck)
                     Result.success(updatedDeck)
                 } else {
-                    Result.failure(Exception(response.message ?: "Unknown error"))
+                    Result.success(pendingDeck)
                 }
             } catch (e: Exception) {
-                Result.failure(e)
+                Result.success(pendingDeck)
             }
         }
     }
 
     suspend fun deleteDeck(id: String): Result<String> {
         return withContext(Dispatchers.IO) {
+            val cachedEntity = findCachedDeckEntity(id)
+            if (cachedEntity?.pendingOperation == PENDING_CREATE) {
+                deckDao?.deleteDeckById(id)
+                flashCardDao?.deleteCardsByDeckId(id)
+                return@withContext Result.success("Deleted local deck")
+            }
+            cachedEntity?.let { entity ->
+                deckDao?.insertDeck(
+                    entity.copy(
+                        isSynced = false,
+                        pendingOperation = PENDING_DELETE,
+                        isDeleted = true,
+                        updatedAt = System.currentTimeMillis().toString()
+                    )
+                )
+            }
             try {
                 val response = deckApiService.deleteDeck(id)
                 if (response.isSuccess()) {
@@ -175,10 +260,10 @@ class DeckRepository(
                     flashCardDao?.deleteCardsByDeckId(id)
                     Result.success(response.message ?: "Deleted successfully")
                 } else {
-                    Result.failure(Exception(response.message ?: "Unknown error"))
+                    Result.success(response.message ?: "Delete queued")
                 }
             } catch (e: Exception) {
-                Result.failure(e)
+                Result.success("Delete queued")
             }
         }
     }
@@ -297,8 +382,17 @@ class DeckRepository(
         return metadataDecks + orphanCardDecks
     }
 
-    private suspend fun cacheDeck(deck: Deck) {
-        deckDao?.insertDeck(deck.toEntity())
+    private suspend fun findCachedDeckEntity(id: String): DeckEntity? {
+        return deckDao?.getUnsyncedDecks()?.firstOrNull { it.id == id }
+            ?: deckDao?.getAllDecksSnapshot()?.firstOrNull { it.id == id }
+    }
+
+    private suspend fun cacheDeck(
+        deck: Deck,
+        isSynced: Boolean = true,
+        pendingOperation: String? = null
+    ) {
+        deckDao?.insertDeck(deck.toEntity(isSynced, pendingOperation))
     }
 
     private suspend fun cacheDecks(decks: List<Deck>) {
@@ -325,7 +419,10 @@ class DeckRepository(
         )
     }
 
-    private fun Deck.toEntity(): DeckEntity {
+    private fun Deck.toEntity(
+        isSynced: Boolean = true,
+        pendingOperation: String? = null
+    ): DeckEntity {
         return DeckEntity(
             id = id,
             categoryId = categoryId,
@@ -335,7 +432,10 @@ class DeckRepository(
             isPublic = isPublic,
             createdAt = createdAt,
             updatedAt = updatedAt,
-            cardCount = customCardCount ?: cards.size
+            cardCount = customCardCount ?: cards.size,
+            isSynced = isSynced,
+            pendingOperation = pendingOperation,
+            isDeleted = false
         )
     }
 

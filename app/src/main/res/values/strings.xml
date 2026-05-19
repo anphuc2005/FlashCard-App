@@ -339,4 +339,7 @@
     <string name="deck_bulk_delete_success">Đã gửi yêu cầu xóa %1$d bộ thẻ</string>
     <string name="reset_password_loading">Đang đặt lại mật khẩu...</string>
     <string name="color_blue_hex">#247BDF</string>
+    <string name="home_sync_offline">Dang offline. Thay doi se tu dong dong bo khi co mang.</string>
+    <string name="home_sync_pending">Co %1$d thay doi dang cho dong bo.</string>
+    <string name="home_sync_synced">Du lieu da duoc dong bo.</string>
 </resources>

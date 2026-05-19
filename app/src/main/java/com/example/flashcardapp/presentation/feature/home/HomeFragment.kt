@@ -47,6 +47,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import androidx.core.view.isVisible
 import com.example.flashcardapp.presentation.common.dialog.accountDialog.ReminderDialog
+import com.example.flashcardapp.presentation.feature.auth.AuthActivity
 
 class HomeFragment : Fragment() {
 
@@ -103,6 +104,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.refreshSessionState()
         viewModel.refreshHomeRealtime()
         viewModel.refreshUnreadNotificationCount()
 
@@ -149,6 +151,11 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
+                    if (state.requiresLogin) {
+                        navigateToLogin()
+                        return@collect
+                    }
+
                     // Update shortcuts
                     shortcutAdapter.submitList(state.shortcuts)
 
@@ -188,6 +195,7 @@ class HomeFragment : Fragment() {
                         }
                     }
                     renderNotificationBadge(state.unreadNotificationCount)
+                    renderSyncStatus(state.syncStatus)
 
                     // Handle loading state
                     binding.btnStart.isEnabled = !state.isLoading && state.activeDeck != null
@@ -412,6 +420,15 @@ class HomeFragment : Fragment() {
             getString(R.string.home_notification_badge_content, unreadCount)
     }
 
+    private fun renderSyncStatus(status: HomeSyncStatus) {
+        binding.textSyncStatus.isVisible = status !is HomeSyncStatus.Synced
+        binding.textSyncStatus.text = when (status) {
+            HomeSyncStatus.Offline -> getString(R.string.home_sync_offline)
+            is HomeSyncStatus.Pending -> getString(R.string.home_sync_pending, status.count)
+            HomeSyncStatus.Synced -> getString(R.string.home_sync_synced)
+        }
+    }
+
     private fun showReminderDialog(){
         val dialog = ReminderDialog.newInstance(reminderHour, reminderMinute, reminderEnabled)
         dialog.listener = object : ReminderDialog.Listener {
@@ -474,6 +491,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadUserAvatar(forceRefresh: Boolean) {
+        if (viewModel.uiState.value.requiresLogin) {
+            renderAvatar(null)
+            return
+        }
         avatarLoadJob?.cancel()
         avatarLoadJob = viewLifecycleOwner.lifecycleScope.launch {
             val profileResult = (requireActivity().application as FlashcardApp)
@@ -500,6 +521,12 @@ class HomeFragment : Fragment() {
                 .error(R.drawable.user)
                 .into(binding.imgAvatar)
         }
+    }
+
+    private fun navigateToLogin() {
+        if (!isAdded) return
+        startActivity(Intent(requireContext(), AuthActivity::class.java))
+        requireActivity().finish()
     }
 
 
