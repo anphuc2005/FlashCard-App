@@ -1,0 +1,58 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.FlashCardApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Gradient background colors -->
+        <item name="colorOnBackground">@color/md_theme_light_background1</item>
+        <item name="gradientBackground1">@color/md_theme_light_background1</item>
+        <item name="gradientBackground2">@color/md_theme_light_background2</item>
+
+        <!-- Main background -->
+        <item name="mainBackground">@color/md_theme_light_main_background</item>
+
+        <item name="bottomNavBackground">@color/md_theme_light_bottomNav</item>"
+
+        <!-- Component background -->
+        <item name="componentBackground">@color/md_theme_light_component_background</item>
+
+        <!-- Text color -->
+        <item name="android:textColor">@color/md_theme_light_text</item>
+        <item name="textColor">@color/md_theme_light_text</item>
+
+        <!-- Loading gradient background -->
+        <item name="loadingBackground1">@color/md_theme_light_loading_background1</item>
+        <item name="loadingBackground2">@color/md_theme_light_loading_background2</item>
+
+        <!-- Button -->
+        <item name="buttonColor">@color/md_button</item>
+
+        <!-- Button Bottom Nav -->
+        <item name="buttonBottomNavActive">@color/md_button_bottom_nav_active</item>
+        <item name="buttonBottomNavInactive">@color/md_button_bottom_nav_inactive</item>
+
+        <!-- Sub title -->
+        <item name="subTitleColor">@color/md_sub_title</item>
+
+        <!-- Icon colors -->
+        <item name="iconBlue">@color/md_icon_blue</item>
+        <item name="iconRed">@color/md_icon_red</item>
+        <item name="iconGreen">@color/md_icon_green</item>
+        <item name="iconYellow">@color/md_icon_yellow</item>
+        <item name="iconPurple">@color/md_icon_purple</item>
+        <item name="iconGray">@color/md_icon_gray</item>
+
+        <item name="iconBlueBackground">@color/md_icon_blue_background</item>
+        <item name="iconRedBackground">@color/md_icon_red_background</item>
+        <item name="iconGreenBackground">@color/md_icon_green_background</item>
+        <item name="iconYellowBackground">@color/md_icon_yellow_background</item>
+        <item name="iconPurpleBackground">@color/md_icon_purple_background</item>
+
+        <!-- Nav bar active color -->
+        <item name="navBarActive">@color/md_navbar_active</item>
+    </style>
+
+    <style name="Theme.FlashCardApp" parent="Base.Theme.FlashCardApp" />
+
+    <style name="Theme.FlashCardApp.Splash" parent="Theme.FlashCardApp">
+        <item name="android:windowBackground">@drawable/bg_splash_screen</item>
+    </style>
+</resources>

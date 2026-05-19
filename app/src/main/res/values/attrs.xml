@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Gradient background -->
+    <attr name="gradientBackground1" format="color" />
+    <attr name="gradientBackground2" format="color" />
+
+    <!-- Main background -->
+    <attr name="mainBackground" format="color" />
+
+    <!-- Component background -->
+    <attr name="componentBackground" format="color" />
+
+    <attr name="bottomNavBackground" format="color" />"
+
+    <!-- Text -->
+    <attr name="textColor" format="color" />
+
+    <!-- Loading gradient background -->
+    <attr name="loadingBackground1" format="color" />
+    <attr name="loadingBackground2" format="color" />
+
+    <!-- Button -->
+    <attr name="buttonColor" format="color" />
+
+    <!-- Button Bottom Nav -->
+    <attr name="buttonBottomNavActive" format="color" />
+    <attr name="buttonBottomNavInactive" format="color" />
+
+
+    <!-- Sub title -->
+    <attr name="subTitleColor" format="color" />
+
+    <!-- Icon colors -->
+    <attr name="iconBlue" format="color" />
+    <attr name="iconRed" format="color" />
+    <attr name="iconGreen" format="color" />
+    <attr name="iconYellow" format="color" />
+    <attr name="iconPurple" format="color" />
+    <attr name="iconGray" format="color" />
+    <attr name="iconOrange" format="color" />
+
+
+    <attr name="iconBlueBackground" format="color" />
+    <attr name="iconRedBackground" format="color" />
+    <attr name="iconGreenBackground" format="color" />
+    <attr name="iconYellowBackground" format="color" />
+    <attr name="iconPurpleBackground" format="color" />
+    <attr name="iconGrayBackground" format="color" />
+    <attr name="iconOrangeBackground" format="color" />
+
+
+
+    <!-- Nav bar -->
+    <attr name="navBarActive" format="color" />
+</resources>
+

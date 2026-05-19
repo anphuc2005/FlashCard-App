@@ -1,0 +1,227 @@
+package com.example.flashcardapp.presentation.feature.editDeck
+
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.flashcardapp.FlashcardApp
+import com.example.flashcardapp.R
+import com.example.flashcardapp.databinding.FragmentEditDeckBinding
+import com.example.flashcardapp.presentation.common.adapter.EditDeckCardAdapter
+import com.example.flashcardapp.presentation.common.dialog.accountDialog.AppConfirmDialog
+import com.example.flashcardapp.presentation.common.notification.showAppError
+import com.example.flashcardapp.presentation.common.notification.showAppSuccess
+import com.example.flashcardapp.presentation.common.notification.showAppWarning
+import kotlinx.coroutines.launch
+
+class EditDeckFragment : Fragment() {
+
+    private var _binding: FragmentEditDeckBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: EditDeckViewModel by viewModels {
+        val container = (requireActivity().application as FlashcardApp).container
+        EditDeckViewModelFactory(
+            container.getDeckByIdUseCase,
+            container.updateDeckUseCase,
+            container.getCardsByDeckIdUseCase,
+            container.deleteFlashCardUseCase
+        )
+    }
+
+    private var deckId: String? = null
+    private lateinit var editDeckCardAdapter: EditDeckCardAdapter
+    private var selectedThemeColor: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        deckId = arguments?.getString("DECK_ID") ?: arguments?.getString("DECK_ID_STR")
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentEditDeckBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupViews()
+        setupListeners()
+        observeData()
+
+        deckId?.let { id ->
+            viewModel.getDeckDetail(id)
+        }
+    }
+
+    private fun setupViews() {
+        editDeckCardAdapter = EditDeckCardAdapter(
+            onEditClick = { card ->
+                val targetDeckId = card.deckId.ifBlank { deckId.orEmpty() }
+                if (card.id.isBlank() || targetDeckId.isBlank()) {
+                    showAppError(getString(R.string.edit_card_missing_arguments))
+                } else {
+                    val bundle = Bundle().apply {
+                        putString("CARD_ID", card.id)
+                        putString("QUESTION", card.question)
+                        putString("ANSWER", card.answer)
+                        putString("IMAGE_URL", card.imageUrl)
+                        putString("DECK_ID", targetDeckId)
+                    }
+                    findNavController().navigate(R.id.action_editDeckFragment_to_editCardFragment, bundle)
+                }
+            },
+            onDeleteClick = { card ->
+                val dialog = AppConfirmDialog.newInstance(
+                    title = getString(R.string.delete_confirm_title),
+                    message = getString(R.string.delete_confirm_message_card),
+                    confirmText = getString(R.string.delete_confirm_action),
+                    cancelText = getString(R.string.delete_confirm_cancel),
+                    iconRes = R.drawable.ic_delete,
+                    destructive = true
+                )
+                dialog.listener = object : AppConfirmDialog.Listener {
+                    override fun onConfirm() {
+                        viewModel.deleteCard(card)
+                        showAppSuccess(getString(R.string.delete_success_card))
+                    }
+                }
+                dialog.show(childFragmentManager, "delete_card_confirm")
+            }
+        )
+
+        binding.rvCards.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvCards.adapter = editDeckCardAdapter
+        binding.tvTitle.text = getString(R.string.edit_deck_title)
+    }
+
+    private fun setupListeners() {
+        binding.btnClose.setOnClickListener {
+            requireActivity().finish()
+        }
+
+        binding.btnAddCard.setOnClickListener {
+            val targetDeckId = deckId
+            if (targetDeckId.isNullOrBlank()) {
+                showAppError(getString(R.string.edit_deck_missing_id))
+                return@setOnClickListener
+            }
+
+            findNavController().navigate(
+                R.id.action_editDeckFragment_to_addCardFragment,
+                bundleOf("DECK_ID" to targetDeckId)
+            )
+        }
+
+        binding.switchPublic.setOnCheckedChangeListener { _, isChecked ->
+            updateSwitchTint(isChecked)
+        }
+        setupColorPicker()
+
+        binding.btnSave.setOnClickListener {
+            val deckName = binding.etDeckName.text.toString().trim()
+            val description = binding.etDeckDescription.text.toString().trim()
+            val isPublic = binding.switchPublic.isChecked
+
+            if (deckName.isEmpty()) {
+                showAppWarning(getString(R.string.edit_deck_name_required))
+                return@setOnClickListener
+            }
+
+            deckId?.let { id ->
+                viewModel.updateDeck(id, deckName, description, isPublic, selectedThemeColor)
+            }
+        }
+    }
+
+    private fun observeData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.deckState.collect { state ->
+                        when (state) {
+                            is EditDeckState.Loading -> Unit
+                            is EditDeckState.Success -> {
+                                binding.etDeckName.setText(state.deck.name)
+                                binding.etDeckDescription.setText(state.deck.description)
+                                binding.switchPublic.isChecked = state.deck.isPublic
+                                println("Deck is public: ${state.deck.isPublic} ${state.deck.name}")
+                                updateSwitchTint(state.deck.isPublic)
+                                applyIconColor(state.deck.themeColor)
+                                binding.tvCardCountLabel.text =
+                                    getString(R.string.edit_deck_card_count, state.deck.cardCount)
+                            }
+                            is EditDeckState.UpdateSuccess -> {
+                                showAppSuccess(getString(R.string.edit_deck_update_success))
+                                requireActivity().finish()
+                            }
+                            is EditDeckState.Error -> {
+                                showAppError(state.message)
+                            }
+                            else -> Unit
+                        }
+                    }
+                }
+                launch {
+                    viewModel.cardsState.collect { cards ->
+                        editDeckCardAdapter.submitList(cards)
+                        if (cards.isNotEmpty()) {
+                            binding.tvCardCountLabel.text =
+                                getString(R.string.edit_deck_card_count, cards.size)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateSwitchTint(isChecked: Boolean) {
+        val thumbColor = ContextCompat.getColor(
+            requireContext(),
+            if (isChecked) R.color.switch_thumb_blue else R.color.switch_thumb_gray
+        )
+        val trackColor = ContextCompat.getColor(
+            requireContext(),
+            if (isChecked) R.color.switch_track_blue else R.color.switch_track_gray
+        )
+        binding.switchPublic.thumbTintList = ColorStateList.valueOf(thumbColor)
+        binding.switchPublic.trackTintList = ColorStateList.valueOf(trackColor)
+    }
+
+    private fun setupColorPicker() {
+        binding.colorBlue.setOnClickListener { applyIconColor(getString(R.string.color_blue_hex)) }
+        binding.colorGreen.setOnClickListener { applyIconColor("#10B981") }
+        binding.colorPurple.setOnClickListener { applyIconColor("#6366F1") }
+        binding.colorOrange.setOnClickListener { applyIconColor("#F97316") }
+        binding.colorRed.setOnClickListener { applyIconColor("#F43F5E") }
+    }
+
+    private fun applyIconColor(rawColor: String?) {
+        val fallbackColor = getString(R.string.color_blue_hex)
+        val safeColor = rawColor?.takeIf { it.isNotBlank() } ?: fallbackColor
+        val parsed = runCatching { Color.parseColor(safeColor) }.getOrElse { Color.parseColor(fallbackColor) }
+        selectedThemeColor = safeColor
+        binding.ivDeckIcon.backgroundTintList = ColorStateList.valueOf(parsed)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

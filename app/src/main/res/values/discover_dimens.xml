@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="discover_content_padding_horizontal">24dp</dimen>
+    <dimen name="discover_list_padding_horizontal">24dp</dimen>
+    <dimen name="discover_courses_padding_horizontal">8dp</dimen>
+    <dimen name="discover_screen_padding_bottom">20dp</dimen>
+</resources>

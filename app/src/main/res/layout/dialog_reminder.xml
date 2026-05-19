@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_round"
+    android:padding="18dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cài đặt nhắc nhở"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="?attr/textColor"/>
+
+        <ImageView
+            android:id="@+id/btnHistory"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_time"
+            app:tint="?attr/iconBlue"/>
+    </LinearLayout>
+
+    <!-- Time picker block -->
+    <LinearLayout
+        android:id="@+id/blockTime"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/bg_card_soft"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="08:00"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#0A63E8"/>
+
+        <!-- AM/PM toggle -->
+        <LinearLayout
+            android:id="@+id/segAmPm"
+            android:layout_width="80dp"
+            android:layout_height="64dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_seg"
+            android:padding="6dp">
+
+            <TextView
+                android:id="@+id/btnAm"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="@drawable/bg_seg_on"
+                android:text="AM"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/btnPm"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="PM"
+                android:textStyle="bold"
+                android:textColor="#6B7280"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Toggle row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_card_soft"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bật thông báo"
+            android:textSize="16sp"
+            android:textColor="?attr/textColor"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchEnable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:thumbTint="@color/switch_thumb_blue"
+            app:trackTint="@color/switch_track_blue"
+            android:checked="true"/>
+    </LinearLayout>
+
+    <!-- Save button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSave"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginTop="18dp"
+        android:text="Lưu cài đặt"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:backgroundTint="#0A63E8"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="20dp"/>
+</LinearLayout>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="18dp"
+    android:background="@drawable/bg_dialog_round">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Giao diện"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="?attr/textColor" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="14dp"
+        android:weightSum="2">
+
+        <!-- Sáng -->
+        <LinearLayout
+            android:id="@+id/cardLight"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/bg_theme_option_selected">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_sun"
+                android:background="@drawable/bg_circle_soft" />
+
+            <TextView
+                android:id="@+id/tvLight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Sáng"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#0A63E8"/>
+        </LinearLayout>
+
+        <!-- Tối -->
+        <LinearLayout
+            android:id="@+id/cardDark"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/bg_theme_option_unselected">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_moon"
+                app:tint="#1F2B3C"
+                android:background="@drawable/bg_circle_soft_dark" />
+
+            <TextView
+                android:id="@+id/tvDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Tối"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#1F2B3C"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSave"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="18dp"
+        android:text="Lưu"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:backgroundTint="#0A63E8"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="18dp"/>
+</LinearLayout>

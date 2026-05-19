@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base style so AAPT can resolve StarIcon references -->
+    <style name="StarIcon">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <style name="StarIcon.Filled" parent="StarIcon">
+        <item name="android:src">@drawable/ic_star_filled</item>
+        <item name="android:tint">#F5B400</item>
+    </style>
+
+    <style name="StarIcon.Outline" parent="StarIcon">
+        <item name="android:src">@drawable/ic_star_outline</item>
+        <item name="android:tint">#C4CAD4</item>
+    </style>
+</resources>

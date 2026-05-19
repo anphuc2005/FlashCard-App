@@ -1,0 +1,237 @@
+package com.example.flashcardapp.di
+
+import android.content.Context
+import com.example.flashcardapp.AppSessionManager
+import com.example.flashcardapp.data.datasource.local.database.FlashCardDatabase
+import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreImpl
+import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
+import com.example.flashcardapp.data.repository.DeckRepository
+import com.example.flashcardapp.data.repository.FlashCardRepository
+import com.example.flashcardapp.data.repository.StudyRepository
+import com.example.flashcardapp.data.repository.CategoryRepository
+import com.example.flashcardapp.data.repository.EmailAuthRepositoryImpl
+import com.example.flashcardapp.data.repository.NotificationRepository
+import com.example.flashcardapp.data.repository.ProfileRepository
+import com.example.flashcardapp.data.repository.ReportRepository
+import com.example.flashcardapp.data.repository.StatisticsRepository
+import com.example.flashcardapp.data.repository.UploadRepositoryImpl
+import com.example.flashcardapp.domain.repository.UploadRepository
+import com.example.flashcardapp.domain.usecase.auth.AuthUseCases
+import com.example.flashcardapp.domain.usecase.auth.ForgotPasswordUseCase
+import com.example.flashcardapp.domain.usecase.auth.GoogleLoginUseCase
+import com.example.flashcardapp.domain.usecase.auth.LoginUseCase
+import com.example.flashcardapp.domain.usecase.auth.RegisterUseCase
+import com.example.flashcardapp.domain.usecase.auth.ResetPasswordUseCase
+import com.example.flashcardapp.domain.usecase.auth.VerifyOtpUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.AddFlashCardsBulkUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.DeleteFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.flashcard.UpdateFlashCardUseCase
+import com.example.flashcardapp.domain.usecase.deck.AddDeckUseCase
+import com.example.flashcardapp.domain.usecase.deck.CloneDeckUseCase
+import com.example.flashcardapp.domain.usecase.deck.ExploreDecksUseCase
+import com.example.flashcardapp.domain.usecase.deck.GetDeckByIdUseCase
+import com.example.flashcardapp.domain.usecase.deck.UpdateDeckUseCase
+import com.example.flashcardapp.domain.usecase.category.GetAllCategoriesUseCase
+import com.example.flashcardapp.domain.usecase.deck.GetExploreDecksFromApiUseCase
+import com.example.flashcardapp.domain.usecase.profile.GetMyProfileUseCase
+import com.example.flashcardapp.domain.usecase.profile.UpdateMyProfileUseCase
+import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
+import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetCachedStudySessionCardsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetCurrentStudyStreakUseCase
+import com.example.flashcardapp.domain.usecase.study.GetRecentStudySessionUseCase
+import com.example.flashcardapp.domain.usecase.study.GetStudySessionByDeckUseCase
+import com.example.flashcardapp.domain.usecase.study.HasStudiedTodayUseCase
+import com.example.flashcardapp.domain.usecase.study.DeleteStudySessionByDeckUseCase
+import com.example.flashcardapp.domain.usecase.study.SaveStudySessionStateUseCase
+import com.example.flashcardapp.domain.usecase.study.SaveStudyReviewUseCase
+import com.example.flashcardapp.domain.usecase.study.StudyUseCases
+import com.example.flashcardapp.domain.usecase.study.SyncStudyReviewsUseCase
+import com.example.flashcardapp.domain.usecase.notification.GetNotificationsPageUseCase
+import com.example.flashcardapp.domain.usecase.notification.GetUnreadNotificationCountUseCase
+import com.example.flashcardapp.domain.usecase.notification.MarkNotificationReadUseCase
+import com.example.flashcardapp.domain.usecase.report.SubmitDeckReportUseCase
+
+/**
+ * Dependency Injection Container
+ * Khởi tạo 1 lần và dùng chung toàn App (Singleton pattern)
+ */
+class AppContainer(private val applicationContext: Context) {
+
+    // 1. Core / Managers
+    val sessionManager = AppSessionManager(applicationContext)
+
+    init {
+        RetrofitClient.tokenProvider = { sessionManager.accessToken }
+    }
+
+    // 2. Data Stores
+    private val authSessionStore by lazy {
+        AuthSessionStoreImpl(sessionManager)
+    }
+
+    // 3. Repositories
+    val authRepository by lazy {
+        EmailAuthRepositoryImpl(RetrofitClient.authApiService, authSessionStore)
+    }
+
+    val deckRepository: DeckRepository by lazy {
+        val database = FlashCardDatabase.getInstance(applicationContext)
+        DeckRepository(
+            deckApiService = RetrofitClient.deckApiService,
+            flashCardDao = database.flashCardDao(),
+            cardApiService = RetrofitClient.cardApiService,
+            deckDao = database.deckDao()
+        )
+    }
+
+    val categoryRepository: CategoryRepository by lazy {
+        CategoryRepository(RetrofitClient.categoriesApiService)
+    }
+
+    val flashCardRepository: FlashCardRepository by lazy {
+        val database = FlashCardDatabase.getInstance(applicationContext)
+        FlashCardRepository(RetrofitClient.cardApiService, database.flashCardDao())
+    }
+
+    val uploadRepository: UploadRepository by lazy {
+        UploadRepositoryImpl(RetrofitClient.uploadApiService)
+    }
+
+    val profileRepository: ProfileRepository by lazy {
+        ProfileRepository(
+            profileApiService = RetrofitClient.profileApiService,
+            sessionTokenProvider = { sessionManager.accessToken }
+        )
+    }
+
+    val statisticsRepository: StatisticsRepository by lazy {
+        StatisticsRepository(RetrofitClient.statisticsApiService)
+    }
+
+    val notificationRepository: NotificationRepository by lazy {
+        NotificationRepository(RetrofitClient.notificationApiService)
+    }
+
+    val reportRepository: ReportRepository by lazy {
+        ReportRepository(RetrofitClient.reportApiService)
+    }
+
+        val studyRepository: StudyRepository by lazy {
+            val database = FlashCardDatabase.getInstance(applicationContext)
+            StudyRepository(
+                RetrofitClient.studyApiService,
+                database.studyReviewDao(),
+                database.flashCardDao(),
+                applicationContext
+            )
+        }
+
+        // 4. Use Cases
+        val authUseCases: AuthUseCases by lazy {
+            AuthUseCases(
+                login = LoginUseCase(authRepository),
+                googleLogin = GoogleLoginUseCase(authRepository),
+                register = RegisterUseCase(authRepository),
+                forgotPassword = ForgotPasswordUseCase(authRepository),
+                verifyOtp = VerifyOtpUseCase(authRepository),
+                resetPassword = ResetPasswordUseCase(authRepository)
+            )
+        }
+
+        val addFlashCardUseCase: AddFlashCardUseCase by lazy {
+            AddFlashCardUseCase(flashCardRepository)
+        }
+
+        val addFlashCardsBulkUseCase: AddFlashCardsBulkUseCase by lazy {
+            AddFlashCardsBulkUseCase(flashCardRepository)
+        }
+
+        val updateFlashCardUseCase: UpdateFlashCardUseCase by lazy {
+            UpdateFlashCardUseCase(flashCardRepository)
+        }
+
+        val deleteFlashCardUseCase: DeleteFlashCardUseCase by lazy {
+            DeleteFlashCardUseCase(flashCardRepository)
+        }
+
+        val addDeckUseCase: AddDeckUseCase by lazy {
+            AddDeckUseCase(deckRepository)
+        }
+
+        val exploreDecksUseCase: ExploreDecksUseCase by lazy {
+            ExploreDecksUseCase(deckRepository)
+        }
+
+        val cloneDeckUseCase: CloneDeckUseCase by lazy {
+            CloneDeckUseCase(deckRepository)
+        }
+
+        val getAllDecksFromApiUseCase: GetExploreDecksFromApiUseCase by lazy {
+            GetExploreDecksFromApiUseCase(deckRepository)
+        }
+
+        val getAllCategoriesUseCase: GetAllCategoriesUseCase by lazy {
+            GetAllCategoriesUseCase(categoryRepository)
+        }
+
+        val getDeckByIdUseCase: GetDeckByIdUseCase by lazy {
+            GetDeckByIdUseCase(deckRepository)
+        }
+
+        val updateDeckUseCase: UpdateDeckUseCase by lazy {
+            UpdateDeckUseCase(deckRepository)
+        }
+
+        val getCardsByDeckIdUseCase: com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase by lazy {
+            com.example.flashcardapp.domain.usecase.flashcard.GetCardsByDeckIdUseCase(
+                flashCardRepository
+            )
+        }
+
+        val uploadImageUseCase: UploadImageUseCase by lazy {
+            UploadImageUseCase(uploadRepository)
+        }
+
+        val getMyProfileUseCase: GetMyProfileUseCase by lazy {
+            GetMyProfileUseCase(profileRepository)
+        }
+
+        val updateMyProfileUseCase: UpdateMyProfileUseCase by lazy {
+            UpdateMyProfileUseCase(profileRepository)
+        }
+
+        val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase by lazy {
+            GetUnreadNotificationCountUseCase(notificationRepository)
+        }
+
+        val getNotificationPageUseCase: GetNotificationsPageUseCase by lazy {
+            GetNotificationsPageUseCase(notificationRepository)
+        }
+
+        val markNotificationAsReadUseCase: MarkNotificationReadUseCase by lazy {
+            MarkNotificationReadUseCase(notificationRepository)
+        }
+
+        val submitDeckReportUseCase: SubmitDeckReportUseCase by lazy {
+            SubmitDeckReportUseCase(reportRepository)
+        }
+
+        val studyUseCases: StudyUseCases by lazy {
+            StudyUseCases(
+                getSessionCards = GetStudySessionCardsUseCase(studyRepository),
+                getCachedSessionCards = GetCachedStudySessionCardsUseCase(studyRepository),
+                getRecentSession = GetRecentStudySessionUseCase(studyRepository),
+                getSessionByDeck = GetStudySessionByDeckUseCase(studyRepository),
+                saveSessionState = SaveStudySessionStateUseCase(studyRepository),
+                deleteSessionByDeck = DeleteStudySessionByDeckUseCase(studyRepository),
+                getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
+                saveReview = SaveStudyReviewUseCase(studyRepository),
+                syncReviews = SyncStudyReviewsUseCase(studyRepository),
+                getCurrentStreak = GetCurrentStudyStreakUseCase(studyRepository),
+                hasStudiedToday = HasStudiedTodayUseCase(studyRepository)
+            )
+        }
+    }
