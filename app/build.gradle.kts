@@ -18,7 +18,19 @@ android {
 
     }
 
+    signingConfigs {
+        create("sharedDebug") {
+            storeFile = file("debug.keystore")
+            storePassword = providers.gradleProperty("KEYSTORE_PASSWORD").orElse("android").get()
+            keyAlias = providers.gradleProperty("KEY_ALIAS").orElse("androiddebugkey").get()
+            keyPassword = providers.gradleProperty("KEY_PASSWORD").orElse("android").get()
+        }
+    }
+
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("sharedDebug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
