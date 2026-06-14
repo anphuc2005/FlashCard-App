@@ -15,8 +15,6 @@ import com.example.flashcardapp.presentation.main.MainActivity
 /** Handles building and displaying reminder notifications. */
 object ReminderNotificationHelper {
     private const val CHANNEL_ID = "reminder_channel"
-    private const val CHANNEL_NAME = "Study reminders"
-    private const val CHANNEL_DESC = "Nhắc nhở học tập hằng ngày"
     private const val NOTIFICATION_ID = 1001
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -50,9 +48,11 @@ object ReminderNotificationHelper {
     private fun ensureChannel(context: Context) {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            CHANNEL_NAME,
+            context.getString(R.string.reminder_notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
-        ).apply { description = CHANNEL_DESC }
+        ).apply {
+            description = context.getString(R.string.reminder_notification_channel_description)
+        }
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
     }

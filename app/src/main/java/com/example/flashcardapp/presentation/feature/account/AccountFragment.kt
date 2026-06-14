@@ -45,8 +45,6 @@ class AccountFragment : Fragment() {
         uri?.let { binding.avatar.setImageURI(it) }
     }
 
-    private var pendingNotificationAction: (() -> Unit)? = null
-
     private var reminderHour = 8
     private var reminderMinute = 0
     private var reminderEnabled = true
@@ -71,12 +69,8 @@ class AccountFragment : Fragment() {
         if (granted) openImagePicker()
     }
 
-    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) {
-            pendingNotificationAction?.invoke()
-        }
-        pendingNotificationAction = null
-    }
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -159,11 +153,11 @@ class AccountFragment : Fragment() {
         binding.btnEditAvatar.setOnClickListener { requestGalleryPermissionAndPick() }
 
         binding.rowReminder.root.setOnClickListener {
-            ensureNotificationPermission { showReminderDialog() }
+            showReminderDialog()
         }
         binding.rowTheme.root.setOnClickListener { showThemeDialog() }
         binding.rowNotification.root.setOnClickListener {
-            ensureNotificationPermission { showNotificationDialog() }
+            showNotificationDialog()
         }
 //        binding.rowExport.root.setOnClickListener { showExportDialog() }
 //        binding.rowRate.root.setOnClickListener { showRatingDialog() }
@@ -213,15 +207,11 @@ class AccountFragment : Fragment() {
         pickImageLauncher.launch("image/*")
     }
 
-    private fun ensureNotificationPermission(onGranted: () -> Unit) {
-
+    private fun requestNotificationPermissionIfNeeded() {
         val permission = Manifest.permission.POST_NOTIFICATIONS
         if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            onGranted()
             return
         }
-
-        pendingNotificationAction = onGranted
         notificationPermissionLauncher.launch(permission)
     }
 
@@ -255,6 +245,9 @@ class AccountFragment : Fragment() {
                 reminderMinute = minute
                 reminderEnabled = enabled
                 scheduleReminderIfNeeded()
+                if (enabled && notifStudy) {
+                    requestNotificationPermissionIfNeeded()
+                }
             }
 
             override fun onReminderHistory() {
@@ -279,22 +272,37 @@ class AccountFragment : Fragment() {
     }
 
     private fun showNotificationDialog() {
-        val dialog = NotificationDialog.newInstance(notifStudy, notifNewDeck, notifAchievement)
-        dialog.listener = object : NotificationDialog.Listener {
-            override fun onApply(study: Boolean, newDeck: Boolean, achievement: Boolean) {
-                notifStudy = study
-                notifNewDeck = newDeck
-                notifAchievement = achievement
-                ReminderSettingsStore.saveNotificationSettings(
-                    requireContext(),
-                    study = study,
-                    newDeck = newDeck,
-                    achievement = achievement
-                )
-                scheduleReminderIfNeeded()
-            }
+        childFragmentManager.setFragmentResultListener(
+            NotificationDialog.RESULT_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            val study = result.getBoolean(NotificationDialog.RESULT_STUDY)
+            val newDeck = result.getBoolean(NotificationDialog.RESULT_NEW_DECK)
+            val achievement = result.getBoolean(NotificationDialog.RESULT_ACHIEVEMENT)
+            applyNotificationSettings(study, newDeck, achievement)
         }
+        val dialog = NotificationDialog.newInstance(notifStudy, notifNewDeck, notifAchievement)
         dialog.show(childFragmentManager, "NotificationDialog")
+    }
+
+    private fun applyNotificationSettings(
+        study: Boolean,
+        newDeck: Boolean,
+        achievement: Boolean
+    ) {
+        notifStudy = study
+        notifNewDeck = newDeck
+        notifAchievement = achievement
+        ReminderSettingsStore.saveNotificationSettings(
+            requireContext(),
+            study = study,
+            newDeck = newDeck,
+            achievement = achievement
+        )
+        scheduleReminderIfNeeded()
+        if (study || newDeck || achievement) {
+            requestNotificationPermissionIfNeeded()
+        }
     }
 
     private fun showExportDialog() {

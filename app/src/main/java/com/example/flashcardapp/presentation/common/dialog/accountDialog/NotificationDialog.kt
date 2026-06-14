@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.core.os.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
@@ -12,12 +13,6 @@ import com.example.flashcardapp.R
 import com.example.flashcardapp.databinding.DialogNotificationBinding
 
 class NotificationDialog : DialogFragment() {
-
-    interface Listener {
-        fun onApply(study: Boolean, newDeck: Boolean, achievement: Boolean)
-    }
-
-    var listener: Listener? = null
 
     private var _binding: DialogNotificationBinding? = null
     private val binding get() = _binding!!
@@ -83,10 +78,13 @@ class NotificationDialog : DialogFragment() {
         binding.switchAchievement.setOnCheckedChangeListener { _, _ -> updateSwitchTint() }
 
         binding.btnApply.setOnClickListener {
-            listener?.onApply(
-                study = binding.switchStudy.isChecked,
-                newDeck = binding.switchNewDeck.isChecked,
-                achievement = binding.switchAchievement.isChecked
+            parentFragmentManager.setFragmentResult(
+                RESULT_KEY,
+                bundleOf(
+                    RESULT_STUDY to binding.switchStudy.isChecked,
+                    RESULT_NEW_DECK to binding.switchNewDeck.isChecked,
+                    RESULT_ACHIEVEMENT to binding.switchAchievement.isChecked
+                )
             )
             dismiss()
         }
@@ -96,6 +94,10 @@ class NotificationDialog : DialogFragment() {
         private const val ARG_STUDY = "arg_study"
         private const val ARG_NEW_DECK = "arg_new_deck"
         private const val ARG_ACHIEVEMENT = "arg_achievement"
+        const val RESULT_KEY = "notification_settings_result"
+        const val RESULT_STUDY = "result_study"
+        const val RESULT_NEW_DECK = "result_new_deck"
+        const val RESULT_ACHIEVEMENT = "result_achievement"
 
         fun newInstance(study: Boolean, newDeck: Boolean, achievement: Boolean): NotificationDialog =
             NotificationDialog().apply {

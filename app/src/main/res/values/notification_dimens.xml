@@ -13,4 +13,15 @@
     <dimen name="app_notification_title_size">14sp</dimen>
     <dimen name="app_notification_message_size">12sp</dimen>
     <dimen name="app_notification_min_width">320dp</dimen>
+    <dimen name="notification_settings_padding">18dp</dimen>
+    <dimen name="notification_settings_header_icon_size">20dp</dimen>
+    <dimen name="notification_settings_header_spacing">8dp</dimen>
+    <dimen name="notification_settings_title_size">20sp</dimen>
+    <dimen name="notification_settings_row_height">56dp</dimen>
+    <dimen name="notification_settings_row_padding_end">4dp</dimen>
+    <dimen name="notification_settings_text_size">16sp</dimen>
+    <dimen name="notification_settings_divider_height">1dp</dimen>
+    <dimen name="notification_settings_button_margin_top">16dp</dimen>
+    <dimen name="notification_settings_button_height">56dp</dimen>
+    <dimen name="notification_settings_button_radius">18dp</dimen>
 </resources>

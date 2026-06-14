@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.flashcardapp.AppSessionManager
 import com.example.flashcardapp.data.datasource.local.OfflineCardImageStore
 import com.example.flashcardapp.data.datasource.local.database.FlashCardDatabase
+import com.example.flashcardapp.data.datasource.local.session.NotificationEventStore
 import com.example.flashcardapp.data.datasource.local.session.AuthSessionStoreImpl
 import com.example.flashcardapp.data.datasource.remote.api.RetrofitClient
 import com.example.flashcardapp.data.repository.DeckRepository
@@ -106,6 +107,7 @@ class AppContainer(private val applicationContext: Context) {
         database.deckDao().deleteAllDecks()
         database.userProfileDao().deleteProfile()
         offlineCardImageStore.clearAllImages()
+        NotificationEventStore.clear(applicationContext)
     }
 
     val categoryRepository: CategoryRepository by lazy {

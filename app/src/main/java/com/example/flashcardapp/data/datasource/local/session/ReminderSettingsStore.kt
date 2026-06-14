@@ -14,7 +14,7 @@ object ReminderSettingsStore {
     data class ReminderSettings(
         val hour: Int = 8,
         val minute: Int = 0,
-        val enabled: Boolean = true
+        val enabled: Boolean = false
     )
 
     data class NotificationSettings(
@@ -28,7 +28,7 @@ object ReminderSettingsStore {
         return ReminderSettings(
             hour = prefs.getInt(KEY_REMINDER_HOUR, 8).coerceIn(0, 23),
             minute = prefs.getInt(KEY_REMINDER_MINUTE, 0).coerceIn(0, 59),
-            enabled = prefs.getBoolean(KEY_REMINDER_ENABLED, true)
+            enabled = prefs.getBoolean(KEY_REMINDER_ENABLED, false)
         )
     }
 

@@ -155,7 +155,7 @@
                         android:contentDescription="@string/learning_tts_read_answer"
                         android:padding="@dimen/learning_space_sm"
                         android:src="@drawable/ic_volume_up"
-                        android:tint="@color/learning_primary" />
+                        app:tint="@color/learning_primary" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>

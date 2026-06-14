@@ -7,10 +7,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.FlashcardApp
 import com.example.flashcardapp.R
+import com.example.flashcardapp.data.datasource.local.session.NotificationEventStore
+import com.example.flashcardapp.data.datasource.local.session.ReminderSettingsStore
 import com.example.flashcardapp.domain.model.Deck
 import com.example.flashcardapp.domain.model.Shortcut
 import com.example.flashcardapp.domain.model.study.StudyRecentSession
 import com.example.flashcardapp.domain.usecase.notification.GetUnreadNotificationCountUseCase
+import com.example.flashcardapp.presentation.common.notification.LocalUpdateNotificationHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,7 +60,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val deckRepository = appContainer.deckRepository
     private val studyUseCases = appContainer.studyUseCases
     private val studyRepository = appContainer.studyRepository
+    private val statisticsRepository = appContainer.statisticsRepository
     private val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
+    private val localNotificationHelper = LocalUpdateNotificationHelper(application)
     private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase =
         appContainer.getUnreadNotificationCountUseCase
 
@@ -74,6 +79,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var lastOpenedDeckId: String? = null
     private var recentlyStudiedDeckIds: List<String> = emptyList()
     private val reviewSyncMutex = Mutex()
+    private val notificationRefreshMutex = Mutex()
 
     init {
         syncDecksFromApi()
@@ -122,6 +128,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val recentSession = studyUseCases.getRecentSession().getOrNull()
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
+                    refreshLocalUpdateNotifications(decks)
                     val baseDecks = decks.map { deck ->
                         deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
                     }
@@ -185,6 +192,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
+                    refreshLocalUpdateNotifications(decks)
                     val baseDecks = decks.map { deck ->
                         deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
                     }
@@ -213,6 +221,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
+                    refreshLocalUpdateNotifications(decks)
                     val baseDecks = decks.map { deck ->
                         deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
                     }
@@ -397,6 +406,34 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         if (!isNetworkAvailable()) return
         reviewSyncMutex.withLock {
             studyUseCases.syncReviews()
+        }
+    }
+
+    private suspend fun refreshLocalUpdateNotifications(decks: List<Deck>) {
+        if (!isNetworkAvailable()) return
+        notificationRefreshMutex.withLock {
+            val settings = ReminderSettingsStore.getNotificationSettings(getApplication())
+            val newDeckIds = NotificationEventStore.updateKnownDeckIds(
+                getApplication(),
+                decks.mapTo(mutableSetOf()) { it.id }
+            )
+            if (settings.newDeck && newDeckIds.isNotEmpty()) {
+                val deckNames = decks.filter { it.id in newDeckIds }.map { it.name }
+                localNotificationHelper.showNewDecks(deckNames)
+            }
+
+            statisticsRepository.getAchievements()
+                .onSuccess { achievements ->
+                    val unlockedAchievements = achievements.filter { it.isUnlocked }
+                    val newlyUnlockedCodes = NotificationEventStore.updateUnlockedAchievements(
+                        getApplication(),
+                        unlockedAchievements.mapTo(mutableSetOf()) { it.code }
+                    )
+                    if (settings.achievement && newlyUnlockedCodes.isNotEmpty()) {
+                        unlockedAchievements.firstOrNull { it.code in newlyUnlockedCodes }
+                            ?.let { localNotificationHelper.showAchievement(it.title) }
+                    }
+                }
         }
     }
 
