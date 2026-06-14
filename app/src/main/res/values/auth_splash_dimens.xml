@@ -1,26 +1,19 @@
 <resources>
     <!-- Splash -->
-    <dimen name="splash_logo_width">220dp</dimen>
-    <dimen name="splash_logo_height">225dp</dimen>
     <dimen name="splash_title_margin_top">-12dp</dimen>
     <dimen name="splash_title_translation_y">-10dp</dimen>
-    <dimen name="splash_title_shadow_radius">10dp</dimen>
     <dimen name="splash_title_text_size">23sp</dimen>
     <dimen name="splash_subtitle_margin_top">2dp</dimen>
     <dimen name="splash_subtitle_translation_y">-10dp</dimen>
-    <dimen name="splash_subtitle_shadow_radius">6dp</dimen>
     <dimen name="splash_subtitle_text_size">14sp</dimen>
     <dimen name="splash_progress_label_margin_bottom">14dp</dimen>
-    <dimen name="splash_progress_label_shadow_radius">6dp</dimen>
     <dimen name="splash_progress_label_text_size">13sp</dimen>
     <dimen name="splash_progress_height">10dp</dimen>
-    <dimen name="splash_progress_margin_horizontal">34dp</dimen>
     <dimen name="splash_loading_margin_top">14dp</dimen>
     <dimen name="splash_loading_text_size">11sp</dimen>
     <dimen name="splash_progress_corner_radius">999dp</dimen>
 
     <!-- Auth shared -->
-    <dimen name="auth_screen_padding_horizontal">24dp</dimen>
     <dimen name="auth_screen_padding_top">32dp</dimen>
     <dimen name="auth_screen_padding_bottom">24dp</dimen>
     <dimen name="auth_back_button_size">32dp</dimen>
@@ -55,14 +48,8 @@
     <dimen name="auth_footer_margin_top">34dp</dimen>
 
     <!-- Login -->
-    <dimen name="login_back_margin_top">12dp</dimen>
-    <dimen name="login_title_margin_top">36dp</dimen>
     <dimen name="login_title_text_size">20sp</dimen>
     <dimen name="login_subtitle_margin_top">8dp</dimen>
-    <dimen name="login_logo_margin_top">72dp</dimen>
-    <dimen name="login_logo_text_size">84sp</dimen>
-    <dimen name="login_logo_text_size_min">32sp</dimen>
-    <dimen name="login_logo_text_step">1sp</dimen>
     <dimen name="login_button_margin_top">18dp</dimen>
     <dimen name="login_forgot_margin_top">8dp</dimen>
 
@@ -72,7 +59,6 @@
     <dimen name="register_terms_margin_top">10dp</dimen>
 
     <!-- Forgot password -->
-    <dimen name="forgot_bottom_shade_height">96dp</dimen>
     <dimen name="forgot_screen_padding_top">20dp</dimen>
     <dimen name="forgot_back_margin_top">12dp</dimen>
     <dimen name="forgot_title_margin_top">28dp</dimen>
@@ -80,26 +66,19 @@
     <dimen name="forgot_label_margin_top">30dp</dimen>
 
     <!-- OTP -->
-    <dimen name="otp_screen_padding_top">26dp</dimen>
-    <dimen name="otp_back_margin_top">8dp</dimen>
     <dimen name="otp_content_margin_top">44dp</dimen>
-    <dimen name="otp_icon_container_size">50dp</dimen>
     <dimen name="otp_icon_size">26dp</dimen>
     <dimen name="otp_title_margin_top">20dp</dimen>
     <dimen name="otp_title_text_size">20sp</dimen>
     <dimen name="otp_subtitle_margin_top">8dp</dimen>
-    <dimen name="otp_subtitle_width">240dp</dimen>
     <dimen name="otp_subtitle_text_size">13sp</dimen>
     <dimen name="otp_boxes_margin_top">26dp</dimen>
-    <dimen name="otp_box_size">40dp</dimen>
     <dimen name="otp_box_corner_radius">8dp</dimen>
-    <dimen name="otp_box_spacing">12dp</dimen>
     <dimen name="otp_digit_text_size">18sp</dimen>
     <dimen name="otp_resend_label_margin_top">22dp</dimen>
     <dimen name="otp_resend_margin_top">4dp</dimen>
     <dimen name="otp_resend_text_size">12sp</dimen>
     <dimen name="otp_button_margin_top">22dp</dimen>
-    <dimen name="otp_button_horizontal_margin">16dp</dimen>
     <dimen name="otp_button_height">48dp</dimen>
     <dimen name="otp_button_corner_radius">10dp</dimen>
     <dimen name="otp_button_elevation">6dp</dimen>

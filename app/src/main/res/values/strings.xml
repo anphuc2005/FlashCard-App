@@ -1,11 +1,5 @@
 <resources>
     <string name="app_name">Flashly</string>
-    <string name="app_loading">Đang chuẩn bị hành trình học tập của bạn...</string>
-
-    <string name="app_splash_1">Học nhanh, nhớ lâu</string>
-    <string name="app_splash_sub_1">Ghi nhớ kiến thức hiệu quả với phương pháp lặp lại ngắt quãng</string>
-    <string name="app_splash_2">Duy trì thói quen</string>
-    <string name="app_splash_sub_2">Hệ thống nhắc nhở thông minh giúp bạn không bỏ lỡ ngày học nào</string>
 
     <string name="app_login">Chào mừng trở lại</string>
     <string name="app_login_subtitle">Đăng nhập để tiếp tục học tập cùng cộng đồng flashcard.</string>
@@ -13,7 +7,6 @@
     <string name="app_login_email_hint">Nhập email của bạn</string>
     <string name="app_login_pass">Mật khẩu</string>
     <string name="app_login_pass_hint">Nhập mật khẩu của bạn</string>
-    <string name="app_login_forgot">Quên mật khẩu</string>
     <string name="app_login_forgot_question">Quên mật khẩu?</string>
     <string name="app_login_method">Hoặc đăng nhập bằng</string>
     <string name="app_login_not_account">Chưa có tài khoản?</string>
@@ -36,14 +29,8 @@
     <string name="app_register_login">Đăng nhập</string>
 
     <string name="app_forgot_pass">Quên mật khẩu</string>
-    <string name="app_forgot_pass_subtitle">Nhập email của bạn để lấy lại mật khẩu</string>
-    <string name="app_forgot_pass_hint">Email của bạn</string>
-    <string name="app_forgot_button">Gửi mã xác nhận</string>
 
     <string name="app_otp">Xác nhận mã OTP</string>
-    <string name="app_otp_sub">Mã đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến / thư rác</string>
-    <string name="app_otp_no_receive">Bạn chưa nhận được mã</string>
-    <string name="app_otp_resend">Gửi lại</string>
     <string name="app_otp_button">Xác nhận</string>
     <string name="app_reset_password">Đặt lại mật khẩu</string>
     <string name="dialog_check_email_message">Chúng tôi đã gửi mã xác minh đến %1$s. Vui lòng kiểm tra hộp thư (và cả thư rác).</string>
@@ -57,7 +44,6 @@
     <string name="app_home_learing">Đang học</string>
     <string name="app_home_progress">Tiến độ</string>
     <string name="app_home_study_now">Học ngay</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="item_deck_card_count">%d thẻ</string>
     <string name="home_progress_format">%d%%</string>
     <string name="home_no_active_deck">Không có bộ thẻ nào</string>
@@ -66,14 +52,10 @@
 
     <string name="app_deck">Bộ thẻ của tôi</string>
     <string name="app_session_setting_deck_count">Số lượng thẻ</string>
-    <string name="app_session_setting_deck_limit">Chọn giới hạn thẻ</string>
     <string name="app_deck_detail">Mô tả bộ thẻ</string>
     <string name="app_deck_detail_all_card">Tất cả</string>
     <string name="app_deck_detail_marked">Đánh dấu</string>
-    <string name="app_deck_detail_mastery">Thuần thục</string>
     <string name="app_front_card_learnProgress">Tiến độ học tập</string>
-    <string name="app_front_card_flipCard">Chạm để lật</string>
-    <string name="app_back_card_learnLesson">Bài học hôm nay</string>
     <string name="app_study_result">Kết quả học tập</string>
     <string name="app_study_result_congratulation">Tuyệt vời</string>
     <string name="app_study_result_congratulation_subTitle">Bạn đã hoàn thành xuất sắc phiên học này.\nHãy tiếp tục duy trì phong độ nhé!</string>
@@ -87,14 +69,10 @@
     <string name="otp_title">Xác nhận mã OTP</string>
     <string name="otp_subtitle">Mã đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến.</string>
     <string name="otp_no_code">Bạn không nhận được mã?</string>
-    <string name="otp_resend_countdown">Gửi lại mã (%1$ds)</string>
     <string name="otp_resend_ready">Gửi lại mã</string>
-    <string name="otp_error_incomplete">Vui lòng nhập đầy đủ mã OTP</string>
-    <string name="otp_resent_success">Đã gửi lại mã OTP</string>
     <string name="common_back">Quay lại</string>
     <string name="common_close">Đóng</string>
     <string name="home_welcome_back">Chào mừng trở lại</string>
-    <string name="home_welcome_subtitle">Sẵn sàng tiếp tục học tập cùng cộng đồng flashcard.</string>
     <string name="onboarding_skip">Bỏ qua</string>
     <string name="onboarding_continue">Tiếp tục</string>
     <string name="onboarding_start_now">Bắt đầu ngay</string>
@@ -118,7 +96,6 @@
     <string name="attach">Đính kèm</string>
     <string name="send">Gửi</string>
     <string name="ai_study_buddy">AI Study Buddy</string>
-    <string name="active_now">Active now</string>
     <string name="ask_anything">Ask anything about your deck...</string>
     <string name="chat_mic">Microphone</string>
     <string name="ai_avatar">AI Avatar</string>
@@ -129,17 +106,12 @@
     <string name="chat_new_session">Phiên chat mới</string>
     <string name="chat_history_empty">Bạn chưa có phiên chat nào.</string>
     <string name="chat_session_active">ĐANG MỞ</string>
-    <string name="chat_session_default_title">Phiên hiện tại</string>
     <string name="chat_session_current_default">PHIÊN HIỆN TẠI</string>
-    <string name="chat_session_new_title">Phiên mới %1$d</string>
-    <string name="chat_session_empty_preview">Chưa có tin nhắn</string>
     <string name="chat_session_delete_title">Xóa phiên chat?</string>
     <string name="chat_session_delete_message">Phiên "%1$s" sẽ bị xóa khỏi danh sách lịch sử tạm thời.</string>
-    <string name="chat_session_minimum_error">Bạn cần giữ lại ít nhất một phiên chat.</string>
     <string name="ai_confirm_create_deck">Xác nhận tạo</string>
     <string name="ai_cancel_create_deck">Hủy</string>
     <string name="ai_open_deck">Mở bộ thẻ</string>
-    <string name="error_message">Error: %s</string>
     <string name="reminder_notification_title">Đến giờ học rồi</string>
     <string name="reminder_notification_body">Duy trì thói quen mỗi ngày để nhớ lâu hơn.</string>
     <string name="reminder_notification_channel_name">Nhắc nhở học tập</string>
@@ -173,7 +145,6 @@
     <string name="stat_new_cards_title">Thẻ mới học</string>
     <string name="stat_new_cards_default">0 thẻ</string>
     <string name="stat_achievement_title">Thành tích</string>
-    <string name="stat_deck_progress_title">Tiến độ bộ thẻ</string>
     <string name="stat_no_achievement_data">Chưa có dữ liệu thành tích</string>
     <string name="stat_error_load">Không thể tải thống kê</string>
     <string name="stat_hello_name">Chào %1$s!</string>
@@ -191,7 +162,6 @@
     <string name="learning_stat_new">NEW</string>
     <string name="learning_start">Bắt đầu học</string>
     <string name="learning_session_title">Cài đặt phiên học</string>
-    <string name="learning_session_title_english">Learning Session</string>
     <string name="learning_session_progress">Tiến độ học tập</string>
     <string name="learning_exit_dialog_title">Thoát buổi học?</string>
     <string name="learning_exit_dialog_message">Bạn có chắc chắn muốn thoát? Tiến độ học hiện tại sẽ được lưu để học tiếp.</string>
@@ -207,7 +177,6 @@
     <string name="learning_order_random">Ngẫu nhiên</string>
     <string name="learning_order_ordered">Theo thứ tự</string>
     <string name="learning_order_time_attack">Đua thời gian</string>
-    <string name="learning_order_spaced_repetition">Lặp lại ngắt quãng (SM-2)</string>
     <string name="learning_time_limit_title">Giới hạn thời gian</string>
     <string name="learning_time_limit_one_minute">1 min</string>
     <string name="learning_time_limit_three_minutes">3 min</string>
@@ -215,7 +184,6 @@
     <string name="learning_card_type_title">Loại thẻ</string>
     <string name="learning_card_type_all">Tất cả</string>
     <string name="learning_card_type_new">Thẻ mới</string>
-    <string name="learning_card_type_review">Cần ôn</string>
     <string name="learning_start_now">Bắt đầu ngay</string>
     <string name="learning_progress_empty">0/0</string>
     <string name="learning_no_cards">Chưa có thẻ để học</string>
@@ -224,7 +192,6 @@
     <string name="learning_due_completed">Chúc mừng! Bạn đã hoàn thành tất cả các thẻ cần ôn tập cho hôm nay.</string>
     <string name="learning_no_answer">Chưa có câu trả lời</string>
     <string name="learning_question_label">Câu hỏi</string>
-    <string name="learning_hint_question">Gợi ý cho bạn?</string>
     <string name="learning_answer_label">Trả lời</string>
     <string name="learning_card_badge_review">ÔN TẬP</string>
     <string name="learning_card_badge_new">MỚI</string>
@@ -243,11 +210,8 @@
     <string name="learning_rating_easy_delay">7d</string>
     <string name="learning_card_preview_index">THẺ %1$d</string>
     <string name="learning_result_studied">Thẻ đã học</string>
-    <string name="learning_result_correct">Chính xác</string>
-    <string name="learning_result_incorrect">Sai sót</string>
     <string name="learning_result_time">Thời gian</string>
     <string name="learning_result_done">Hoàn thành</string>
-    <string name="learning_result_score_format">%1$d/%2$d</string>
     <string name="learning_result_time_format">%1$02d:%2$02d</string>
     <string name="app_notification_success_title">Thành công</string>
     <string name="app_notification_error_title">System Error</string>
@@ -281,12 +245,8 @@
     <string name="discover_all">Tất cả</string>
     <string name="discover_collapse">Thu gọn</string>
     <string name="discover_featured_lessons">Bài học nổi bật</string>
-    <string name="discover_see_more">Xem thêm</string>
-    <string name="discover_view_all">Xem toàn bộ</string>
-    <string name="discover_view_less">Thu gọn</string>
     <string name="discover_page_indicator">%1$d/%2$d</string>
     <string name="discover_next_page">Trang sau</string>
-    <string name="loading_default_message">Đang xử lý...</string>
     <string name="deck_search_hint">Tìm kiếm bộ thẻ...</string>
     <string name="discover_save_deck_title">Lưu bộ thẻ?</string>
     <string name="discover_save_deck_message">Bạn có muốn lưu bộ thẻ "%1$s" vào thư viện của mình không?</string>
@@ -306,25 +266,6 @@
     <string name="notifications_inbox_type_deck_warning">Cảnh báo bộ thẻ</string>
     <string name="notifications_inbox_type_report_result">Kết quả báo cáo</string>
     <string name="notifications_inbox_type_system">Thông báo hệ thống</string>
-    <string name="add_card_header_title">Thêm thẻ mới</string>
-    <string name="add_card_front_label">Mặt trước (câu hỏi)</string>
-    <string name="add_card_front_hint">Nhập nội dung câu hỏi tại đây...</string>
-    <string name="add_card_back_label">Mặt sau (câu trả lời)</string>
-    <string name="add_card_back_hint">Nhập câu trả lời hoặc định nghĩa...</string>
-    <string name="add_card_add_image">Thêm ảnh</string>
-    <string name="add_card_add_audio">Âm thanh</string>
-    <string name="add_card_selected">Đã chọn</string>
-    <string name="add_card_tag_label">Nhãn (tag)</string>
-    <string name="add_card_tag_hint">Ví dụ: Từ vựng, IELTS...</string>
-    <string name="add_card_note_label">Ghi chú</string>
-    <string name="add_card_note_hint">Thêm ghi chú (không bắt buộc)</string>
-    <string name="add_card_add_another">Tiếp tục: Thêm thẻ tiếp theo</string>
-    <string name="add_card_save_all">Hoàn tất: Lưu bộ thẻ</string>
-    <string name="add_card_permission_image_denied">Cần cấp quyền để thêm ảnh.</string>
-    <string name="add_card_permission_audio_denied">Cần cấp quyền để thêm âm thanh.</string>
-    <string name="add_card_save_success">Đã lưu thẻ thành công.</string>
-    <string name="add_card_uploading_image">Đang tải ảnh lên...</string>
-    <string name="add_card_upload_image_success">Đã tải ảnh lên.</string>
     <string name="logout_confirm_title">Đăng xuất?</string>
     <string name="logout_confirm_message">Bạn có chắc chắn muốn đăng xuất?</string>
     <string name="logout_confirm_action">Đăng xuất</string>
