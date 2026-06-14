@@ -92,6 +92,7 @@ class HomeFragment : Fragment() {
         loadReminderAndNotificationSettings()
 
         setupAdapters()
+        setupSwipeRefresh()
         binding.tvProgressPercent.text = getString(R.string.home_progress_format, 0)
         binding.progressBar.setProgress(0f)
         observeUiState()
@@ -201,8 +202,23 @@ class HomeFragment : Fragment() {
                     state.error?.let { error ->
                         showError(error)
                     }
+
+                    // Handle swipe refresh state
+                    binding.swipeRefreshLayout.isRefreshing = state.isRefreshing
                 }
             }
+        }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setColorSchemeResources(
+            R.color.md_icon_blue,
+            R.color.md_icon_purple,
+            R.color.md_icon_red
+        )
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshAll()
+            loadUserAvatar(forceRefresh = true)
         }
     }
 

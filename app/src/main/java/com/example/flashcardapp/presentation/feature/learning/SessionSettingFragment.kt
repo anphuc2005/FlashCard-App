@@ -150,7 +150,6 @@ class SessionSettingFragment : Fragment() {
         val mode = LearningStudyMode.fromSessionMode(intent.getStringExtra(EXTRA_STUDY_MODE))
         val startIndex = intent.getIntExtra(EXTRA_START_INDEX, 0).coerceAtLeast(0)
         val cardSequence = intent.getStringArrayListExtra(EXTRA_CARD_SEQUENCE)?.toList().orEmpty()
-        intent.putExtra(EXTRA_AUTO_START_SESSION, false)
 
         viewModel.startSession(
             initialIndex = startIndex,
@@ -158,7 +157,10 @@ class SessionSettingFragment : Fragment() {
             forcedCardSequence = cardSequence
         ) { isReady ->
             if (isReady && isAdded) {
+                intent.putExtra(EXTRA_AUTO_START_SESSION, false)
                 findNavController().navigate(R.id.action_sessionSettingFragment_to_learningCardsFragment)
+            } else {
+                hasAutoStartHandled = false
             }
         }
     }

@@ -150,6 +150,8 @@ class LearningCardsFragment : Fragment() {
         }
     }
 
+    private var hasHandledEmptySession = false
+
     private fun renderState(state: LearningUiState) {
         val cards = state.sessionCards
         if (pagerAdapter.currentList != cards) {
@@ -171,7 +173,18 @@ class LearningCardsFragment : Fragment() {
         val isBackFace = pagerAdapter.isPositionFlipped(safeIndex)
         updateBottomAction(isBackFace = isBackFace, enabled = !state.isCompleted)
 
-        if (pageCount == 0) return
+        if (pageCount == 0) {
+            if (!state.isLoading && !hasHandledEmptySession) {
+                hasHandledEmptySession = true
+                Log.w(TAG, "renderState: sessionCards empty and not loading, popping back")
+                val errorMsg = state.errorMessage ?: getString(R.string.learning_no_cards)
+                Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    findNavController().popBackStack()
+                }
+            }
+            return
+        }
         if (binding.viewPagerCards.currentItem != safeIndex) {
             binding.viewPagerCards.setCurrentItem(safeIndex, false)
         }
@@ -179,6 +192,7 @@ class LearningCardsFragment : Fragment() {
 
     private fun handleCompletion(state: LearningUiState) {
         if (!state.isCompleted) return
+        if (state.sessionCards.isEmpty()) return
         val navController = findNavController()
         if (navController.currentDestination?.id == R.id.learningCardsFragment) {
             navController.navigate(R.id.action_learningCardsFragment_to_studyResultFragment)

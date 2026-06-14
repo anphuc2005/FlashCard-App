@@ -23,6 +23,7 @@ import kotlin.math.roundToInt
 
 data class HomeUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val activeDeck: Deck? = null,
     val recentDecks: List<Deck> = emptyList(),
     val recentStudySession: StudyRecentSession? = null,
@@ -166,17 +167,53 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         syncDecksFromApi()
     }
 
+    fun refreshAll() {
+        _uiState.value = _uiState.value.copy(isRefreshing = true)
+        viewModelScope.launch {
+            val recentSession = studyUseCases.getRecentSession().getOrNull()
+
+            deckRepository.getAllDecksFromApi()
+                .onSuccess { decks ->
+                    val baseDecks = decks.map { deck ->
+                        deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
+                    }
+                    val enrichedDecks = enrichDecksWithProgress(baseDecks)
+                    cachedDecks = enrichedDecks
+                    publishDecks(enrichedDecks, recentSession)
+                }
+                .onFailure {
+                    if (cachedDecks.isNotEmpty()) {
+                        val refreshedDecks = enrichDecksWithProgress(cachedDecks)
+                        cachedDecks = refreshedDecks
+                        publishDecks(refreshedDecks, recentSession)
+                    }
+                }
+
+            refreshUnreadNotificationCount()
+            _uiState.value = _uiState.value.copy(isRefreshing = false)
+        }
+    }
+
     fun refreshHomeRealtime() {
         viewModelScope.launch {
-            if (cachedDecks.isEmpty()) {
-                return@launch
-            }
-
-            val refreshedDecks = enrichDecksWithProgress(cachedDecks)
-            cachedDecks = refreshedDecks
             val recentSession = studyUseCases.getRecentSession().getOrNull()
-                ?: _uiState.value.recentStudySession
-            publishDecks(refreshedDecks, recentSession)
+
+            deckRepository.getAllDecksFromApi()
+                .onSuccess { decks ->
+                    val baseDecks = decks.map { deck ->
+                        deck.copy(customCardCount = deck.cardCount.coerceAtLeast(0))
+                    }
+                    val enrichedDecks = enrichDecksWithProgress(baseDecks)
+                    cachedDecks = enrichedDecks
+                    publishDecks(enrichedDecks, recentSession)
+                }
+                .onFailure {
+                    if (cachedDecks.isNotEmpty()) {
+                        val refreshedDecks = enrichDecksWithProgress(cachedDecks)
+                        cachedDecks = refreshedDecks
+                        publishDecks(refreshedDecks, recentSession)
+                    }
+                }
         }
     }
 
@@ -235,7 +272,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         onResult(
                             ResumeSessionPayload(
                                 mode = recentSession.mode,
-                                currentIndex = recentSession.currentIndex.coerceAtLeast(0),
+                                currentIndex = 0,
                                 cardSequence = emptyList()
                             ),
                             null

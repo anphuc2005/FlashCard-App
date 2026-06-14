@@ -55,7 +55,13 @@ class LearningActivity : AppCompatActivity() {
         val navGraph = navController.navInflater.inflate(R.navigation.nav_learning)
         navController.setGraph(
             navGraph,
-            Bundle().apply { putString(EXTRA_DECK_ID, deckId) }
+            Bundle().apply {
+                putString(EXTRA_DECK_ID, deckId)
+                putBoolean(EXTRA_AUTO_START_SESSION, intent.getBooleanExtra(EXTRA_AUTO_START_SESSION, false))
+                putString(EXTRA_STUDY_MODE, intent.getStringExtra(EXTRA_STUDY_MODE))
+                putInt(EXTRA_START_INDEX, intent.getIntExtra(EXTRA_START_INDEX, 0))
+                putStringArrayList(EXTRA_CARD_SEQUENCE, intent.getStringArrayListExtra(EXTRA_CARD_SEQUENCE))
+            }
         )
     }
 }

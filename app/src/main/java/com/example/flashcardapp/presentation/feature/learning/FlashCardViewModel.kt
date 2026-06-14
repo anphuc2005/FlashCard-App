@@ -164,18 +164,18 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
                 deck = deck,
                 cards = cards,
                 reviewedCardIds = reviewedCardIds,
-                sessionCards = emptyList(),
-                settings = currentState.settings.copy(cardLimit = defaultLimit),
-                currentIndex = 0,
-                ratings = emptyMap(),
+                sessionCards = if (currentState.isSessionStarted) currentState.sessionCards else emptyList(),
+                settings = if (currentState.isSessionStarted) currentState.settings else currentState.settings.copy(cardLimit = defaultLimit),
+                currentIndex = if (currentState.isSessionStarted) currentState.currentIndex else 0,
+                ratings = if (currentState.isSessionStarted) currentState.ratings else emptyMap(),
                 isLoading = false,
                 errorMessage = if (cards.isEmpty()) deckResult.exceptionOrNull()?.message else null,
-                isCompleted = false,
-                isSessionStarted = false,
-                isTimeExpired = false,
+                isCompleted = if (currentState.isSessionStarted) currentState.isCompleted else false,
+                isSessionStarted = currentState.isSessionStarted,
+                isTimeExpired = if (currentState.isSessionStarted) currentState.isTimeExpired else false,
                 isOfflineMode = isOfflineResult,
-                timeRemainingSeconds = null,
-                result = LearningResult()
+                timeRemainingSeconds = if (currentState.isSessionStarted) currentState.timeRemainingSeconds else null,
+                result = if (currentState.isSessionStarted) currentState.result else LearningResult()
             )
         }
     }
@@ -271,6 +271,7 @@ class FlashCardViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
         viewModelScope.launch {
+            deckLoadJob?.cancel()
             timerJob?.cancel()
             syncPendingReviews()
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
