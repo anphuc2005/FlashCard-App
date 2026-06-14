@@ -25,6 +25,16 @@ interface StudyReviewDao {
     @Query("SELECT DISTINCT cardId FROM study_review_table WHERE deckId = :deckId")
     suspend fun getReviewedCardIds(deckId: String): List<String>
 
+    @Query(
+        """
+        SELECT deckId
+        FROM study_review_table
+        GROUP BY deckId
+        ORDER BY MAX(studiedAt) DESC
+        """
+    )
+    suspend fun getRecentlyStudiedDeckIds(): List<String>
+
     @Query("DELETE FROM study_review_table WHERE id IN (:ids)")
     suspend fun deleteReviews(ids: List<String>)
 

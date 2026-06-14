@@ -40,6 +40,7 @@ import com.example.flashcardapp.domain.usecase.profile.UpdateMyProfileUseCase
 import com.example.flashcardapp.domain.usecase.upload.UploadImageUseCase
 import com.example.flashcardapp.domain.usecase.study.GetStudySessionCardsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetCachedStudySessionCardsUseCase
+import com.example.flashcardapp.domain.usecase.study.GetRecentlyStudiedDeckIdsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetReviewedCardIdsUseCase
 import com.example.flashcardapp.domain.usecase.study.GetCurrentStudyStreakUseCase
 import com.example.flashcardapp.domain.usecase.study.GetRecentStudySessionUseCase
@@ -255,6 +256,7 @@ class AppContainer(private val applicationContext: Context) {
                 saveSessionState = SaveStudySessionStateUseCase(studyRepository),
                 deleteSessionByDeck = DeleteStudySessionByDeckUseCase(studyRepository),
                 getReviewedCardIds = GetReviewedCardIdsUseCase(studyRepository),
+                getRecentlyStudiedDeckIds = GetRecentlyStudiedDeckIdsUseCase(studyRepository),
                 saveReview = SaveStudyReviewUseCase(studyRepository),
                 syncReviews = SyncStudyReviewsUseCase(studyRepository),
                 getCurrentStreak = GetCurrentStudyStreakUseCase(studyRepository),

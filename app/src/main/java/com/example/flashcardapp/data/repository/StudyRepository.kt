@@ -260,6 +260,16 @@ class StudyRepository(
         }
     }
 
+    suspend fun getRecentlyStudiedDeckIds(): Result<List<String>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Result.success(studyReviewDao.getRecentlyStudiedDeckIds())
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
     suspend fun syncReviews(): Result<Int> {
         return withContext(Dispatchers.IO) {
             try {

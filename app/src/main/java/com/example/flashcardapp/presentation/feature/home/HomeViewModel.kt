@@ -1,6 +1,8 @@
 package com.example.flashcardapp.presentation.feature.home
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flashcardapp.FlashcardApp
@@ -13,6 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -53,6 +57,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val deckRepository = appContainer.deckRepository
     private val studyUseCases = appContainer.studyUseCases
     private val studyRepository = appContainer.studyRepository
+    private val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
     private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase =
         appContainer.getUnreadNotificationCountUseCase
 
@@ -67,6 +72,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private var cachedDecks: List<Deck> = emptyList()
     private var lastOpenedDeckId: String? = null
+    private var recentlyStudiedDeckIds: List<String> = emptyList()
+    private val reviewSyncMutex = Mutex()
 
     init {
         syncDecksFromApi()
@@ -82,7 +89,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 parseTimestampMillis(deck.createdAt)
             )
         }
-        val prioritizedDecks = prioritizeRecentDeck(sortedDecks, recentStudySession)
+        val prioritizedDecks = prioritizeRecentDecks(sortedDecks, recentStudySession)
         val activeDeck = findActiveDeck(prioritizedDecks, recentStudySession)
         val progressRaw = activeDeck?.let { deck ->
             if (deck.cardCount > 0) {
@@ -110,6 +117,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun syncDecksFromApi() {
         viewModelScope.launch {
+            syncPendingReviews()
+            refreshRecentlyStudiedDeckIds()
             val recentSession = studyUseCases.getRecentSession().getOrNull()
             deckRepository.getAllDecksFromApi()
                 .onSuccess { decks ->
@@ -170,6 +179,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun refreshAll() {
         _uiState.value = _uiState.value.copy(isRefreshing = true)
         viewModelScope.launch {
+            syncPendingReviews()
+            refreshRecentlyStudiedDeckIds()
             val recentSession = studyUseCases.getRecentSession().getOrNull()
 
             deckRepository.getAllDecksFromApi()
@@ -196,6 +207,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshHomeRealtime() {
         viewModelScope.launch {
+            syncPendingReviews()
+            refreshRecentlyStudiedDeckIds()
             val recentSession = studyUseCases.getRecentSession().getOrNull()
 
             deckRepository.getAllDecksFromApi()
@@ -373,13 +386,42 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun prioritizeRecentDeck(
+    private suspend fun refreshRecentlyStudiedDeckIds() {
+        studyUseCases.getRecentlyStudiedDeckIds()
+            .onSuccess { deckIds ->
+                recentlyStudiedDeckIds = deckIds
+            }
+    }
+
+    private suspend fun syncPendingReviews() {
+        if (!isNetworkAvailable()) return
+        reviewSyncMutex.withLock {
+            studyUseCases.syncReviews()
+        }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
+
+    private fun prioritizeRecentDecks(
         decks: List<Deck>,
         recentSession: StudyRecentSession?
     ): List<Deck> {
-        val recentDeckId = recentSession?.deckId ?: return decks
-        val recentDeck = decks.firstOrNull { it.id == recentDeckId } ?: return decks
-        return listOf(recentDeck) + decks.filterNot { it.id == recentDeckId }
+        val prioritizedIds = buildList {
+            lastOpenedDeckId?.let(::add)
+            addAll(recentlyStudiedDeckIds)
+            recentSession?.deckId?.let(::add)
+        }.distinct()
+        if (prioritizedIds.isEmpty()) return decks
+
+        val decksById = decks.associateBy { it.id }
+        val prioritizedDecks = prioritizedIds.mapNotNull(decksById::get)
+        val prioritizedDeckIds = prioritizedDecks.mapTo(mutableSetOf()) { it.id }
+        return prioritizedDecks + decks.filterNot { it.id in prioritizedDeckIds }
     }
 
     private fun findActiveDeck(

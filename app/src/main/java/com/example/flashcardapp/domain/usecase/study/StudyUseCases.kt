@@ -8,6 +8,7 @@ data class StudyUseCases(
     val saveSessionState: SaveStudySessionStateUseCase,
     val deleteSessionByDeck: DeleteStudySessionByDeckUseCase,
     val getReviewedCardIds: GetReviewedCardIdsUseCase,
+    val getRecentlyStudiedDeckIds: GetRecentlyStudiedDeckIdsUseCase,
     val saveReview: SaveStudyReviewUseCase,
     val syncReviews: SyncStudyReviewsUseCase,
     val getCurrentStreak: GetCurrentStudyStreakUseCase,
